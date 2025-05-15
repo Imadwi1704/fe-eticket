@@ -135,7 +135,10 @@ export default function ticketAdminPage() {
         <div className="container">
           <div className="card w-100 shadow-none">
             <div className="card-body p-5">
-              <h2 className="fw-semibold mb-4">Data Tiket</h2>
+              <h2 className="card-title fw-semibold text-left mb-2">Data Tiket Museum Lampung</h2>
+              <p className="mb-4">
+                Berfungsi untuk melakukan Create, Read, Upadate, dan Delet Data Tiket pada Museum Lampung.
+              </p>
               <div className="d-flex justify-content-end mb-3">
                 <button className="btn btn-success" onClick={handleAddTicket}>
                   + Tambah Data

@@ -40,7 +40,7 @@ export default function UserPage() {
         <div className="col-lg-12">
           <div className="card w-100">
             <div className="card-body p-4">
-              <h2 className="card-title fw-semibold text-left mb-2">Data User</h2>
+              <h2 className="card-title fw-semibold text-left mb-2">Data User Pengunjung</h2>
               <p className="mb-4">
                 Berfungsi untuk melihat data user pengunjung yang sudah mendaftar akun.
               </p>

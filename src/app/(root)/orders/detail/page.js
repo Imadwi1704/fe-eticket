@@ -2,15 +2,11 @@
  import Navbar from "@/components/Navbar";
  import Footer from "@/components/Footer";
  
- export default function Historynext() {
+ export default function DetailPage() {
    return (
      <>
        <Navbar />
-                    <div className="modal-body">
-                      <p>
-                        Pastikan tiket yang dipilih dan jumlahnya sesuai dengan
-                        jumlah pengunjung!
-                      </p>
+                    <div>
                       <p>
                         <strong>Tanggal Berkunjung:</strong> {selectedDate}
                       </p>

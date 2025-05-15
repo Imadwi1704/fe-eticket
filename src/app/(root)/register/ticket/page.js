@@ -118,11 +118,12 @@ export default function Ticket() {
                           <div className="card-body">
                             <h6 className="fw-bold">{Ticket.type}</h6>
                             <p className="text-muted small">
-                              *Syarat & ketentuan berlaku
+                              *Syarat & ketentuan berlaku*
+                              <br />{Ticket.terms}
                             </p>
                             <div className="d-flex align-items-center gap-2">
                               <span className="fw-bold">
-                                IDR {Ticket.price.toLocaleString("id-ID")}
+                                Rp {Ticket.price.toLocaleString("id-ID")}
                               </span>
                               <button
                                 className="btn border"

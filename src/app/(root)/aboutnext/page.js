@@ -277,7 +277,7 @@ export default function Aboutnext() {
                 ))}
               </ul>
               <Link
-                href="/loginuser/ticket"
+                href="/register/ticket"
                 className="btn text-white fw-bold mt-3"
                 style={{
                   backgroundColor: "#714D29",
