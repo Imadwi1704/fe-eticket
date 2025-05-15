@@ -19,7 +19,7 @@ export default function Navbar() {
     { name: "Sejarah", path: "/historynext" },
     { name: "Koleksi", path: "/venues" },
     { name: "Galeri", path: "/galeri" },
-    { name: "Contacts", path: "/contacts" },
+    { name: "Review & Contact", path: "/contacts" },
   ];
 
   useEffect(() => {

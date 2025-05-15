@@ -1,110 +1,122 @@
 "use client";
+
+import Head from "next/head";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Image from "next/image";
-import { useState } from "react";
-import lampungLogo from "@/public/lampung-logo.png"; // pastikan file ini ada di /public
 
-export default function DetailPage() {
-   const [selectedDate, setSelectedDate] = useState("");
-    const [selectedTicket, setSelectedTicket] = useState([]);
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [ticket, setTicket] = useState([]);
-    const token = getCookie("token");
-  
-    useEffect(() => {
-      if (!token) return;
-  
-      const fetchData = async () => {
-        try {
-          const res = await fetch("http://localhost:5001/api/ticket", {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-  
-          const result = await res.json();
-          if (res.ok) {
-            setTicket(result);
-          } else {
-            console.error("Gagal mengambil data:", result?.message || "Tidak diketahui");
-          }
-        } catch (error) {
-          console.error("Terjadi kesalahan saat fetch:", error);
-        }
-      };
-  
-      fetchData();
-    }, [token]);
-  
-    const handleSelectTicket = (Ticket) => {
-      const existing = selectedTicket.find((item) => item.id === Ticket.id);
-      let updated;
-      if (existing) {
-        updated = selectedTicket.map((item) =>
-          item.id === Ticket.id ? { ...item, qty: item.qty + 1 } : item
-        );
-      } else {
-        updated = [...selectedTicket, { ...Ticket, qty: 1 }];
-      }
-      setSelectedTicket(updated);
-      updateTotal(updated);
-    };
-  
-    const updateTotal = (list) => {
-      const total = list.reduce((sum, item) => sum + item.price * item.qty, 0);
-      setTotalPrice(total);
-    };
-  
+export default function Ordersnext() {
   return (
     <>
       <Navbar />
-
-      <div className="flex justify-center items-center py-10 bg-[#fdf8e4] min-h-screen">
-        <div className="bg-[#fef9dc] rounded-xl shadow-md p-6 relative w-[90%] max-w-lg">
-          {/* Header */}
-          <div className="absolute top-3 right-3 bg-white text-sm px-3 py-1 rounded-full font-bold text-[#bd7b00] shadow">
-            ERUWAIJURAI
-          </div>
-
-          {/* Detail */}
-          <div className="text-gray-800 space-y-2">
-            <p><strong>Kode Pemesanan:</strong> #ORD123456</p>
-            <p><strong>Date:</strong></p>
-
-            {selectedTicket.map((item) => (
-              <p key={item.id}>
-                <strong>{item.type}:</strong> {item.qty} x Rp {item.price.toLocaleString("id-ID")}
-              </p>
-            ))}
-
-            <p><strong>Metode Pembayaran:</strong> Transfer Bank</p>
-
-            <p className="font-bold text-lg mt-3">
-              Total Pembayaran: Rp {totalPrice.toLocaleString("id-ID")}
-            </p>
-
-            {/* Tombol */}
-            <div className="mt-4">
-              <button
-                className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2"
-                onClick={() => alert("Tiket berhasil diunduh!")}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M.5 9.9v4.6h15V9.9h-2V13H2.5V9.9h-2zM8 1.5v8.6l2.9-2.9 1.1 1.1L8 13 3 8.3l1.1-1.1L7 10.1V1.5H8z"/>
-                </svg>
-                Download Tiket
-              </button>
+      
+      {/* Main Content */}
+      <main className="container py-5">
+        <section className="card border-0 shadow-lg">
+          <div className="card-body p-4 p-md-5">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h2 className="h3 fw-bold text-dark mb-0">History Pemesanan</h2>
+              <div className="d-flex gap-2">
+                <button className="btn btn-outline-secondary btn-sm">
+                  <i className="bi bi-filter"></i> Filter
+                </button>
+                <button className="btn btn-outline-secondary btn-sm">
+                  <i className="bi bi-sort-down"></i> Urutkan
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Logo */}
-          <div className="absolute bottom-4 right-4 opacity-30 w-32">
-            <Image src={lampungLogo} alt="Logo Lampung" />
+            {/* Table Section */}
+            <div className="table-responsive rounded-3 overflow-hidden">
+              <table className="table table-hover mb-0">
+                <thead className="bg-gradient-primary text-white">
+                  <tr>
+                    <th className="text-center">No</th>
+                    <th>Kode Pemesanan</th>
+                    <th>Tiket</th>
+                    <th className="text-center">Jumlah</th>
+                    <th>Tanggal</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th className="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Contoh Data Dummy */}
+                  <tr>
+                    <td className="text-center align-middle">1</td>
+                    <td className="align-middle">
+                      <span className="badge bg-light text-dark border">ORD123456</span>
+                    </td>
+                    <td className="align-middle">
+                      <div className="d-flex flex-column">
+                        <span className="fw-medium">Tiket Reguler</span>
+                        <small className="text-muted">Museum Negeri</small>
+                      </div>
+                    </td>
+                    <td className="text-center align-middle">2</td>
+                    <td className="align-middle">
+                      <div className="d-flex flex-column">
+                        <span>2025-05-01</span>
+                        <small className="text-muted">10:00 WIB</small>
+                      </div>
+                    </td>
+                    <td className="align-middle">
+                      <span className="badge bg-success bg-opacity-10 text-success rounded-pill fw-medium">
+                        <i className="bi bi-check-circle me-2"></i>Berhasil
+                      </span>
+                    </td>
+                    <td className="align-middle fw-medium">Rp 100.000</td>
+                    <td><a href="/orders/detail"><i className="bi bi-eye me-2"></i></a></td>
+                    <td><a href="/"><i className="bi bi-printer me-2"></i></a></td>
+                  </tr>
+
+                  {/* Contoh Data Lain */}
+                  <tr>
+                    <td className="text-center align-middle">2</td>
+                    <td className="align-middle">
+                      <span className="badge bg-light text-dark border">ORD789012</span>
+                    </td>
+                    <td className="align-middle">
+                      <div className="d-flex flex-column">
+                        <span className="fw-medium">Tiket VIP</span>
+                        <small className="text-muted">Paket Tur Lengkap</small>
+                      </div>
+                    </td>
+                    <td className="text-center align-middle">4</td>
+                    <td className="align-middle">
+                      <div className="d-flex flex-column">
+                        <span>2025-05-02</span>
+                        <small className="text-muted">13:30 WIB</small>
+                      </div>
+                    </td>
+                    <td className="align-middle">
+                      <span className="badge bg-warning bg-opacity-10 text-warning rounded-pill fw-medium">
+                        <i className="bi bi-clock-history me-2"></i>Pending
+                      </span>
+                    </td>
+                    <td className="align-middle fw-medium">Rp 450.000</td>
+                    <td className="text-center align-middle">
+                      {/* Dropdown Menu sama */}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <nav className="d-flex justify-content-end mt-4">
+              <ul className="pagination">
+                <li className="page-item"><a className="page-link" href="#"><i className="bi bi-chevron-left"></i></a></li>
+                <li className="page-item active"><a className="page-link" href="#">1</a></li>
+                <li className="page-item"><a className="page-link" href="#">2</a></li>
+                <li className="page-item"><a className="page-link" href="#">3</a></li>
+                <li className="page-item"><a className="page-link" href="#"><i className="bi bi-chevron-right"></i></a></li>
+              </ul>
+            </nav>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
 
       <Footer />
     </>
