@@ -69,7 +69,7 @@ export default function DetailPage() {
             </div>
 
             <div className="mb-3">
-              <p>Kode Pemesanan:#ORD123456</p>
+              <p>Kode Pemesanan:</p>
               <p>Tanggal Berkunjung:{selectedDate}</p>
               <p>Rincian Pemesanan:</p>
               <ul>
