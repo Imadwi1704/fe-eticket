@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Footer from "@/components/Footer";
 import Script from "next/script";
 import { getCookie } from "cookies-next";
-import {FiImage } from "react-icons/fi";
-import {useSearchParams } from "next/navigation";
-
+import { FiImage } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 export default function VenuesPage() {
   const searchParam = useSearchParams();
@@ -15,7 +16,11 @@ export default function VenuesPage() {
   const [selectedVenue, setSelectedVenue] = useState(id || null);
   const token = getCookie("token");
 
-  const handleSelectedVenue = venues.find((item) => item.id === selectedVenue)
+  const handleSelectedVenue = venues.find((item) => item.id === Number(selectedVenue));
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -44,10 +49,10 @@ export default function VenuesPage() {
   }, [token]);
 
   useEffect(() => {
-    if(id) {
-      setSelectedVenue(Number(id))
-    };
-  }, [id])
+    if (id) {
+      setSelectedVenue(Number(id));
+    }
+  }, [id]);
 
   return (
     <>
@@ -66,21 +71,18 @@ export default function VenuesPage() {
           />
           <div
             className="position-absolute top-0 start-0 w-100 h-100"
-            style={{
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1,
-            }}
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1 }}
           ></div>
           <div
             className="position-absolute top-50 start-50 translate-middle text-center"
             style={{ zIndex: 2 }}
           >
-            <h2 className="text-white fw-bold d-inline-block pb-2">
+            <h2 className="text-white fw-bold d-inline-block pb-2" data-aos="zoom-in">
               Koleksi Museum Lampung
               <span
                 className="d-block mx-auto mt-2"
                 style={{
-                  width: "80px", 
+                  width: "80px",
                   height: "5px",
                   backgroundColor: "#FFFFFF",
                   borderRadius: "20px",
@@ -93,19 +95,19 @@ export default function VenuesPage() {
         <div className="container my-5">
           {/* Detail Venue */}
           {handleSelectedVenue && (
-            <div className="row mb-5">
+            <div className="row mb-5" data-aos="fade-up">
               <div className="col-12">
                 <div className="card shadow-sm border-0">
-                {handleSelectedVenue.photo ? (
+                  {handleSelectedVenue.photo ? (
                     <img
                       src={`http://localhost:5001/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
-                      style={{ height: "300px" }}
+                      style={{ height: "300px", objectFit: "cover" }}
                       crossOrigin="anonymous"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "data:image/svg+xml;base64,….";
+                        e.target.src = "https://via.placeholder.com/300x300?text=Image+Not+Found";
                       }}
                     />
                   ) : (
@@ -132,58 +134,84 @@ export default function VenuesPage() {
           )}
 
           {/* Venue Cards */}
+<div
+  className="d-flex overflow-auto pb-3 px-2"
+  style={{
+    gap: "1rem",
+    scrollSnapType: "x mandatory",
+    marginTop: selectedVenue ? "40px" : "0",
+  }}
+>
+  {venues.length > 0 ? (
+    venues.map((venue, index) => (
+      <div
+        key={venue.id}
+        className="card border-0 shadow-sm rounded-4 bg-white hover-shadow transition-all"
+        onClick={() => setSelectedVenue(venue.id)}
+        style={{
+          minWidth: "270px",
+          flex: "0 0 auto",
+          cursor: "pointer",
+          scrollSnapAlign: "start",
+          transition: "transform 0.3s ease, box-shadow 0.3s ease",
+        }}
+        data-aos="zoom-in-up"
+        data-aos-delay={index * 100}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.03)";
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.15)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.10)";
+        }}
+      >
+        <div className="overflow-hidden rounded-top-4 position-relative">
+          {venue.photo ? (
+            <img
+              style={{ width: "100%", height: "200px", objectFit: "cover" }}
+              src={`http://localhost:5001/uploads/${venue.photo}?t=${new Date().getTime()}`}
+              alt={venue.name}
+              className="img-fluid"
+              crossOrigin="anonymous"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/270x200?text=No+Image";
+              }}
+            />
+          ) : (
+            <div
+              className="d-flex justify-content-center align-items-center bg-light"
+              style={{ width: "100%", height: "200px" }}
+            >
+              <FiImage className="text-muted" size={40} />
+            </div>
+          )}
           <div
-            className="d-flex overflow-auto pb-2"
-            style={{
-              gap: "1rem",
-              scrollSnapType: "x mandatory",
-              marginTop: selectedVenue ? "40px" : "0",
-            }}
+            className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-dark text-white rounded"
+            style={{ fontSize: "12px", opacity: 0.85 }}
           >
-            {venues.length > 0 ? (
-              venues.map((venue) => ( 
-                <div
-                  key={venue.id}
-                  className="card shadow-sm border-0"
-                  onClick={() => setSelectedVenue(venue.id)}
-                  style={{
-                    minWidth: "250px",
-                    flex: "0 0 auto",
-                    cursor: "pointer",
-                    scrollSnapAlign: "start",
-                  }}
-                >
-                   <div className="flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border border-gray-200">
-                      {venue.photo ? (
-                        <img
-                          style={{ width: 250, height: 250 }}
-                          src={`http://localhost:5001/uploads/${venue.photo}?t=${new Date().getTime()}`}
-                          alt={venue.name}
-                          className="object-cover"
-                          crossOrigin="anonymous"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "data:image/svg+xml;base64,…";
-                          }}
-                        />
-                          ) : (
-                            <FiImage className="text-gray-400 h-5 w-5" />
-                          )}
-                      
-                  <div className="card-body">
-                    <h5 className="card-title fw-bold">{venue.name}</h5>
-                    <p className="text-muted mb-1">
-                      <strong>Tahun:</strong> {venue.year}
-                    </p>
-                    <p className="card-text">{venue.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center w-100 text-muted">Belum ada data venue.</p>
-            )}
+            {venue.year}
           </div>
+        </div>
+
+        <div className="card-body px-3 py-2">
+          <h5 className="card-title fw-semibold text-dark mb-2">{venue.name}</h5>
+          <p className="text-muted small mb-2">{venue.description?.slice(0, 80)}...</p>
+          <div className="d-flex justify-content-between align-items-center">
+            <span className="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">
+              Koleksi
+            </span>
+            <small className="text-muted">Klik untuk detail</small>
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-center w-100 text-muted">Belum ada data venue.</p>
+  )}
+</div>
+
         </div>
       </div>
 

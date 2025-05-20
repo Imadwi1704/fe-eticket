@@ -9,21 +9,19 @@ export default function Review() {
   const [review, setReview] = useState({
     score: "",
     comment: "",
+    userId: "",
   });
+  const [list, setList] = useState([]); // Untuk menampilkan list review
   const [message, setMessage] = useState("");
   const token = getCookie("token");
 
-  const handleChange = (e) => {
-    setReview((old) => ({ ...old, [e.target.name]: e.target.value }));
-  };
-
-  // Extract userId from JWT token payload
+  // Ambil userId dari JWT token
   useEffect(() => {
     if (token) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(atob(token.split(".")[1]));
         if (payload.id) {
-          setReview(prev => ({ ...prev, userId: payload.id }));
+          setReview((prev) => ({ ...prev, userId: payload.id }));
         }
       } catch (err) {
         console.error("Error parsing token:", err);
@@ -31,31 +29,40 @@ export default function Review() {
     }
   }, [token]);
 
-  // Fetch existing reviews
+  // Ambil daftar review
   useEffect(() => {
-    if (!token) return;
-    fetchReviews();
+    if (token) {
+      fetchReviews();
+    }
   }, [token]);
 
   const fetchReviews = async () => {
-    try {
-      const res = await fetch("http://localhost:5001/api/review/create", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await res.json();
-      if (res.ok) {
-        setList(result.data || result);
-      } else {
-        console.error("Gagal fetch review:", result.message);
-      }
-    } catch (err) {
-      console.error("Error fetchReviews:", err);
-    }
-  };
+  try {
+    const res = await fetch("http://localhost:5001/api/reviews/create", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    const result = await res.json();
+    console.log("Review fetched:", result); // Debug
+
+    if (res.ok) {
+      const reviews = Array.isArray(result.data) ? result.data : [];
+      setList(reviews);
+    } else {
+      console.error("Gagal fetch review:", result.message);
+    }
+  } catch (err) {
+    console.error("Error fetchReviews:", err);
+  }
+};
+
+
+  const handleChange = (e) => {
+    setReview((old) => ({ ...old, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,10 +71,17 @@ export default function Review() {
       return;
     }
 
+    // Validasi rating
+    const score = Number(review.score);
+    if (score < 1 || score > 5) {
+      alert("Rating harus antara 1 sampai 5.");
+      return;
+    }
+
     try {
       const payload = {
         ...review,
-        score: Number(review.score),
+        score,
       };
 
       const res = await fetch(`http://localhost:5001/api/reviews/create`, {
@@ -81,7 +95,7 @@ export default function Review() {
       const result = await res.json();
       if (res.ok) {
         setMessage("Terima kasih telah memberikan penilaian!");
-        setReview({score: "", comment: "" });
+        setReview({ score: "", comment: "", userId: review.userId });
         fetchReviews();
       } else {
         alert(result.message || "Gagal menyimpan review");
@@ -91,6 +105,14 @@ export default function Review() {
       alert("Terjadi kesalahan saat menyimpan data.");
     }
   };
+
+  // Auto hilangkan message
+  useEffect(() => {
+    if (message) {
+      const timeout = setTimeout(() => setMessage(""), 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [message]);
 
   return (
     <>
@@ -190,7 +212,7 @@ export default function Review() {
 
       <Footer />
 
-      {/* Script JS Tambahan */}
+      {/* Script Tambahan */}
       <Script src="/assets/js/jquery.min.js" strategy="lazyOnload" />
       <Script src="/assets/js/bootstrap.min.js" strategy="lazyOnload" />
       <Script src="/assets/js/jquery.sticky.js" strategy="lazyOnload" />

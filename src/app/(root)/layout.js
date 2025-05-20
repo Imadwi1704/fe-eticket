@@ -3,17 +3,14 @@
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
-// dynamic import seperti sebelumnya
 const Navbar = dynamic(() => import("../../components/Navbar"), { ssr: false });
 const Belitiketbutton = dynamic(() => import("../../components/Belitiketbutton"), { ssr: false });
 
 export default function IndexLayout({ children }) {
-  const pathname = usePathname(); // langsung dapat string
-
+  const pathname = usePathname(); 
   return (
     <div>
       <Navbar />
-
       {children}
 
       {pathname !== "/register/ticket" && (

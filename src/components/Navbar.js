@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
+import Spinner from "../../src/components/spinner";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +11,16 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navRef = useRef(null);
 
   const navItems = [
@@ -23,21 +33,43 @@ export default function Navbar() {
   ];
 
   useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const shouldOpenLogin = localStorage.getItem("openLoginModal");
+    if (shouldOpenLogin === "true") {
+      window.dispatchEvent(new CustomEvent("openLoginModal"));
+      localStorage.removeItem("openLoginModal");
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleOpenLogin = () => setShowLogin(true);
+    window.addEventListener("openLoginModal", handleOpenLogin);
+    return () => window.removeEventListener("openLoginModal", handleOpenLogin);
+  }, []);
+
+  useEffect(() => {
     const token = getCookie("token");
-    const storedUsername = getCookie("username");
     const storedFullName = getCookie("fullName");
     if (token) {
       setIsLoggedIn(true);
-      setUsername(storedUsername || "Pengunjung");
       setFullName(storedFullName || "Pengunjung");
     }
   }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const email = form.email.value;
-    const password = form.password.value;
+    setLoading(true);
+    const email = e.target.email.value;
+    const password = e.target.password.value;
 
     try {
       const res = await fetch("http://localhost:5001/api/auth/login", {
@@ -47,93 +79,248 @@ export default function Navbar() {
       });
 
       const data = await res.json();
-      if (res.ok && data.response.token) {
-        setCookie("token", data.response.token, { maxAge: 60 * 60 * 24, path: "/" });
-        setCookie("username", data.response.user.username, { maxAge: 60 * 60 * 24, path: "/" });
-        setCookie("fullName", data.response.user.fullName, { maxAge: 60 * 60 * 24, path: "/" });
+      if (res.ok && data.data?.token) {
+        setCookie("token", data.data.token, { maxAge: 86400 });
+        setCookie("fullName", data.data.user.fullName, { maxAge: 86400 });
+        setCookie("role", data.data.user.role, { maxAge: 86400 });
         setIsLoggedIn(true);
-        setUsername(data.response.user.username);
-        setFullName(data.response.user.fullName);
+        setFullName(data.data.user.fullName);
         setShowLogin(false);
       } else {
-        alert(data.response.message || "Login gagal");
+        alert(data.msg || data.message || "Login gagal");
       }
     } catch (error) {
-      console.error("Login error:", error);
       alert("Terjadi kesalahan saat login.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    const verifyAndSetToken = async (token) => {
+      try {
+        // Verifikasi token ke backend
+        const res = await fetch("http://localhost:5001/api/auth/verify-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        });
+
+        if (!res.ok) throw new Error("Invalid token");
+        
+        // Set cookie dengan opsi keamanan
+        setCookie("token", token, {
+          maxAge: 86400,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
+        
+        return true;
+      } catch (error) {
+        deleteCookie("token");
+        return false;
+      }
+    };
+
+    const handleGoogleCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+      const fullName = urlParams.get("fullName");
+
+      if (token && fullName) {
+        setLoading(true);
+        
+        const isValid = await verifyAndSetToken(token);
+        
+        if (isValid) {
+          setCookie("fullName", decodeURIComponent(fullName));
+          setIsLoggedIn(true);
+          setFullName(decodeURIComponent(fullName));
+          window.history.replaceState({}, "", window.location.pathname);
+        } else {
+          alert("Sesi login tidak valid");
+        }
+        
+        setLoading(false);
+      }
+    };
+
+    handleGoogleCallback();
+  }, []);
+
+  const handleGoogleLogin = () => {
+    // Simpan halaman sebelumnya
+    sessionStorage.setItem("preAuthPath", window.location.pathname);
+    window.location.href = "http://localhost:5001/api/auth/google";
+  };
+
+  const renderGoogleLoginButton = () => (
+    <button
+      type="button"
+      className="btn btn-danger w-100 position-relative"
+      onClick={handleGoogleLogin}
+      disabled={loading}
+    >
+      {loading ? (
+        <>
+          <Spinner size="sm" />
+          <span className="ms-2">Memproses...</span>
+        </>
+      ) : (
+        "Login dengan Google"
+      )}
+    </button>
+  );
+
+  {renderGoogleLoginButton()}
+
+  const handleLogout = () => {
+    fetch("http://localhost:5001/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).finally(() => {
+      deleteCookie("token");
+      deleteCookie("role");
+      deleteCookie("fullName");
+      setIsLoggedIn(false);
+      setFullName("");
+      setShowProfileMenu(false);
+      
+    });
+  };
+
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    const email = e.target.forgotEmail.value;
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Kode reset password telah dikirim ke email Anda");
+        setShowForgotPassword(false);
+        setShowResetPasswordModal(true);
+      } else {
+        alert(data.msg || "Gagal mengirim email reset password");
+      }
+    } catch {
+      alert("Terjadi kesalahan saat mengirim permintaan reset password");
     }
   };
 
-  const handleLogout = () => {
-    deleteCookie("token");
-    deleteCookie("username");
-    deleteCookie("fullName");
-    setIsLoggedIn(false);
-    setUsername("");
-    setFullName("");
-    setShowProfileMenu(false);
+  const handleSubmitReset = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert("Password tidak cocok");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, newPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Password berhasil direset. Silakan login kembali.");
+        setShowResetPasswordModal(false);
+        setShowLogin(true);
+        setCode("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        alert(data.message || "Gagal mereset password");
+      }
+    } catch {
+      alert("Terjadi kesalahan saat mereset password");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const renderProfileMenu = () => (
-  <div
-    className="position-absolute bg-white rounded shadow p-2"
-    style={{ top: "110%", right: 0, minWidth: "150px", zIndex: 1000 }}
-  >
-    {/* Header dengan tombol close */}
-    <div className="d-flex justify-content-between align-items-center mb-3">
-      <span className="small text-muted">Menu</span>
-      <button 
-        className="btn btn-sm p-0"
-        onClick={() => setShowProfileMenu(false)}
-        aria-label="Tutup menu"
+  const renderProfileMenu = () => {
+    if (!showProfileMenu) return null;
+    return (
+      <ul
+        className="dropdown-menu dropdown-menu-end show position-absolute bg-white shadow rounded"
+        style={{ right: 0, top: "110%" }}
+        aria-labelledby="profileDropdown"
       >
-        × {/* Unicode multiplication X */}
-      </button>
-    </div>
-    {/* Isi menu */}
-    <Link href="/profile" className="btn btn-sm w-100 text-start">
-      Profile Saya
-    </Link>
-    <Link href="/orders" className="btn btn-sm w-100 text-start">
-      History Pemesanan
-    </Link>
-    <button className="btn btn-danger btn-sm w-100" onClick={handleLogout}>
-      Logout
-    </button>
-  </div>
-);
+        <li>
+          <Link
+            href="/profile"
+            className="dropdown-item"
+            onClick={() => setShowProfileMenu(false)}
+          >
+            Profil Saya
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/orders"
+            className="dropdown-item"
+            onClick={() => setShowProfileMenu(false)}
+          >
+            History Pemesanan
+          </Link>
+        </li>
+        <li>
+          <hr className="dropdown-divider" />
+        </li>
+        <li>
+          <button
+            className="dropdown-item text-danger"
+            onClick={() => {
+              handleLogout();
+              setShowProfileMenu(false);
+            }}
+          >
+            Logout
+          </button>
+        </li>
+      </ul>
+    );
+  };
 
   return (
     <header className="navbar navbar-expand-lg fixed-top py-2">
       <div className="container d-flex justify-content-between align-items-center px-2">
-        <Link href="/" className="navbar-brand text-white fw-bold fs-5">
+        <Link href="/" className="navbar-brand fw-bold fs-5">
           Ruwai Jurai
         </Link>
 
         {/* Mobile */}
         <div className="d-lg-none d-flex align-items-center gap-2">
           {!isLoggedIn ? (
-            <>  
+            <>
               <Link href="/register" className="btn btn-light btn-sm">
                 Daftar
               </Link>
-              <button className="btn btn-light btn-sm" onClick={() => setShowLogin(true)}>
+              <button
+                className="btn btn-light btn-sm"
+                onClick={() => setShowLogin(true)}
+              >
                 Masuk
               </button>
             </>
           ) : (
-            <div className="position-relative">
+            <div className="position-relative" ref={navRef}>
               <button
                 className="btn btn-light btn-sm"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
-                <i className="bi bi-person-circle me-2"></i>{fullName.split(" ")[0]}
+                <i className="bi bi-person-circle me-2"></i>
+                {fullName.split(" ")[0]}
               </button>
-              {showProfileMenu && renderProfileMenu()}
+              {renderProfileMenu()}
             </div>
           )}
           <button
-            className="btn btn-sm text-white"
+            className="btn btn-sm"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation"
             style={{ fontSize: "1.3rem" }}
@@ -147,7 +334,7 @@ export default function Navbar() {
           <ul className="navbar-nav d-flex flex-row gap-0 mb-0 small">
             {navItems.map((item, idx) => (
               <li className="nav-item" key={idx}>
-                <Link href={item.path} className="nav-link text-white px-2">
+                <Link href={item.path} className="nav-link px-2">
                   {item.name}
                 </Link>
               </li>
@@ -155,85 +342,311 @@ export default function Navbar() {
           </ul>
           {!isLoggedIn ? (
             <>
-              <Link href="/register" className="btn btn-light px-4 rounded-pill">
+              <Link
+                href="/register"
+                className="btn btn-outline-light btn-sm rounded-pill"
+              >
                 Daftar
               </Link>
-              <button className="btn btn-light px-4 rounded-pill" onClick={() => setShowLogin(true)}>
+              <button
+                className="btn btn-light btn-sm rounded-pill"
+                onClick={() => setShowLogin(true)}
+              >
                 Masuk
               </button>
             </>
           ) : (
-            <div className="position-relative">
+            <div className="position-relative" ref={navRef}>
               <button
+                className="btn d-flex align-items-center gap-2"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="btn text-white d-flex align-items-center gap-2"
               >
                 {fullName.split(" ")[0]}
                 <i className="bi bi-person-circle fs-4"></i>
               </button>
-              {showProfileMenu && renderProfileMenu()}
+              {renderProfileMenu()}
             </div>
           )}
         </nav>
+      </div>
 
-        {/* Mobile Dropdown */}
-        {isOpen && (
-          <nav ref={navRef} className="position-absolute bg-white rounded shadow-sm p-3" style={{ top: "100%", right: "1rem", width: "230px", zIndex: 999 }}>
-            <ul className="navbar-nav">
-              {navItems.map((item, idx) => (
-                <li className="nav-item mb-2" key={idx}>
-                  <Link href={item.path} className="nav-link text-dark" onClick={() => setIsOpen(false)}>
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-              <li className="mt-3 d-flex flex-column gap-2">
-                {!isLoggedIn ? (
-                  <>
-                    <Link href="/register" className="btn btn-warning btn-sm fw-bold">
-                      Daftar
-                    </Link>
-                    <button className="btn btn-light btn-sm fw-bold" onClick={() => { setShowLogin(true); setIsOpen(false); }}>
-                      Masuk
-                    </button>
-                  </>
-                ) : (
-                  <button className="btn btn-danger btn-sm fw-bold" onClick={() => { handleLogout(); setIsOpen(false); }}>
-                    Logout
-                  </button>
-                )}
+      {/* Mobile menu */}
+      {isOpen && (
+        <div className="bg-primary d-lg-none py-3 px-4">
+          <ul className="navbar-nav d-flex flex-column gap-1 small">
+            {navItems.map((item, idx) => (
+              <li key={idx} className="nav-item">
+                <Link
+                  href={item.path}
+                  className="nav-link text-white px-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.name}
+                </Link>
               </li>
-            </ul>
-          </nav>
-        )}
+            ))}
+          </ul>
+        </div>
+      )}
 
-        {/* Modal Login */}
-        {showLogin && (
-          <div className="modal-backdrop show d-flex align-items-center justify-content-center" style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(0, 0, 0, 0.7)", zIndex: 1050 }} onClick={() => setShowLogin(false)}>
-            <div className="bg-white rounded p-4 shadow" style={{ width: "90%", maxWidth: "400px" }} onClick={(e) => e.stopPropagation()}>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Masuk Akun</h5>
-                <button className="btn-close" onClick={() => setShowLogin(false)} />
+      {/* Login Modal */}
+      {showLogin && (
+  <div
+    className="modal fade show d-block"
+    tabIndex={-1}
+    role="dialog"
+    aria-modal="true"
+    style={{
+      backgroundColor: "rgba(0,0,0,0.6)",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      zIndex: 1050,
+    }}
+    onClick={() => setShowLogin(false)}
+  >
+    <div
+      className="modal-dialog modal-dialog-centered"
+      role="document"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="modal-content shadow p-4 rounded">
+        <div className="modal-header border-0 pb-0">
+          <h5 className="modal-title fw-semibold">Masuk Akun</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowLogin(false)}
+          />
+        </div>
+        <form onSubmit={handleLogin}>
+          <div className="modal-body">
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="mb-2">
+              <label htmlFor="password" className="form-label">
+                Kata Sandi
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="form-control"
+                required
+              />
+            </div>
+            <div className="text-end mb-3">
+              <button
+                type="button"
+                className="btn btn-link text-decoration-none p-0"
+                onClick={() => {
+                  setShowForgotPassword(true);
+                  setShowLogin(false);
+                }}
+              >
+                Lupa Password?
+              </button>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary w-100 mb-3"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Masuk"}
+            </button>
+
+            <div className="text-center my-2 text-muted">atau</div>
+
+            <button
+              type="button"
+              className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
+              onClick={handleGoogleLogin}
+            >
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                width="20"
+                height="20"
+              />
+              Masuk dengan Google
+            </button>
+
+            <div className="text-center mt-4">
+              <p className="mb-0">
+                Belum punya akun?{" "}
+                <a
+                  href="/register"
+                  className="text-decoration-none fw-semibold"
+                  onClick={() => setShowLogin(false)}
+                >
+                  Daftar sekarang
+                </a>
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => setShowForgotPassword(false)}
+        >
+          <div
+            className="modal-dialog"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content p-3">
+              <div className="modal-header">
+                <h5 className="modal-title">Lupa Password</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowForgotPassword(false)}
+                />
               </div>
-              <form onSubmit={handleLogin}>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Username/Email</label>
-                  <input type="email" name="email" id="email" className="form-control" required />
+              <form onSubmit={handleForgotPassword}>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="forgotEmail" className="form-label">
+                      Masukkan Email Anda
+                    </label>
+                    <input
+                      id="forgotEmail"
+                      name="forgotEmail"
+                      type="email"
+                      className="form-control"
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary w-100">
+                    Kirim Kode Reset
+                  </button>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Kata Sandi</label>
-                  <input type="password" name="password" id="password" className="form-control" required />
-                </div>
-                <div className="text-center mb-3">
-                  <label>Belum Punya Akun ERUWAIJUARAI?</label>
-                </div>
-                <Link href="/register" className="btn btn-outline-dark w-100 mb-2">Daftar</Link>
-                <button type="submit" className="btn btn-dark w-100">Masuk</button>
               </form>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Reset Password Modal */}
+      {showResetPasswordModal && (
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => setShowResetPasswordModal(false)}
+        >
+          <div
+            className="modal-dialog"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content p-3">
+              <div className="modal-header">
+                <h5 className="modal-title">Reset Password</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowResetPasswordModal(false)}
+                />
+              </div>
+              <form onSubmit={handleSubmitReset}>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="code" className="form-label">
+                      Kode Reset
+                    </label>
+                    <input
+                      id="code"
+                      name="code"
+                      type="text"
+                      className="form-control"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3 position-relative">
+                    <label htmlFor="newPassword" className="form-label">
+                      Password Baru
+                    </label>
+                    <input
+                      id="newPassword"
+                      name="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      className="form-control"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? "Sembunyikan" : "Tampilkan"}
+                    </button>
+                  </div>
+                  <div className="mb-3 position-relative">
+                    <label htmlFor="confirmPassword" className="form-label">
+                      Konfirmasi Password Baru
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="form-control"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? "Sembunyikan" : "Tampilkan"}
+                    </button>
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Memproses..." : "Reset Password"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

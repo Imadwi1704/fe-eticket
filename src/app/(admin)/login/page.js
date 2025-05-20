@@ -14,37 +14,37 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.email || !formData.password) {
-      alert("email dan password harus diisi!");
-      return;
-    }
-  
-    try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-  
-      const data = await res.json();
-      // Set cookie token
-      setCookie("token", data.response.token, {
+  e.preventDefault();
+  if (!formData.email || !formData.password) {
+    alert("email dan password harus diisi!");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5001/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    if (res.ok && data.status === "success") {
+      setCookie("token", data.data.token, {
         maxAge: 60 * 60 * 24, // 1 hari
         path: "/",
       });
-  console.log(data)
-      if (res.ok && data.metaData?.code === 200) {
-        router.push("/login/admin/dashboard");
-      } else {
-        alert(data.metaData?.message || "Login gagal");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Terjadi kesalahan saat login.");
+      router.push("/login/admin/dashboard");
+    } else {
+      alert(data.message || "Login gagal");
     }
-  };
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Terjadi kesalahan saat login.");
+  }
+};
+
   
   
 

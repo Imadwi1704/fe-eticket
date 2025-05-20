@@ -8,7 +8,8 @@ import { getCookie } from "cookies-next";
 
 export default function Register() {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);    
+  const [checked, setChecked] = useState(false);
+  const [regStep, setRegStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
@@ -16,6 +17,7 @@ export default function Register() {
     password: "",
     confirmPassword: "",
   });
+  const [verificationCode, setVerificationCode] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const modalRef = useRef();
 
@@ -28,7 +30,6 @@ export default function Register() {
     }
   }, [router]);
 
-  // Sebelum pengecekan selesai, jangan render apa-apa
   if (!checked) return null;
 
   const showModal = (message) => {
@@ -62,14 +63,9 @@ export default function Register() {
       const result = await res.json();
 
       if (res.ok) {
-        showModal("Pendaftaran berhasil!");
-        setFormData({
-          fullName: "",
-          phoneNumber: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        });
+        // Berhasil daftar, lanjut ke step verifikasi
+        setRegStep(2);
+        showModal("Kode verifikasi telah dikirim ke email Anda. Silakan cek email.");
       } else {
         showModal("Gagal daftar: " + (result.message || "Terjadi kesalahan."));
       }
@@ -77,6 +73,58 @@ export default function Register() {
       showModal("Terjadi kesalahan saat mendaftar.");
     }
   };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+
+    if (!verificationCode) {
+      return showModal("Mohon masukkan kode verifikasi.");
+    }
+
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          code: verificationCode,
+        }),
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+  showModal("Verifikasi berhasil! Anda dapat login sekarang.");
+ setTimeout(() => {
+  // Simpan info bahwa user harus buka modal login
+  localStorage.setItem("openLoginModal", "true");
+  router.replace("/");
+}, 2000);
+} else {
+        showModal("Verifikasi gagal: " + (result.message || "Kode salah."));
+      }
+    } catch {
+      showModal("Terjadi kesalahan saat verifikasi.");
+    }
+    
+  };
+  const handleResendCode = async () => {
+  try {
+    const res = await fetch("http://localhost:5001/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: formData.email }),
+    });
+    const result = await res.json();
+
+    if (res.ok) {
+      showModal("Kode verifikasi baru telah dikirim ke email Anda.");
+    } else {
+      showModal("Gagal mengirim ulang kode: " + (result.message || "Email Sudah Diverifikasi."));
+    }
+  } catch {
+    showModal("Terjadi kesalahan saat mengirim ulang kode.");
+  }
+};
 
   return (
     <>
@@ -100,82 +148,121 @@ export default function Register() {
                 </h2>
               </div>
 
-              <form
-                className="custom-form contact-form shadow p-4 rounded"
-                onSubmit={handleSubmit}
-                style={{ backgroundColor: "rgba(205,183,140,0.1)" }}
-              >
-                <div className="row g-3">
-                  <div className="col-12">
-                    <label>Nama Lengkap</label>
+              {regStep === 1 && (
+                <form
+                  className="custom-form contact-form shadow p-4 rounded"
+                  onSubmit={handleSubmit}
+                  style={{ backgroundColor: "rgba(205,183,140,0.1)" }}
+                >
+                  <div className="row g-3">
+                    <div className="col-12">
+                      <label>Nama Lengkap</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Silahkan Isi Nama Lengkap Anda"
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label>Nomor Handphone</label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Silahkan Isi Nomor Telepon"
+                        pattern="[0-9]{10,15}"
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Silahkan Isi Email"
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Sandi"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label>Konfirmasi Password</label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="Konfirmasi Sandi"
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <div className="col-12 text-center">
+                      <button type="submit" className="btn btn-dark px-4 mt-3">
+                        Daftar Sekarang
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {regStep === 2 && (
+                <form
+                  onSubmit={handleVerify}
+                  className="custom-form shadow p-4 rounded"
+                  style={{ backgroundColor: "rgba(205,183,140,0.1)" }}
+                >
+                  <p>
+                    Masukkan kode verifikasi yang telah dikirim ke email{" "}
+                    <strong>{formData.email}</strong>.
+                  </p>
+                  <div className="mb-3">
+                    <label htmlFor="verificationCode" className="form-label">
+                      Kode Verifikasi
+                    </label>
                     <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
+                      type="number"
+                      id="verificationCode"
+                      name="verificationCode"
                       className="form-control"
-                      placeholder="Silahkan Isi Nama Lengkap Anda"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
                       required
                     />
                   </div>
-                  <div className="col-12">
-                    <label>Nomor Handphone</label>
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      className="form-control"
-                      placeholder="Silahkan Isi Nomor Telepon"
-                      pattern="[0-9]{10,15}"
-                      required
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="form-control"
-                      placeholder="Silahkan Isi Email"
-                      required
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label>Password</label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="form-control"
-                      placeholder="Sandi"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label>Konfirmasi Password</label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="form-control"
-                      placeholder="Konfirmasi Sandi"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className="col-12 text-center">
-                    <button type="submit" className="btn btn-dark px-4 mt-3">
-                      Daftar Sekarang
-                    </button>
-                  </div>
-                </div>
-              </form>
+                  <button type="submit" className="btn btn-primary w-100">
+                    Verifikasi
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-link mt-2"
+                    onClick={handleResendCode}
+                  >
+                    Belum menerima kode? Kirim ulang
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
@@ -193,7 +280,9 @@ export default function Register() {
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="feedbackModalLabel">Informasi</h5>
+              <h5 className="modal-title" id="feedbackModalLabel">
+                Informasi
+              </h5>
               <button
                 type="button"
                 className="btn-close"
@@ -203,11 +292,7 @@ export default function Register() {
             </div>
             <div className="modal-body text-center">{modalMessage}</div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                 Tutup
               </button>
             </div>

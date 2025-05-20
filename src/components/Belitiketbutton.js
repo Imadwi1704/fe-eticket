@@ -1,26 +1,38 @@
-import Link from 'next/link';
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Belitiketbutton = () => {
+  const router = useRouter();
+  const [hover, setHover] = useState(false);
+
   return (
-    <Link href="/register/ticket">
-      <button style={styles.button}>
-        Beli Tiket
-      </button>
-    </Link>
+    <button
+      style={{
+        ...styles.button,
+        backgroundColor: hover ? "#e0a600" : "#FEBA15",
+      }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={() => router.push("/register/ticket")}
+      type="button"
+    >
+      Beli Tiket
+    </button>
   );
 };
 
 const styles = {
   button: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#FEBA15',
-    color: 'white',
-    border: 'none',
-    borderRadius: '20px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s',
-  }
+    padding: "10px 20px",
+    fontSize: "16px",
+    color: "white",
+    border: "none",
+    borderRadius: "20px",
+    cursor: "pointer",
+    transition: "background-color 0.3s",
+  },
 };
 
 export default Belitiketbutton;

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getCookie } from "cookies-next";
 
-export default function RootLayout({ children }) {
+export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -90,7 +90,13 @@ export default function RootLayout({ children }) {
                 <li className={isActive("/login/admin/data_user")}>
                   <a className="sidebar-link" href="/login/admin/data_user">
                      <i className="bi bi-people-fill me-2" />
-                    <span className="hide-menu">Data pengunjung</span>
+                    <span className="hide-menu">Data User</span>
+                  </a>
+                </li>
+                <li className={isActive("/login/admin/data_user")}>
+                  <a className="sidebar-link" href="/login/admin/data_user">
+                     <i className="bi bi-people-fill me-2" />
+                    <span className="hide-menu">Data Kunjungan Pengunjung</span>
                   </a>
                 </li>
                 <li className={isActive("/login/admin/pemesanan")}>
@@ -192,7 +198,7 @@ export default function RootLayout({ children }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-content">
-              <div className="modal-header bg-primary text-white">
+              <div className="modal-header text-white">
                 <h5 className="modal-title">
                   {selectedReview ? 'Detail Review' : 'Daftar Review Pengunjung'}
                 </h5>

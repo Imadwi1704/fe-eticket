@@ -243,12 +243,35 @@ strong {
 }
 
 .nav-tabs {
-  background-color: rgba(248, 244, 225, 1);
-  border-radius: 50px;
-  border-width: 100px;
-  border-bottom: 0;
-  padding: 15px;
-  
+  border-bottom: none; /* hilangkan border default */
+  justify-content: center;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: #000;
+  font-weight: bold;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  position: relative;
+}
+
+.nav-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 3px;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+  border-radius: 2px;
+}
+
+.nav-tabs .nav-link.active::after {
+  background-color: #714D29; /* warna garis bawah saat aktif */
 }
 
 .nav-tabs .nav-link {

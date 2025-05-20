@@ -661,6 +661,7 @@ progress {
 }
 
 .list-unstyled {
+  background-color: #74502D;
   padding-left: 0;
   list-style: none;
 }
