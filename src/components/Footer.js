@@ -73,7 +73,7 @@ const Footer = () => {
               className="list-unstyled mb-3 d-flex flex-wrap gap-4"
               style={{ fontSize: "14px" }}
             >
-              {["Beranda", "Destinasi Info", "Sejarah", "Koleksi", "Gallery", "Contact"].map(
+              {["Beranda", "Destinasi Info", "Sejarah", "Koleksi", "Gallery", "Review Museum"].map(
                 (item, index) => (
                   <li key={index} className="position-relative">
                     <Link

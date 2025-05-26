@@ -58,39 +58,40 @@ export default function VenuesPage() {
     <>
       <div style={{ backgroundColor: "#F8F4E1", minHeight: "100vh" }}>
         {/* Hero Section */}
-        <section
-          className="hero-section position-relative"
-          id="aboutnext"
-          style={{ paddingTop: "50px" }}
-        >
-          <img
-            src="/assets/images/museum.jpg"
-            alt="Museum"
-            className="w-100 img-fluid"
-            style={{ height: "auto", objectFit: "cover" }}
-          />
+         <section
+        className="hero-section position-relative d-flex align-items-center justify-content-center"
+        id="aboutnext"
+        style={{
+          height: "60vh",
+          backgroundImage: "url('/assets/images/museum.jpg')",
+          backgroundSize: "cover",
+          backgroundAttachment: "fixed",
+          backgroundPosition: "center",
+        }}
+      >
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            background:
+              "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
+            zIndex: 1,
+          }}
+        ></div>
+
+        <div className="position-relative text-white text-center z-2" style={{ zIndex: 2 }}>
+          <h1 className="fw-bold display-5">Koleksi Museum Lampung</h1>
           <div
-            className="position-absolute top-0 start-0 w-100 h-100"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1 }}
+            style={{
+              width: "80px",
+              height: "5px",
+              backgroundColor: "#FFFFFF",
+              borderRadius: "10px",
+              margin: "10px auto",
+            }}
           ></div>
-          <div
-            className="position-absolute top-50 start-50 translate-middle text-center"
-            style={{ zIndex: 2 }}
-          >
-            <h2 className="text-white fw-bold d-inline-block pb-2" data-aos="zoom-in">
-              Koleksi Museum Lampung
-              <span
-                className="d-block mx-auto mt-2"
-                style={{
-                  width: "80px",
-                  height: "5px",
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: "20px",
-                }}
-              ></span>
-            </h2>
-          </div>
-        </section>
+        </div>
+      </section>
+
 
         <div className="container my-5">
           {/* Detail Venue */}

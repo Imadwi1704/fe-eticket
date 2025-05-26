@@ -58,7 +58,9 @@ export default function AdminPage() {
                     <th>Tiket yang Dipilih</th>
                     <th>Banyak Tiket</th>
                     <th>Tanggal Berkunjung</th>
-                    <th>Status Keberhasilan</th>
+                    <th>Status Pembayaran</th>
+                    <th>Status Berkunjung</th>
+                    <th>Metode Pembayaran</th>
                     <th>Total Pembelian</th>
                   </tr>
                 </thead>

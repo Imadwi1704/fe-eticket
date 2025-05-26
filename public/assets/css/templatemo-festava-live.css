@@ -398,12 +398,15 @@ strong {
 
 .sticky-wrapper.is-sticky .navbar {
   background-color: var(--primary-brown);
+  gap: 0.25rem;
+
 }
 
 
 .navbar {
   background: transparent;
   z-index: 9;
+  gap: 0.25rem;
 }
 
 .navbar-brand,
@@ -422,7 +425,8 @@ strong {
 .navbar-nav .nav-link {
   display: inline-block;
   color: var(--white-color);
-  font-size: var(--p-font-size);
+  font-size: 0.85rem;
+  padding: 4px 8px;
   font-weight: var(--font-weight-normal);
   position: relative;
   padding-top: 15px;
@@ -431,8 +435,15 @@ strong {
 
 .navbar-nav .nav-link.active, 
 .navbar-nav .nav-link:hover {
-  color: black;
+  background-color: rgba(248, 244, 225, 1); 
+  color: var(--dark-color);                  
+  border-radius: 1 rem;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-bottom: 3px solid rgba(248, 244, 225, 1);
+  transition: all 0.3s ease;
 }
+
 
 .navbar-toggler {
   border: 0;

@@ -11,11 +11,11 @@ export default function Review() {
     comment: "",
     userId: "",
   });
-  const [list, setList] = useState([]); // Untuk menampilkan list review
+  const [list, setList] = useState([]);
   const [message, setMessage] = useState("");
+  const [showModal, setShowModal] = useState(false); // State untuk modal
   const token = getCookie("token");
 
-  // Ambil userId dari JWT token
   useEffect(() => {
     if (token) {
       try {
@@ -29,7 +29,6 @@ export default function Review() {
     }
   }, [token]);
 
-  // Ambil daftar review
   useEffect(() => {
     if (token) {
       fetchReviews();
@@ -37,28 +36,27 @@ export default function Review() {
   }, [token]);
 
   const fetchReviews = async () => {
-  try {
-    const res = await fetch("http://localhost:5001/api/reviews/create", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await fetch("http://localhost:5001/api/reviews", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const result = await res.json();
-    console.log("Review fetched:", result); // Debug
+      const result = await res.json();
+      console.log("Review fetched:", result);
 
-    if (res.ok) {
-      const reviews = Array.isArray(result.data) ? result.data : [];
-      setList(reviews);
-    } else {
-      console.error("Gagal fetch review:", result.message);
+      if (res.ok) {
+        const reviews = Array.isArray(result.data) ? result.data : [];
+        setList(reviews);
+      } else {
+        console.error("Gagal fetch review:", result.message);
+      }
+    } catch (err) {
+      console.error("Error fetchReviews:", err);
     }
-  } catch (err) {
-    console.error("Error fetchReviews:", err);
-  }
-};
-
+  };
 
   const handleChange = (e) => {
     setReview((old) => ({ ...old, [e.target.name]: e.target.value }));
@@ -71,7 +69,6 @@ export default function Review() {
       return;
     }
 
-    // Validasi rating
     const score = Number(review.score);
     if (score < 1 || score > 5) {
       alert("Rating harus antara 1 sampai 5.");
@@ -79,12 +76,9 @@ export default function Review() {
     }
 
     try {
-      const payload = {
-        ...review,
-        score,
-      };
+      const payload = { ...review, score };
 
-      const res = await fetch(`http://localhost:5001/api/reviews/create`, {
+      const res = await fetch("http://localhost:5001/api/reviews/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,10 +86,12 @@ export default function Review() {
         },
         body: JSON.stringify(payload),
       });
+
       const result = await res.json();
       if (res.ok) {
         setMessage("Terima kasih telah memberikan penilaian!");
         setReview({ score: "", comment: "", userId: review.userId });
+        setShowModal(true); // Tampilkan modal
         fetchReviews();
       } else {
         alert(result.message || "Gagal menyimpan review");
@@ -106,39 +102,48 @@ export default function Review() {
     }
   };
 
-  // Auto hilangkan message
-  useEffect(() => {
-    if (message) {
-      const timeout = setTimeout(() => setMessage(""), 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [message]);
-
   return (
     <>
-      {/* Section Review */}
+      <section
+        className="hero-section position-relative d-flex align-items-center justify-content-center"
+        id="aboutnext"
+        style={{
+          height: "60vh",
+          backgroundImage: "url('/assets/images/museum.jpg')",
+          backgroundSize: "cover",
+          backgroundAttachment: "fixed",
+          backgroundPosition: "center",
+        }}
+      >
+        <div
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            background: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
+            zIndex: 1,
+          }}
+        ></div>
+
+        <div
+          className="position-relative text-white text-center z-2"
+          style={{ zIndex: 2 }}
+        >
+          <h1 className="fw-bold display-5">Contact & Review Museum Lampung</h1>
+          <div
+            style={{
+              width: "80px",
+              height: "5px",
+              backgroundColor: "#FFFFFF",
+              borderRadius: "10px",
+              margin: "10px auto",
+            }}
+          ></div>
+        </div>
+      </section>
+
       <section className="section-padding" id="review">
         <div className="container">
           <div className="row">
             <div className="col-lg-7 col-12 mx-auto">
-              <div className="text-center mb-5">
-                <h2 className="text-black fw-bold position-relative d-inline-block pb-2">
-                  Review
-                  <span
-                    style={{
-                      display: "block",
-                      width: "100px",
-                      height: "5px",
-                      backgroundColor: "#000",
-                      margin: "8px auto 0",
-                      borderRadius: "5px",
-                    }}
-                  />
-                </h2>
-              </div>
-
-              {message && <div className="alert alert-success">{message}</div>}
-
               <form
                 onSubmit={handleSubmit}
                 className="shadow p-5 rounded"
@@ -146,8 +151,8 @@ export default function Review() {
               >
                 <input type="hidden" name="userId" value={review.userId} />
                 <p className="mb-4" style={{ color: "#444" }}>
-                  Silahkan kirimkan saran dan masukan Anda setelah berkunjung
-                  di Museum Lampung
+                  Silahkan kirimkan saran dan masukan Anda setelah berkunjung di
+                  Museum Lampung
                 </p>
 
                 <div className="mb-3">
@@ -191,6 +196,42 @@ export default function Review() {
           </div>
         </div>
       </section>
+
+      {/* Modal Sukses */}
+      {showModal && (
+        <>
+          <div className="modal fade show d-block" tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Terima Kasih!</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>{message}</p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="modal-backdrop fade show"
+            onClick={() => setShowModal(false)}
+          ></div>
+        </>
+      )}
 
       {/* Google Maps */}
       <section className="section-padding">

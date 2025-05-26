@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function Aboutnext() {
@@ -14,14 +13,13 @@ export default function Aboutnext() {
 
   return (
     <>
-      <Navbar />
 
       {/* Hero Section with Parallax */}
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center"
         id="aboutnext"
         style={{
-          height: "80vh",
+          height: "60vh",
           backgroundImage: "url('/assets/images/museum.jpg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -91,11 +89,28 @@ export default function Aboutnext() {
                 alt="Sejarah Museum"
                 style={{ maxWidth: "60%" }}
               />
-              <div className="mt-3">
-                <Link href="/historynext">
-                  <button className="btn btn-custom fw-bold px-4 py-2">Pelajari Selengkapnya</button>
-                </Link>
-              </div>
+               <div className="mt-3">
+                  <Link href="/historynext">
+                    <button
+                      className="btn text-white px-4 py-2 fw-bold"
+                      style={{
+                        background: "#714D29",
+                        borderRadius: "20px",
+                        transition: "0.3s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = "#FFFFFF";
+                        e.target.style.color = "#000000";
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = "#714D29";
+                        e.target.style.color = "#FFFFFF";
+                      }}
+                    >
+                      Pelajari Selengkapnya
+                    </button>
+                  </Link>
+                </div>
             </div>
 
             <div className="col-lg-6 col-12" data-aos="fade-left">

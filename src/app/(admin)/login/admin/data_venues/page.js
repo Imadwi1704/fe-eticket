@@ -165,6 +165,9 @@ export default function VenueAdminPage() {
           <div className="card w-100 shadow-none">
             <div className="card-body p-5">
               <h2 className="fw-semibold mb-4">Data Koleksi</h2>
+              <p className="mb-4">
+                Berfungsi untuk melakukan Create, Read, Update, dan Delete Data Koleksi pada Museum Lampung.
+              </p>
               <div className="d-flex justify-content-end mb-3">
                 <button className="btn btn-success" onClick={handleAddVenue}>
                   + Tambah Data
@@ -286,10 +289,31 @@ export default function VenueAdminPage() {
           </div>
         </div>
       )}
-
+      {/* Toast Notification */}
       {message && (
-        <div className="alert alert-success fixed-bottom text-center">
-          {message}
+        <div 
+          className="toast show position-fixed bottom-0 end-0 m-3" 
+          role="alert" 
+          style={{ 
+            minWidth: '350px',
+            animation: 'slideIn 0.3s ease-out',
+            backgroundColor: '#fff',
+            borderLeft: '4px solid #198754',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
+        >
+          <div className="toast-body d-flex align-items-center">
+            <i className="bi bi-check2-circle fs-4 text-success me-3"></i>
+            <div>
+              <h6 className="mb-1 text-success">Berhasil!</h6>
+              <p className="mb-0 text-secondary">{message}</p>
+            </div>
+            <button 
+              type="button" 
+              className="btn-close ms-auto" 
+              onClick={() => setMessage('')}
+            ></button>
+          </div>
         </div>
       )}
     </>

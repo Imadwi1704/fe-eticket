@@ -1,26 +1,39 @@
 "use client";
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
+import { getCookie } from "cookies-next";
+
 
 export default function AdminPage() {
-  const [data, setData] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loadingPDF, setLoadingPDF] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/some-data");
-        if (!res.ok) throw new Error("Failed to fetch data");
-        const result = await res.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const [orders, setOrders] = useState([]);
+  const token = getCookie("token");
+  
+    useEffect(() => {
+      if (!token) return;
+  
+      const fetchData = async () => {
+        try {
+          const res = await fetch("http://localhost:5001/api/orders", {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          const result = await res.json();
+          if (res.ok) {
+            setOrders(result.data);
+          } else {
+            console.error("Gagal mengambil data:", result?.message || "Tidak diketahui");
+          }
+        } catch (error) {
+          console.error("Terjadi kesalahan saat fetch:", error);
+        }
+      };
+  
+      fetchData();
+    }, [token]);
 
   const handleDownloadPDF = async () => {
     setLoadingPDF(true);
@@ -82,42 +95,34 @@ export default function AdminPage() {
                       <th>Tiket yang Dipilih</th>
                       <th>Banyak Tiket</th>
                       <th>Tanggal Berkunjung</th>
-                      <th>Status Keberhasilan</th>
-                      <th>Total Pembelian</th>
+                      <th>Metode Pembayaran</th>
+                      <th>Total Pembayaran</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Contoh Data Dummy */}
-                    <tr>
-                      <td>1</td>
-                      <td>ORD123456</td>
-                      <td>Sunil Joshi</td>
-                      <td>Tiket Reguler</td>
-                      <td>2</td>
-                      <td>2025-05-01</td>
-                      <td>
-                        <span className="badge bg-primary rounded-3 fw-semibold">Berhasil</span>
-                      </td>
-                      <td>Rp 100.000</td>
-                    </tr>
-                    {/* Mapping data aslinya */}
-                    {/* {data?.map((item, index) => (
-                      <tr key={index}>
+                  {Array.isArray(orders) && orders.length > 0 ? (
+                    orders.map((order, index) => (
+                      <tr key={order.id}>
                         <td>{index + 1}</td>
-                        <td>{item.kode_pemesanan}</td>
-                        <td>{item.nama_pengunjung}</td>
-                        <td>{item.tiket_dipilih}</td>
-                        <td>{item.banyak_tiket}</td>
-                        <td>{item.tanggal_berkunjung}</td>
-                        <td>
-                          <span className="badge bg-primary rounded-3 fw-semibold">
-                            {item.status}
-                          </span>
-                        </td>
-                        <td>Rp {item.total_pembelian.toLocaleString()}</td>
+                        <td>{order.orderCode}</td>
+                        <td>{order.visitorName || "-"}</td>
+                        <td>{order.orderItem?.ticket?.type}</td>
+                        <td>{order.orderItem?.quantity}</td>
+                        <td>{order.visitDate}</td>
+                        <td>{order.payments?.paymentMethod}</td>
+                        <td>{order.transactionDate}</td>
+                        <td>{order.totalAmount || "-"}</td>
                       </tr>
-                    ))} */}
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="text-center">
+                        Tidak ada data Pembayaran.
+                      </td>
+                    </tr>
+                    )}
                   </tbody>
+                  
                 </table>
               </div>
 

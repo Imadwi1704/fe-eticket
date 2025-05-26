@@ -1,41 +1,95 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Pakai next/navigation untuk push URL
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Template from "@/components/admin/Template";
 
 const FilterLaporan = () => {
   const router = useRouter();
   const [bulan, setBulan] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
+  const [daftarTiket, setDaftarTiket] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState("");
 
   const tahunSekarang = new Date().getFullYear();
   const daftarTahun = Array.from({ length: tahunSekarang - 2009 }, (_, i) => tahunSekarang - i);
 
+  useEffect(() => {
+  const fetchTickets = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/ticket");
+      const data = await res.json();
+      console.log("Data tiket:", data); // <--- Tambahkan ini
+
+      if (res.ok) {
+        // Cek apakah data.tickets atau data langsung array
+        setDaftarTiket(data.tickets || data); 
+      } else {
+        console.error("Gagal ambil tiket:", data.message);
+      }
+    } catch (err) {
+      console.error("Error fetch tiket:", err);
+    }
+  };
+
+  fetchTickets();
+}, []);
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!bulan || !tahun) {
-      alert("Silakan pilih bulan dan tahun terlebih dahulu.");
+    if (!bulan || !tahun || !selectedTicket) {
+      alert("Silakan pilih tiket, bulan, dan tahun terlebih dahulu.");
       return;
     }
 
-    // Redirect ke halaman laporan dengan query bulan & tahun
-    router.push(`/login/admin/filter_laporan/laporan?bulan=${bulan}&tahun=${tahun}`);
+    // Redirect ke halaman laporan dengan query string
+    router.push(
+      `/login/admin/filter_laporan/laporan?tiket=${selectedTicket}&bulan=${bulan}&tahun=${tahun}`
+    );
   };
 
   return (
     <>
       <Template />
-      <div className="container mt-4">
+      <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="container">
         <div className="card shadow-sm">
           <div className="card-body p-5">
-            <h2 className="card-title fw-semibold mb-4">Filter Data Tiket</h2>
+            <h2 className="card-title fw-semibold mb-4">Filter Laporan Pemesanan</h2>
             <p className="mb-4 text-muted">
               Gunakan filter di bawah ini untuk melihat data tiket berdasarkan bulan dan tahun.
             </p>
 
             <form onSubmit={handleSubmit}>
+              {/* Filter Tiket */}
+              <div className="form-group row mb-4">
+                <label htmlFor="tiket" className="col-sm-4 col-form-label fw-bold">
+                  Tiket
+                </label>
+                <div className="col-sm-8">
+                 <select
+  id="tiket"
+  name="tiket"
+  className="form-select text-black"
+  value={selectedTicket}
+  onChange={(e) => setSelectedTicket(e.target.value)}
+  required
+>
+  <option value="">--- Pilih Tiket ---</option>
+  <option value="semua">Semua Tiket</option>
+  {Array.isArray(daftarTiket) &&
+    daftarTiket.map((tiket) => (
+      <option key={tiket.id} value={tiket.id}>
+        {tiket.type}
+      </option>
+    ))}
+</select>
+
+                </div>
+              </div>
+
               {/* Filter Bulan */}
               <div className="form-group row mb-4">
                 <label htmlFor="bulan" className="col-sm-4 col-form-label fw-bold">
@@ -104,10 +158,10 @@ const FilterLaporan = () => {
                   Filter Laporan
                 </button>
               </div>
-
             </form>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

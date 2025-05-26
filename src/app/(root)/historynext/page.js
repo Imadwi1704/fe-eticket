@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useEffect } from "react";
 import AOS from "aos";
@@ -19,44 +18,38 @@ export default function Historynext() {
 
   return (
     <>
-      <Navbar />
-
+      
       {/* Hero Section */}
       <section
-        className="hero-section position-relative"
+        className="hero-section position-relative d-flex align-items-center justify-content-center"
         id="aboutnext"
-        style={{ paddingTop: "100px", height: "60vh" }}
+        style={{
+          height: "60vh",
+          backgroundImage: "url('/assets/images/museum.jpg')",
+          backgroundSize: "cover",
+          backgroundAttachment: "fixed",
+          backgroundPosition: "center",
+        }}
       >
-        <Image
-          src="/assets/images/museum.jpg"
-          alt="Museum Lampung"
-          fill
-          style={{ objectFit: "cover" }}
-          priority
-          className="z-0"
-        />
-
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            background: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4))",
             zIndex: 1,
           }}
         ></div>
 
-        <div
-          className="position-absolute top-50 start-50 translate-middle text-center z-2"
-          data-aos="zoom-in"
-        >
-          <h2 className="text-white fw-bold display-4 mb-4">
-            Sejarah Museum Lampung
-            <span className="d-block mx-auto mt-3" style={{
-              width: "120px",
-              height: "4px",
-              backgroundColor: "#FFD700",
-              borderRadius: "20px",
-            }}></span>
-          </h2>
+        <div className="position-relative text-white text-center z-2" style={{ zIndex: 2 }}>
+          <h1 className="fw-bold display-5">Sejarah Museum Lampung</h1>
+          <div
+            style={{
+              width: "80px",
+              height: "5px",
+              backgroundColor: "#FFFFFF",
+              borderRadius: "10px",
+              margin: "10px auto",
+            }}
+          ></div>
         </div>
       </section>
 
@@ -141,19 +134,25 @@ export default function Historynext() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                  </div>
+                  </div>
             </div>
 
             <div className="col-lg-4">
-              <div className="sticky-top" style={{ top: "100px" }}>
+              <div 
+                className="sticky-top" 
+                style={{ 
+                  top: "100px",
+                  zIndex: 990 // Nilai z-index lebih rendah dari navbar
+                }}
+              >
                 <div className="card border-0 shadow-lg" data-aos="fade-left">
                   <div className="card-header bg-brown text-white fw-bold">
                     <i className="fas bg-brown fa-history me-2"></i>
                     Timeline Sejarah
                   </div>
                   <div className="card-body">
-                    <ul className="timeline">
+                   <ul className="timeline">
                       {[
                         { year: '1975', event: 'Pembangunan Dimulai' },
                         { year: '1988', event: 'Peresmian Museum' },
@@ -184,8 +183,13 @@ export default function Historynext() {
       </section>
 
       <Footer />
-      
+
       <style jsx global>{`
+        /* Tambahkan z-index untuk navbar */
+        .navbar {
+          z-index: 1000 !important;
+        }
+
         .text-gold { color: #00000; }
         .bg-gold { background-color: #00000; }
         .timeline {
@@ -222,9 +226,9 @@ export default function Historynext() {
           border-bottom: 10px solid transparent;
           border-right: 15px solid white;
         }
-          .bg-brown{
+        .bg-brown {
           background: #74502D
-          }
+        }
       `}</style>
     </>
   );

@@ -137,7 +137,7 @@ export default function ticketAdminPage() {
             <div className="card-body p-5">
               <h2 className="card-title fw-semibold text-left mb-2">Data Tiket Museum Lampung</h2>
               <p className="mb-4">
-                Berfungsi untuk melakukan Create, Read, Upadate, dan Delet Data Tiket pada Museum Lampung.
+                Berfungsi untuk melakukan Create, Read, Update, dan Delete Data Tiket pada Museum Lampung.
               </p>
               <div className="d-flex justify-content-end mb-3">
                 <button className="btn btn-success" onClick={handleAddTicket}>
@@ -232,9 +232,31 @@ export default function ticketAdminPage() {
         </div>
       )}
 
+      {/* Toast Notification */}
       {message && (
-        <div className="alert alert-success fixed-bottom text-center">
-          {message}
+        <div 
+          className="toast show position-fixed bottom-0 end-0 m-3" 
+          role="alert" 
+          style={{ 
+            minWidth: '350px',
+            animation: 'slideIn 0.3s ease-out',
+            backgroundColor: '#fff',
+            borderLeft: '4px solid #198754',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
+        >
+          <div className="toast-body d-flex align-items-center">
+            <i className="bi bi-check2-circle fs-4 text-success me-3"></i>
+            <div>
+              <h6 className="mb-1 text-success">Berhasil!</h6>
+              <p className="mb-0 text-secondary">{message}</p>
+            </div>
+            <button 
+              type="button" 
+              className="btn-close ms-auto" 
+              onClick={() => setMessage('')}
+            ></button>
+          </div>
         </div>
       )}
     </>

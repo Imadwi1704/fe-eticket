@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef} from "react";
 import Link from "next/link";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import Spinner from "../../src/components/spinner";
@@ -20,8 +21,9 @@ export default function Navbar() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const navRef = useRef(null);
+  const pathname = usePathname();
 
   const navItems = [
     { name: "Beranda", path: "/" },
@@ -247,7 +249,7 @@ export default function Navbar() {
     return (
       <ul
         className="dropdown-menu dropdown-menu-end show position-absolute bg-white shadow rounded"
-        style={{ right: 0, top: "110%" }}
+        style={{ right: 0, top: "100%" }}
         aria-labelledby="profileDropdown"
       >
         <li>
@@ -330,16 +332,20 @@ export default function Navbar() {
         </div>
 
         {/* Desktop */}
-        <nav className="d-none d-lg-flex align-items-center gap-3">
-          <ul className="navbar-nav d-flex flex-row gap-0 mb-0 small">
-            {navItems.map((item, idx) => (
-              <li className="nav-item" key={idx}>
-                <Link href={item.path} className="nav-link px-2">
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav className="d-none d-lg-flex align-items-center gap-2 py-1 px-2 small">
+        <ul className="navbar-nav d-flex flex-row gap-0 mb-0 small">
+          {navItems.map((item, idx) => (
+            <li className="nav-item" key={idx}>
+              <Link
+                href={item.path}
+                className={`nav-link px-1 py-0 ${pathname === item.path ? "active text-white" : "text-white"}`}
+
+              >
+                {item.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
           {!isLoggedIn ? (
             <>
               <Link
@@ -361,8 +367,14 @@ export default function Navbar() {
                 className="btn d-flex align-items-center gap-2"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
-                {fullName.split(" ")[0]}
-                <i className="bi bi-person-circle fs-4"></i>
+                <span className="text-white">{fullName.split(" ")[0]}</span>
+                <i
+                  className="bi bi-person-circle fs-4 text-white"
+                  style={{
+                    borderRadius: "50%",
+                    padding: "8px",
+                  }}
+                ></i>
               </button>
               {renderProfileMenu()}
             </div>
@@ -389,8 +401,8 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Login Modal */}
-      {showLogin && (
+    {/* Login Modal */}
+{showLogin && (
   <div
     className="modal fade show d-block"
     tabIndex={-1}
@@ -412,45 +424,66 @@ export default function Navbar() {
       role="document"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="modal-content shadow p-4 rounded">
+      <div className="modal-content shadow-lg p-4 rounded-3" style={{ border: 'none' }}>
         <div className="modal-header border-0 pb-0">
-          <h5 className="modal-title fw-semibold">Masuk Akun</h5>
+          <h5 className="modal-title fw-bold fs-4 text-primary">Masuk Akun</h5>
           <button
             type="button"
             className="btn-close"
             onClick={() => setShowLogin(false)}
+            aria-label="Close"
           />
         </div>
+        
         <form onSubmit={handleLogin}>
-          <div className="modal-body">
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
+          <div className="modal-body pt-1">
+            {/* Email Input */}
+            <div className="mb-4">
+              <label htmlFor="email" className="form-label text-muted">
                 Email
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                className="form-control"
+                className="form-control form-control-lg rounded-2"
+                placeholder="contoh@email.com"
                 required
+                style={{ padding: '12px' }}
               />
             </div>
-            <div className="mb-2">
-              <label htmlFor="password" className="form-label">
+
+            {/* Password Input with Toggle */}
+            <div className="mb-4">
+              <label htmlFor="password" className="form-label text-muted">
                 Kata Sandi
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                className="form-control"
-                required
-              />
+              <div className="input-group">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  className="form-control form-control-lg rounded-2"
+                  placeholder="Masukkan kata sandi"
+                  required
+                  style={{ padding: '12px' }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                >
+                  <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} text-muted`} />
+                </button>
+              </div>
             </div>
-            <div className="text-end mb-3">
+
+            {/* Lupa Password */}
+            <div className="d-flex justify-content-end mb-4">
               <button
                 type="button"
-                className="btn btn-link text-decoration-none p-0"
+                className="btn btn-link text-decoration-none p-0 text-primary"
                 onClick={() => {
                   setShowForgotPassword(true);
                   setShowLogin(false);
@@ -459,20 +492,41 @@ export default function Navbar() {
                 Lupa Password?
               </button>
             </div>
+
+            {/* Submit Button */}
             <button
               type="submit"
-              className="btn btn-primary w-100 mb-3"
+              className="btn btn-primary btn-lg w-100 mb-3 rounded-2 fw-semibold"
               disabled={loading}
+              style={{ 
+                height: '50px',
+                transition: 'all 0.3s ease'
+              }}
             >
-              {loading ? "Loading..." : "Masuk"}
+              {loading ? (
+                <div className="d-flex align-items-center justify-content-center gap-2">
+                  <span className="spinner-border spinner-border-sm" role="status" />
+                  <span>Memproses...</span>
+                </div>
+              ) : "Masuk"}
             </button>
 
-            <div className="text-center my-2 text-muted">atau</div>
+            {/* Separator */}
+            <div className="d-flex align-items-center my-4">
+              <div className="border-top flex-grow-1" />
+              <span className="mx-3 text-muted">atau</span>
+              <div className="border-top flex-grow-1" />
+            </div>
 
+            {/* Google Login */}
             <button
               type="button"
-              className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
+              className="btn btn-outline-danger btn-lg w-100 d-flex align-items-center justify-content-center gap-3 rounded-2 fw-semibold"
               onClick={handleGoogleLogin}
+              style={{ 
+                height: '50px',
+                transition: 'all 0.3s ease'
+              }}
             >
               <img
                 src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -480,15 +534,16 @@ export default function Navbar() {
                 width="20"
                 height="20"
               />
-              Masuk dengan Google
+              <span>Masuk dengan Google</span>
             </button>
 
-            <div className="text-center mt-4">
-              <p className="mb-0">
-                Belum punya akun?{" "}
+            {/* Register Link */}
+            <div className="text-center mt-4 pt-3">
+              <p className="mb-0 text-muted">
+                Belum punya akun?{' '}
                 <a
                   href="/register"
-                  className="text-decoration-none fw-semibold"
+                  className="text-decoration-none fw-semibold text-primary"
                   onClick={() => setShowLogin(false)}
                 >
                   Daftar sekarang
@@ -501,9 +556,8 @@ export default function Navbar() {
     </div>
   </div>
 )}
-
-
-
+    ``
+    
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div

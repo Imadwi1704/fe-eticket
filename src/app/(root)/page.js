@@ -1,8 +1,11 @@
 "use client";
-import { useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Footer from "@components/Footer";
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
+import { motion } from "framer-motion";
+import { FiZoomIn } from "react-icons/fi";
+
 
 export default function RootLayout() {
   const [venues, setVenues] = useState([]);
@@ -64,124 +67,164 @@ export default function RootLayout() {
 
     fetchData();
   }, []);
-
-  return (
+ return (
     <>
-      <div>
-        <section
-          className="hero-section"
-          id="home"
-          style={{ paddingTop: "100px", position: "relative", height: "100vh", overflow: "hidden" }}
-        >
+      <div className="overflow-hidden">
+        {/* Hero Section */}
+        <section className="hero-section" style={{ 
+          height: '100vh', 
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div className="video-overlay" style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(45deg, rgba(113,77,41,0.3) 0%, rgba(0,0,0,0.6) 100%)',
+            zIndex: 2
+          }}></div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="hero-content"
+            style={{
+              position: 'relative',
+              zIndex: 3,
+              color: 'white',
+              padding: '0 5%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}
+          >
+            <h1 className="display-3 fw-bold mb-4" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>
+              Museum Lampung<br />
+              <span className="text-brown">Ruwai Jurai</span>
+            </h1>
+            <p className="lead mb-5 text-white" style={{ 
+              fontSize: '1.5rem',
+              maxWidth: '600px',
+              textShadow: '1px 1px 4px rgba(0,0,0,0.3)'
+            }}>
+              Menjaga Warisan Sejarah dan Budaya Lampung untuk Generasi Mendatang
+            </p>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="/aboutnext"
+              className="btn btn-lg btn-warning d-inline-flex align-items-center"
+              style={{
+                borderRadius: '30px',
+                padding: '1rem 2rem',
+                fontWeight: 600,
+                width: 'fit-content'
+              }}
+            >
+              Jelajahi Museum
+              <FiArrowRight className="ms-2" size={20} />
+            </motion.a>
+          </motion.div>
+
           {/* Video Background */}
-          <div
-            className="video-wrap"
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-          >
-            <iframe
-              src="https://www.youtube.com/embed/gR8kj6ti-s4?autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4"
-              title="YouTube video player"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "none",
-              }}
-            ></iframe>
-
-            {/* Overlay hitam transparan */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                zIndex: 2,
-              }}
-            />
-          </div>
-
-          {/* Teks di atas video */}
-          <div
-            className="position-absolute top-0 start-0 w-100 h-100"
-            style={{ zIndex: 3, display: "flex", alignItems: "center", paddingLeft: "5%" }}
-          >
-            <div>
-              <h2 className="fw-bold text-white mb-2">Museum Lampung</h2>
-              <h2 className="fw-bold text-white mb-2">Ruwai Jurai</h2>
-              <h2 className="fw-bold text-white mb-2">Mengabadikan Sejarah</h2>
-              <h2 className="fw-bold text-white mb-4">Budaya Lampung</h2>
-              <a
-                href="/aboutnext"
-                className="btn btn-light fw-bold py-2 px-4 text-black"
-                style={{ borderRadius: "20px" }}
-              >
-                Jelajahi Sekarang
-              </a>
-            </div>
-          </div>
+          <iframe
+  src="https://www.youtube.com/embed/gR8kj6ti-s4?start=180&autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4&controls=0&modestbranding=1&rel=0"
+  title="YouTube video player"
+  allow="autoplay; encrypted-media"
+  allowFullScreen
+  style={{
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '100vw',
+    height: '100vh',
+    objectFit: 'cover',
+    zIndex: '-1',
+    filter: 'grayscale(50%)'
+  }}
+/>
         </section>
 
-        <section className="section-padding" id="about">
+        {/* About Section */}
+        <section className="section-padding bg-light" id="about">
           <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-12 text-center mb-4">
-                <h2 className="text-black fw-bold position-relative d-inline-block pb-2">
-                  Destination Info
-                </h2>
-                <p className="text-black mt-2">
-                  Berikut adalah beberapa informasi penting tentang Museum Lampung yang perlu Anda ketahui sebelum mengunjunginya.
-                </p>
+            <div className="row g-5 align-items-center">
+              <div className="col-lg-6">
+                <motion.div 
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="image-wrapper position-relative">
+                    <img
+                      src="/assets/images/museum.jpg"
+                      className="img-fluid rounded-3 shadow-lg"
+                      alt="Museum Lampung"
+                      style={{
+                        transform: 'rotate(3deg)',
+                        border: '3px solid white'
+                      }}
+                    />
+                    <div className="decorative-box" style={{
+                      position: 'absolute',
+                      bottom: '-20px',
+                      right: '-20px',
+                      width: '60%',
+                      height: '60%',
+                      background: '#714D29',
+                      zIndex: -1,
+                      borderRadius: '15px'
+                    }}></div>
+                  </div>
+                </motion.div>
               </div>
-              <div className="row align-items-center">
-                <div className="col-lg-6 col-12 d-flex justify-content-center mb-4 mb-lg-0">
-                  <img
-                    src="/assets/images/museum.jpg"
-                    className="about-image img-fluid rounded shadow"
-                    alt="Museum Lampung"
-                    style={{ maxWidth: "85%", height: "auto", borderRadius: "12px" }}
-                  />
-                </div>
 
-                <div className="col-lg-5 col-12">
-                  <h3 className="text-black fw-bold">Museum Ruwai Jurai</h3>
-                  <p className="text-black">
-                    Lampung memiliki museum yang mengabadikan perjalanan sejarah di provinsi paling selatan dari Pulau Sumatera ini. Nama museum itu adalah Museum Negeri Propinsi Lampung “Ruwa Jurai”. Museum yang terletak di Jln. Zainal Arifin Pagar Alam No. 64, Rajabasa, Bandar Lampung, ini letaknya begitu strategis. Hanya berjarak beberapa ratus meter dari Terminal Bus Rajabasa dan dekat dengan gerbang Kampus UNILA.
+              <div className="col-lg-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h2 className="display-5 fw-bold mb-4 text-borwn">
+                    Selamat Datang di <span className="text-dark">Museum Ruwai Jurai</span>
+                  </h2>
+                  <p className="lead mb-4" style={{ lineHeight: 1.7 }}>
+                    Sebagai pusat preservasi budaya Lampung, kami menyimpan lebih dari 15.000 artefak bersejarah 
+                    yang menceritakan perjalanan panjang masyarakat Lampung dari masa ke masa.
                   </p>
                   <div className="mt-3">
-                <Link href="/aboutnext">
-                  <button
-                    className="btn text-white px-4 py-2 fw-bold"
-                    style={{
-                      background: "#714D29",
-                      borderRadius: "20px",
-                      transition: "0.3s",
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = "#FFFFFF"; // putih
-                      e.target.style.color = "#000000";      // hitam
-                    }}
-                    
-                    onMouseOut={(e) => {
-                      e.target.style.background = "#714D29"; // coklat tua (default)
-                      e.target.style.color = "#FFFFFF";      // balik ke putih (atau sesuaikan warna awal)
-                    }}
-                    
-                  >
-                    Pelajari Selengkapnya 
-                  </button>
-                </Link>
-              </div>
+                  <Link href="/aboutnext">
+                    <button
+                      className="btn text-white px-4 py-2 fw-bold"
+                      style={{
+                        background: "#714D29",
+                        borderRadius: "20px",
+                        transition: "0.3s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = "#FFFFFF";
+                        e.target.style.color = "#000000";
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = "#714D29";
+                        e.target.style.color = "#FFFFFF";
+                      }}
+                    >
+                      Pelajari Selengkapnya
+                    </button>
+                  </Link>
                 </div>
+                </motion.div>
               </div>
             </div>
           </div>
         </section>
-
-       <section className="section-padding" id="history">
+         <section className="section-padding bg-light" id="history">
           <div className="container">
             <div className="row justify-content-center align-items-center">
               
@@ -191,7 +234,6 @@ export default function RootLayout() {
                 <p className="text-black">
                   Lampung memiliki museum yang mengabadikan perjalanan sejarah di provinsi paling selatan dari Pulau Sumatera ini. Nama museum itu adalah Museum Negeri Propinsi Lampung “Ruwa Jurai”. Museum yang terletak di Jln. Zainal Arifin Pagar Alam No. 64, Rajabasa, Bandar Lampung, ini letaknya begitu strategis. Hanya berjarak beberapa ratus meter dari Terminal Bus Rajabasa dan dekat dengan gerbang Kampus UNILA.
                 </p>
-
                 <div className="mt-3">
                   <Link href="/historynext">
                     <button
@@ -235,80 +277,51 @@ export default function RootLayout() {
           </div>
         </section>
 
+        {/* Venues Section */}
+        <section className="section-padding" id="venues" style={{ backgroundColor: "rgba(205, 183, 140, 0.16)" }}>
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="section-header mb-5 text-center">
+                <h2 className="display-5 fw-bold mb-3">Koleksi Unggulan</h2>
+                <p className="lead text-muted">Temukan koleksi terbaik kami yang telah dipamerkan</p>
+              </div>
 
-        <section className="artists-section section-padding"
-        id="venues"
-        style={{ backgroundColor: "rgba(205, 183, 140, 0.16)" }}
-        >
-        <div className="container">
-          <div className="row justify-content-center mb-4">
-            <div className="col-12">
-              <h2 className="mb-3 fw-bold">Koleksi Museum</h2>
-              <p className="text-black mt-2">
-                Jelajahi Koleksi yang ada di Museum Lampung
-              </p>
-            </div>
-          </div>
-          <div
-  className="d-flex overflow-auto pb-3 custom-scrollbar"
+              <div className="position-relative">
+               {/* Custom Scrollbar */}
+<div
+  className="scroll-container d-flex gap-3 overflow-auto py-2"
+  ref={containerRef}
   style={{
-    gap: "1rem",
-    scrollSnapType: "x mandatory",
+    scrollBehavior: "smooth",
+    scrollbarWidth: "thin",
+    scrollbarColor: "#ccc transparent",
   }}
 >
-  <style jsx global>{`
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #714D29 #f1f1f1;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #714D29;
-    border-radius: 10px;
-    border: 2px solid #f1f1f1;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #5c3f20;
-  }
-`}</style>
-
   {venues.map((venue) => (
-    <div
+    <motion.div
       key={venue.id}
-      className="artists-thumb bg-white p-3 rounded-6 shadow-sm"
+      className="venue-card"
+      whileHover={{ scale: 1.02 }}
       style={{
-        minWidth: "300px",
+        minWidth: "220px",
         flex: "0 0 auto",
-        scrollSnapAlign: "start",
-        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-        cursor: "pointer",
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.transform = "scale(1.03)";
-        e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)";
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "0 2px 10px rgba(0,0,0,0.05)";
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "10px",
+        backgroundColor: "#fff",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
-      {/* Gambar */}
       <div className="artists-image-wrap mb-2 text-center">
         {venue.photo ? (
           <img
             src={`http://localhost:5001/uploads/${venue.photo}?t=${Date.now()}`}
             alt={venue.name}
-            className="img-fluid rounded"
+            className="img-fluid"
             style={{
               width: "100%",
               height: "180px",
@@ -324,14 +337,16 @@ export default function RootLayout() {
         ) : (
           <div
             className="d-flex align-items-center justify-content-center bg-light rounded"
-            style={{ height: "180px", border: "1px solid #ccc" }}
+            style={{
+              height: "180px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
           >
             <FiImage className="text-muted" size={36} />
           </div>
         )}
       </div>
-
-      {/* Nama dan tombol */}
       <div className="text-center">
         <p className="fw-semibold mb-2" style={{ fontSize: "0.9rem" }}>{venue.name}</p>
         <Link href={`/venues?id=${venue.id}`}>
@@ -358,14 +373,16 @@ export default function RootLayout() {
           </button>
         </Link>
       </div>
-    </div>
+    </motion.div>
   ))}
 </div>
-
-            </div>
-
+              </div>
+            </motion.div>
+          </div>
         </section>
-<section className="section-padding" id="review">
+
+        {/* Review Section */}
+       <section className="section-padding" id="review">
   <div className="container">
     {/* Judul Testimoni */}
     <div className="row">
@@ -418,7 +435,7 @@ export default function RootLayout() {
         style={{
           gap: "1.5rem",
           scrollSnapType: "x mandatory",
-          padding: "1rem 60px", // kasih padding besar supaya tombol panah tidak nutup isi
+          padding: "1rem 60px", 
           scrollBehavior: "smooth",
         }}
       >
@@ -514,42 +531,117 @@ export default function RootLayout() {
     </div>
   </div>
 </section>
-        <section className="section-padding" id="ourgallery">
-  <div className="container">
-    {/* Judul Our Gallery */}
-    <div className="row">
-      <div className="col-12 text-center mb-4">
-        <h2 className="text-black fw-bold position-relative d-inline-block pb-2">
-          Our Gallery
-        </h2>
-      </div>
-    </div>
 
-    {/* Grid Gallery */}
-    <div className="row g-3">
-      {["our1.jpg", "our2.jpeg", "our3.jpg", "our4.jpg"].map((image, index) => (
-        <div key={index} className="col-lg-3 col-md-4 col-6">
-          <div className="gallery-item position-relative overflow-hidden">
-            <img
-              src={`/assets/images/${image}`}
-              className="img-fluid rounded shadow"
-              alt={`Gallery ${index + 1}`}
-              style={{ width: "100%", height: "250px", objectFit: "cover", transition: "0.3s" }}
-              onMouseOver={(e) => e.target.style.transform = "scale(1.05)"}
-              onMouseOut={(e) => e.target.style.transform = "scale(1)"}
-            />
+        {/* Gallery Section */}
+        <section className="section-padding bg-light" id="ourgallery">
+          <div className="container-fluid">
+            <div className="row g-0">
+              {["our1.jpg", "our2.jpeg", "our3.jpg", "our4.jpg"].map((image, index) => (
+                <div key={index} className="col-lg-3 col-md-6 gallery-item">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="image-container"
+                  >
+                    <img
+                      src={`/assets/images/${image}`}
+                      alt={`Gallery ${index + 1}`}
+                      loading="lazy"
+                    />
+                    <div className="gallery-overlay">
+                      <button className="view-button">
+                        <FiZoomIn size={24} />
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-       
-
-
+        </section>
 
         <Footer />
       </div>
+
+      <style jsx global>{`
+        :root {
+          --primary-color: #714D29;
+          --secondary-color: #f8f9fa;
+        }
+
+        .hero-section {
+          position: relative;
+          height: 100vh;
+          overflow: hidden;
+        }
+
+        .venue-card {
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          overflow: hidden;
+          transition: transform 0.3s ease;
+        }
+
+        .review-card {
+          background: white;
+          padding: 2rem;
+          border-radius: 15px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .gallery-item {
+          position: relative;
+          overflow: hidden;
+          cursor: pointer;
+        }
+
+        .gallery-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(113,77,41,0.8);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+          opacity: 1;
+        }
+
+        .scroll-container {
+          display: flex;
+          gap: 2rem;
+          padding: 2rem 0;
+          overflow-x: auto;
+          scroll-behavior: smooth;
+        }
+
+        .scroll-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: white;
+          border: none;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+          transition: all 0.3s ease;
+        }
+
+        .scroll-arrow:hover {
+          background: var(--primary-color);
+          color: white;
+          transform: translateY(-50%) scale(1.1);
+        }
+          .text-brown {
+          }
+      `}</style>
     </>
   );
 }
