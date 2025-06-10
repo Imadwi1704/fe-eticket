@@ -12,7 +12,7 @@ https://templatemo.com/tm-583-festava-live
 -----------------------------------------*/
 :root {
   --white-color:                  #ffffff;
-  --primary-color:                #F8CB2E;
+  --primary-color:                #0D6EFD;
   --secondary-color:              #EE5007;
   --section-bg-color:             #f0f8ff;
   --custom-btn-bg-color:          #EE5007;
@@ -25,13 +25,13 @@ https://templatemo.com/tm-583-festava-live
   --body-font-family:             'Outfit', sans-serif;
 
   --h1-font-size:                 74px;
-  --h2-font-size:                 46px;
-  --h3-font-size:                 32px;
-  --h4-font-size:                 28px;
+  --h2-font-size:                 38px;
+  --h3-font-size:                 20px;
+  --h4-font-size:                 18px;
   --h5-font-size:                 24px;
   --h6-font-size:                 22px;
   --p-font-size:                  18px;
-  --btn-font-size:                14px;
+  --btn-font-size:                12px;
   --copyright-font-size:          16px;
 
   --border-radius-large:          100px;
@@ -251,7 +251,7 @@ strong {
   border: none;
   border-radius: 0;
   background: none;
-  color: #000;
+  color: #E8F9FD;
   font-weight: bold;
   font-size: 0.9rem;
   padding: 6px 12px;
@@ -271,7 +271,7 @@ strong {
 }
 
 .nav-tabs .nav-link.active::after {
-  background-color: #714D29; /* warna garis bawah saat aktif */
+  background-color: #227bbf; /* warna garis bawah saat aktif */
 }
 
 .nav-tabs .nav-link {
@@ -291,7 +291,6 @@ strong {
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-link:focus, 
 .nav-tabs .nav-link:hover {
-  background: rgba(116, 80, 45, 1);
   color: #ffffff;
   font-weight: bold;
 }
@@ -392,36 +391,65 @@ strong {
   left: 0;
   margin-top: 51px;
 }
-:root {
-  --primary-brown: #714D29;
-}
+
 
 .sticky-wrapper.is-sticky .navbar {
-  background-color: var(--primary-brown);
+  background-color: #ffffff;
   gap: 0.25rem;
 
 }
 
 
 .navbar {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.107);
   z-index: 9;
   gap: 0.25rem;
+  color: rgb(255, 255, 255);
+  padding: 0.125rem 0; /* Atas & bawah: 0.125rem, kiri & kanan: 0 */
+  
 }
+
 
 .navbar-brand,
 .navbar-brand:hover {
-  color: var(--white-color);
+  color: black;
   font-size: var(--h5-font-size);
   font-weight: var(--font-weight-bold);
 }
 
 .navbar-expand-lg .navbar-nav .nav-link {
   border-radius: var(--border-radius-large);
-  margin: 10px;
+  margin: 20px;
   padding: 10px 20px;
 }
+/* Di global CSS */
+.text-oranye {
+  color: #ffffff !important;
+}
+.text-blue {
+  color: #79DAE8 !important;
+}
+.hover-text-oranye:hover {
+  color: #79DAE8 !important;
+  transition: color 0.3s ease;
+}
 
+.nav-link.active::after {
+  content: '';
+  color: #79DAE8;
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 3px;
+  animation: underline-grow 0.3s ease;
+}
+
+@keyframes underline-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
 .navbar-nav .nav-link {
   display: inline-block;
   color: var(--white-color);
@@ -435,12 +463,10 @@ strong {
 
 .navbar-nav .nav-link.active, 
 .navbar-nav .nav-link:hover {
-  background-color: rgba(248, 244, 225, 1); 
-  color: var(--dark-color);                  
+  color: #ffffff;                  
   border-radius: 1 rem;
   font-size: 0.85rem;
   padding: 4px 8px;
-  border-bottom: 3px solid rgba(248, 244, 225, 1);
   transition: all 0.3s ease;
 }
 
@@ -631,7 +657,7 @@ strong {
 .artists-thumb {
   position: relative;
   overflow: hidden;
-  margin-bottom: 30px;
+  margin-bottom: 0px;
 }
 
 .artists-image {
@@ -646,28 +672,34 @@ strong {
 }
 
 .artists-hover {
-  background-color: var(--primary-color);
-  background-color: rgba(248, 203, 46, 0.75);
+  background-color: #23232356;
   border-radius: var(--border-radius-medium);
-  backdrop-filter: blur(5px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(180%);
   -webkit-backdrop-filter: blur(5px) saturate(180%);
-  margin: 10px;
-  padding: 10px;
+  margin: 0px;
+  padding: 0px;
   transition: all 0.5s ease;
   transform: translateY(100%);
   position: absolute;
   bottom: 0;
   right: 0;
   left: 0;
+
+  /* Ukuran yang kamu minta */
+  width: 100%;
+  height: 250px;
+
   opacity: 0;
+  overflow: hidden;
 }
 
 .artists-hover p strong {
   color: var(--white-color);
   display: inline-block;
-  min-width: 180px;
-  margin-right: 20px;
+  min-width: 50px;
+  margin-right: 0; /* Disesuaikan agar tidak merusak layout */
 }
+
 
 .artists-hover p a {
   color: var(--secondary-color);
@@ -842,7 +874,7 @@ strong {
 }
 
 .custom-form button[type="submit"] {
-  background: rgba(116, 80, 45, 1);
+  background: rgb(7, 7, 7);
   border: none;
   border-radius: var(--border-radius-large);
   color: var(--white-color);
@@ -988,8 +1020,8 @@ strong {
   }
 
   .section-padding {
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding-top: 0px;
+    padding-bottom: 10px;
   }
   
   .navbar {

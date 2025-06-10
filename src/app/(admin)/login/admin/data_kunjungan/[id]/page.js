@@ -1,26 +1,39 @@
 "use client";
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
+import { useParams, useRouter } from "next/navigation";
 
 export default function DataKunjungan() {
   const [data, setData] = useState(null);
-  const { id } = router.query; // Ambil id dari URL
+  const params = useParams();
+  const id = params.id;
 
-  useEffect(() => {
-    if (!id) return; // Hindari fetch jika id belum tersedia
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`/api/data_kunjungan/${id}`); 
-        if (!res.ok) throw new Error("Failed to fetch data");
-        const result = await res.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  // file: utils/validateOrder.js
 
-    fetchData();
-  }, [id]);
+ const validateOrderByCode = async (code, token) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/validate-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // Token JWT admin
+      },
+      body: JSON.stringify({ code }), // Kirim kode pemesanan
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Gagal validasi order');
+    }
+
+    return data; // Berisi informasi order dan status validasi
+  } catch (error) {
+    console.error("Error validating order:", error.message);
+    throw error;
+  }
+};
+
 
   return (
     <>

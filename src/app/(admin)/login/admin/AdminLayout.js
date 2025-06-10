@@ -90,6 +90,94 @@ export default function AdminLayout({ children }) {
 
   return (
     <>
+      <style jsx global>{`
+        :root {
+          --primary-color: #0d6efd;
+          --primary-light: #e7f1ff;
+          --primary-dark: #0b5ed7;
+          --sidebar-bg: #0d6efd;
+          --sidebar-text: #ffffff;
+          --sidebar-hover: rgba(255, 255, 255, 0.1);
+          --sidebar-active: rgba(255, 255, 255, 0.2);
+          --bs-body-font-family: 'Poppins', sans-serif;
+        }
+        
+        .left-sidebar {
+          background-color: var(--sidebar-bg) !important;
+          color: var(--sidebar-text);
+        }
+        
+        .sidebar-nav .sidebar-item .sidebar-link {
+          color: var(--sidebar-text);
+        }
+        
+        .sidebar-nav .sidebar-item:hover {
+          background-color: var(--sidebar-hover);
+        }
+        
+        .sidebar-nav .sidebar-item.active {
+          background-color: var(--sidebar-active);
+          border-left: 3px solid white;
+        }
+        
+        .sidebar-dropdown {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-subitem .sidebar-link {
+          color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .sidebar-subitem:hover {
+          background-color: var(--sidebar-hover);
+        }
+        
+        .brand-logo {
+          background-color: var(--primary-dark);
+          padding: 15px;
+        }
+        
+        .btn-primary {
+          background-color: var(--primary-color);
+          border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+          background-color: var(--primary-dark);
+          border-color: var(--primary-dark);
+        }
+        
+        .bg-primary {
+          background-color: var(--primary-color) !important;
+        }
+        
+        .text-primary {
+          color: var(--primary-color) !important;
+        }
+        
+        .badge.bg-primary {
+          background-color: var(--primary-color) !important;
+        }
+        
+        .modal-header {
+          background-color: var(--primary-color) !important;
+          color: white;
+        }
+        
+        .navbar {
+          background-color: white;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-menu {
+          border: 1px solid var(--primary-light);
+        }
+        
+        .dropdown-item:hover {
+          background-color: var(--primary-light);
+        }
+      `}</style>
+
       <div
         className="page-wrapper"
         id="main-wrapper"
@@ -99,7 +187,7 @@ export default function AdminLayout({ children }) {
         data-sidebar-position="fixed"
         data-header-position="fixed"
       >
-        <aside className="left-sidebar" style={{ backgroundColor: "#714D29" }}>
+        <aside className="left-sidebar">
           <div>
             <div className="brand-logo d-flex align-items-center justify-content-between">
               <a href="/login/admin/dashboard" className="text-nowrap logo-img">
@@ -115,6 +203,7 @@ export default function AdminLayout({ children }) {
                 {renderSidebarItem("/login/admin/dashboard", "ti ti-layout-dashboard", "Dashboard")}
                 {renderSidebarItem("/login/admin/data_tiket", "ti ti-id", "Data Tiket")}
                 {renderSidebarItem("/login/admin/data_venues", "ti ti-grid-dots", "Data Koleksi")}
+                {renderSidebarItem("/login/admin/data_gallery", "ti ti-photo", "Data Gallery")}
                 {renderSidebarItem("/login/admin/data_user", "bi bi-people-fill me-2", "Data User")}
 
                 {renderDropdown(
@@ -140,7 +229,7 @@ export default function AdminLayout({ children }) {
                   )
                 )}
 
-                {renderSidebarItem("/login/admin/data_pembayaran", "bi bi-people-fill me-2", "Data Pembayaran")}
+                {renderSidebarItem("/login/admin/data_pembayaran", "bi bi-receipt", "Data Pembayaran")}
                 {renderSidebarItem("/login/admin/pemesanan", "ti ti-file-description", "Data Pemesanan")}
 
                 {renderDropdown(
@@ -171,13 +260,22 @@ export default function AdminLayout({ children }) {
           <header className="app-header">
             <nav className="navbar navbar-expand-lg navbar-light">
               <div className="d-flex align-items-center w-100">
-                <button className="btn sidebartoggler nav-icon me-3" id="headerCollapse" type="button">
-                  <i className="ti ti-menu-2" />
-                </button>
+              <button
+                    className="btn sidebartoggler nav-icon me-3 d-block d-lg-none"
+                    id="headerCollapse"
+                    type="button"
+                  >
+                    <i className="ti ti-menu-2" />
+              </button>
 
                 <div className="d-flex align-items-center justify-content-between w-100">
                   <div className="d-flex align-items-center">
-                    <button className="btn position-relative" type="button" onClick={() => setShowModal(true)}>
+                    <button 
+                      className="btn position-relative" 
+                      type="button" 
+                      onClick={() => setShowModal(true)}
+                      style={{ color: 'var(--primary-color)' }}
+                    >
                       <i className="ti ti-bell-ringing fs-5" />
                       {reviews.length > 0 && (
                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -195,35 +293,35 @@ export default function AdminLayout({ children }) {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
+                      
                       <img
                         src="/assets/images/profile/user-1.jpg"
                         alt="Foto Profil Admin"
                         width={40}
                         height={40}
-                        className="rounded-circle border border-2 border-white"
+                        className="rounded-circle border border-2 border-primary"
                       />
                     </button>
                     <ul className="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="profileDropdown">
                       <li>
                         <a className="dropdown-item d-flex align-items-center" href="/login/admin/profile">
-                          <i className="ti ti-user me-2"></i> Profile
+                          <i className="ti ti-user me-2 text-primary"></i> Profile
                         </a>
                       </li>
                       <li><hr className="dropdown-divider" /></li>
                       <li>
                         <a className="dropdown-item d-flex align-items-center" href="/login">
-                          <i className="ti ti-logout me-2"></i> Logout
+                          <i className="ti ti-logout me-2 text-primary"></i> Logout
                         </a>
                       </li>
                     </ul>
                   </div>
-
                 </div>
               </div>
             </nav>
           </header>
 
-          <div className="container-fluid p-4" style={{ backgroundColor: "rgba(248, 244, 225, 1)", minHeight: "calc(100vh - 80px)" }}>
+          <div className="container-fluid p-4" style={{ minHeight: "calc(100vh - 80px)" }}>
             {children}
           </div>
         </div>
@@ -233,31 +331,35 @@ export default function AdminLayout({ children }) {
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg">
-              <div className="modal-header bg-white">
-                <h5 className="modal-title">
+              <div className="modal-header">
+                <h5 className="modal-title text-white">
                   {selectedReview ? "Detail Review" : "Daftar Review Pengunjung"}
                 </h5>
-                <button type="button" className="btn-close" onClick={() => { setShowModal(false); setSelectedReview(null); }} />
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
+                  onClick={() => { setShowModal(false); setSelectedReview(null); }} 
+                />
               </div>
 
               <div className="modal-body p-4">
                 {selectedReview ? (
                   <div className="row g-3">
                     <div className="col-md-6">
-                      <label className="fw-bold">Nama:</label>
+                      <label className="fw-bold text-primary">Nama:</label>
                       <p>{selectedReview.user?.fullName}</p>
                     </div>
                     <div className="col-md-6">
-                      <label className="fw-bold">Rating:</label>
+                      <label className="fw-bold text-primary">Rating:</label>
                       <div className="text-warning">{'★'.repeat(selectedReview.score)}</div>
                     </div>
                     <div className="col-md-6">
-                      <label className="fw-bold">Tanggal:</label>
+                      <label className="fw-bold text-primary">Tanggal:</label>
                       <p>{selectedReview.date}</p>
                     </div>
                     <div className="col-12">
-                      <label className="fw-bold">Komentar:</label>
-                      <p className="border p-3 rounded">{selectedReview.comment}</p>
+                      <label className="fw-bold text-primary">Komentar:</label>
+                      <p className="border p-3 rounded bg-light">{selectedReview.comment}</p>
                     </div>
                   </div>
                 ) : (
@@ -270,14 +372,14 @@ export default function AdminLayout({ children }) {
                           onClick={() => setSelectedReview(review)}
                         >
                           <div>
-                            <span className="fw-bold">{review.user?.fullName}</span><br />
+                            <span className="fw-bold text-primary">{review.user?.fullName}</span><br />
                             <small className="text-muted">{review.date}</small>
                           </div>
                           <span className="badge bg-primary rounded-pill">{review.score}/5</span>
                         </button>
                       ))
                     ) : (
-                      <div className="text-center py-4">Tidak ada review tersedia</div>
+                      <div className="text-center py-4 text-muted">Tidak ada review tersedia</div>
                     )}
                   </div>
                 )}
@@ -285,7 +387,11 @@ export default function AdminLayout({ children }) {
 
               {selectedReview && (
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setSelectedReview(null)}>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={() => setSelectedReview(null)}
+                  >
                     Kembali ke Daftar
                   </button>
                 </div>

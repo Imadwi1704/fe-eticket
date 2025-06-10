@@ -11,7 +11,7 @@ const Belitiketbutton = () => {
     <button
       style={{
         ...styles.button,
-        backgroundColor: hover ? "#e0a600" : "#FEBA15",
+        backgroundColor: hover ? "#0D6EFD" : "#0D6EFD",
       }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

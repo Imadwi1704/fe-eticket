@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import Spinner from "../../src/components/spinner";
@@ -24,6 +24,16 @@ export default function Navbar() {
   const [showPassword, setShowPassword] = useState(false);
   const navRef = useRef(null);
   const pathname = usePathname();
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navItems = [
     { name: "Beranda", path: "/" },
@@ -97,10 +107,10 @@ export default function Navbar() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const verifyAndSetToken = async (token) => {
       try {
-        // Verifikasi token ke backend
         const res = await fetch("http://localhost:5001/api/auth/verify-token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -109,7 +119,6 @@ export default function Navbar() {
 
         if (!res.ok) throw new Error("Invalid token");
         
-        // Set cookie dengan opsi keamanan
         setCookie("token", token, {
           maxAge: 86400,
           secure: process.env.NODE_ENV === "production",
@@ -150,7 +159,6 @@ export default function Navbar() {
   }, []);
 
   const handleGoogleLogin = () => {
-    // Simpan halaman sebelumnya
     sessionStorage.setItem("preAuthPath", window.location.pathname);
     window.location.href = "http://localhost:5001/api/auth/google";
   };
@@ -173,8 +181,6 @@ export default function Navbar() {
     </button>
   );
 
-  {renderGoogleLoginButton()}
-
   const handleLogout = () => {
     fetch("http://localhost:5001/api/auth/logout", {
       method: "POST",
@@ -186,10 +192,8 @@ export default function Navbar() {
       setIsLoggedIn(false);
       setFullName("");
       setShowProfileMenu(false);
-      
     });
   };
-
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -289,10 +293,13 @@ export default function Navbar() {
   };
 
   return (
-    <header className="navbar navbar-expand-lg fixed-top py-2">
-      <div className="container d-flex justify-content-between align-items-center px-2">
+    <header 
+      className={`navbar navbar-expand-lg fixed-top py-0 ${isSticky ? "bg-white shadow-sm" : "bg-transparent"}`}
+      style={{ transition: "all 0.3s ease" }}
+    >
+      <div className="container d-flex justify-content-between align-items-center px-1">
         <Link href="/" className="navbar-brand fw-bold fs-5">
-          Ruwai Jurai
+          <span className={isSticky ? "text-dark" : "text-white"}>Ruwa Jurai</span>
         </Link>
 
         {/* Mobile */}
@@ -325,37 +332,47 @@ export default function Navbar() {
             className="btn btn-sm"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation"
-            style={{ fontSize: "1.3rem" }}
+            style={{ fontSize: "1.3rem", color: isSticky ? "#000" : "#fff" }}
           >
             {isOpen ? "✖" : "☰"}
           </button>
         </div>
 
         {/* Desktop */}
-        <nav className="d-none d-lg-flex align-items-center gap-2 py-1 px-2 small">
-        <ul className="navbar-nav d-flex flex-row gap-0 mb-0 small">
-          {navItems.map((item, idx) => (
-            <li className="nav-item" key={idx}>
-              <Link
-                href={item.path}
-                className={`nav-link px-1 py-0 ${pathname === item.path ? "active text-white" : "text-white"}`}
-
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <nav className="d-none d-lg-flex align-items-center gap-1 py-1 px-1 small">
+          <ul className="navbar-nav d-flex flex-row gap-3 mb-0 small">
+            {navItems.map((item, idx) => (
+              <li className="nav-item position-relative" key={idx}>
+                <Link
+                  href={item.path}
+                  className={`nav-link px-1 py-2 ${isSticky ? "text-dark" : "text-white"}`}
+                >
+                  {item.name}
+                  {pathname === item.path && (
+                    <div 
+                      className="position-absolute bottom-0 start-0 w-100 bg-primary"
+                      style={{ 
+                        height: "3px",
+                        borderRadius: "3px 3px 0 0",
+                        transform: "scaleX(1)",
+                        transition: "transform 0.3s ease"
+                      }}
+                    />
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
           {!isLoggedIn ? (
             <>
               <Link
                 href="/register"
-                className="btn btn-outline-light btn-sm rounded-pill"
+                className={`btn btn-sm rounded-pill ${isSticky ? "btn-outline-dark" : "btn-light"}`}
               >
                 Daftar
               </Link>
               <button
-                className="btn btn-light btn-sm rounded-pill"
+                className={`btn btn-sm rounded-pill ${isSticky ? "btn-dark" : "btn-light"}`}
                 onClick={() => setShowLogin(true)}
               >
                 Masuk
@@ -367,9 +384,9 @@ export default function Navbar() {
                 className="btn d-flex align-items-center gap-2"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
-                <span className="text-white">{fullName.split(" ")[0]}</span>
+                <span className={isSticky ? "text-dark" : "text-white"}>{fullName.split(" ")[0]}</span>
                 <i
-                  className="bi bi-person-circle fs-4 text-white"
+                  className={`bi bi-person-circle fs-4 ${isSticky ? "text-dark" : "text-white"}`}
                   style={{
                     borderRadius: "50%",
                     padding: "8px",
@@ -401,163 +418,162 @@ export default function Navbar() {
         </div>
       )}
 
-    {/* Login Modal */}
-{showLogin && (
-  <div
-    className="modal fade show d-block"
-    tabIndex={-1}
-    role="dialog"
-    aria-modal="true"
-    style={{
-      backgroundColor: "rgba(0,0,0,0.6)",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      zIndex: 1050,
-    }}
-    onClick={() => setShowLogin(false)}
-  >
-    <div
-      className="modal-dialog modal-dialog-centered"
-      role="document"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="modal-content shadow-lg p-4 rounded-3" style={{ border: 'none' }}>
-        <div className="modal-header border-0 pb-0">
-          <h5 className="modal-title fw-bold fs-4 text-primary">Masuk Akun</h5>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setShowLogin(false)}
-            aria-label="Close"
-          />
-        </div>
-        
-        <form onSubmit={handleLogin}>
-          <div className="modal-body pt-1">
-            {/* Email Input */}
-            <div className="mb-4">
-              <label htmlFor="email" className="form-label text-muted">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                className="form-control form-control-lg rounded-2"
-                placeholder="contoh@email.com"
-                required
-                style={{ padding: '12px' }}
-              />
-            </div>
-
-            {/* Password Input with Toggle */}
-            <div className="mb-4">
-              <label htmlFor="password" className="form-label text-muted">
-                Kata Sandi
-              </label>
-              <div className="input-group">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  className="form-control form-control-lg rounded-2"
-                  placeholder="Masukkan kata sandi"
-                  required
-                  style={{ padding: '12px' }}
-                />
+      {/* Login Modal */}
+      {showLogin && (
+        <div
+          className="modal fade show d-block"
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.6)",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 1050,
+          }}
+          onClick={() => setShowLogin(false)}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content shadow-lg p-4 rounded-3" style={{ border: 'none' }}>
+              <div className="modal-header border-0 pb-0">
+                <h5 className="modal-title fw-bold fs-4 text-primary">Masuk Akun</h5>
                 <button
                   type="button"
-                  className="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
-                >
-                  <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} text-muted`} />
-                </button>
-              </div>
-            </div>
-
-            {/* Lupa Password */}
-            <div className="d-flex justify-content-end mb-4">
-              <button
-                type="button"
-                className="btn btn-link text-decoration-none p-0 text-primary"
-                onClick={() => {
-                  setShowForgotPassword(true);
-                  setShowLogin(false);
-                }}
-              >
-                Lupa Password?
-              </button>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg w-100 mb-3 rounded-2 fw-semibold"
-              disabled={loading}
-              style={{ 
-                height: '50px',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              {loading ? (
-                <div className="d-flex align-items-center justify-content-center gap-2">
-                  <span className="spinner-border spinner-border-sm" role="status" />
-                  <span>Memproses...</span>
-                </div>
-              ) : "Masuk"}
-            </button>
-
-            {/* Separator */}
-            <div className="d-flex align-items-center my-4">
-              <div className="border-top flex-grow-1" />
-              <span className="mx-3 text-muted">atau</span>
-              <div className="border-top flex-grow-1" />
-            </div>
-
-            {/* Google Login */}
-            <button
-              type="button"
-              className="btn btn-outline-danger btn-lg w-100 d-flex align-items-center justify-content-center gap-3 rounded-2 fw-semibold"
-              onClick={handleGoogleLogin}
-              style={{ 
-                height: '50px',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt="Google"
-                width="20"
-                height="20"
-              />
-              <span>Masuk dengan Google</span>
-            </button>
-
-            {/* Register Link */}
-            <div className="text-center mt-4 pt-3">
-              <p className="mb-0 text-muted">
-                Belum punya akun?{' '}
-                <a
-                  href="/register"
-                  className="text-decoration-none fw-semibold text-primary"
+                  className="btn-close"
                   onClick={() => setShowLogin(false)}
-                >
-                  Daftar sekarang
-                </a>
-              </p>
+                  aria-label="Close"
+                />
+              </div>
+              
+              <form onSubmit={handleLogin}>
+                <div className="modal-body pt-1">
+                  {/* Email Input */}
+                  <div className="mb-4">
+                    <label htmlFor="email" className="form-label text-muted">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      className="form-control form-control-lg rounded-2"
+                      placeholder="contoh@email.com"
+                      required
+                      style={{ padding: '12px' }}
+                    />
+                  </div>
+
+                  {/* Password Input with Toggle */}
+                  <div className="mb-4">
+                    <label htmlFor="password" className="form-label text-muted">
+                      Kata Sandi
+                    </label>
+                    <div className="input-group">
+                      <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        className="form-control form-control-lg rounded-2"
+                        placeholder="Masukkan kata sandi"
+                        required
+                        style={{ padding: '12px' }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                      >
+                        <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} text-muted`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Lupa Password */}
+                  <div className="d-flex justify-content-end mb-4">
+                    <button
+                      type="button"
+                      className="btn btn-link text-decoration-none p-0 text-primary"
+                      onClick={() => {
+                        setShowForgotPassword(true);
+                        setShowLogin(false);
+                      }}
+                    >
+                      Lupa Password?
+                    </button>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-lg w-100 mb-3 rounded-2 fw-semibold"
+                    disabled={loading}
+                    style={{ 
+                      height: '50px',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    {loading ? (
+                      <div className="d-flex align-items-center justify-content-center gap-2">
+                        <span className="spinner-border spinner-border-sm" role="status" />
+                        <span>Memproses...</span>
+                      </div>
+                    ) : "Masuk"}
+                  </button>
+
+                  {/* Separator */}
+                  <div className="d-flex align-items-center my-4">
+                    <div className="border-top flex-grow-1" />
+                    <span className="mx-3 text-muted">atau</span>
+                    <div className="border-top flex-grow-1" />
+                  </div>
+
+                  {/* Google Login */}
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger btn-lg w-100 d-flex align-items-center justify-content-center gap-3 rounded-2 fw-semibold"
+                    onClick={handleGoogleLogin}
+                    style={{ 
+                      height: '50px',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <img
+                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                      alt="Google"
+                      width="20"
+                      height="20"
+                    />
+                    <span>Masuk dengan Google</span>
+                  </button>
+
+                  {/* Register Link */}
+                  <div className="text-center mt-4 pt-3">
+                    <p className="mb-0 text-muted">
+                      Belum punya akun?{' '}
+                      <a
+                        href="/register"
+                        className="text-decoration-none fw-semibold text-primary"
+                        onClick={() => setShowLogin(false)}
+                      >
+                        Daftar sekarang
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
-        </form>
-      </div>
-    </div>
-  </div>
-)}
-    ``
-    
+        </div>
+      )}
+      
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div

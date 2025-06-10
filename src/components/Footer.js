@@ -1,163 +1,200 @@
 import Link from "next/link";
-import Script from "next/script";
+import { FiMapPin, FiMail, FiPhone, FiClock, FiArrowRight } from "react-icons/fi";
+import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 
-const Footer = () => {
+const CompactFooter = () => {
   return (
     <footer 
-      className="text-white py-5 position-relative" 
+      className="text-white position-relative fw-bold"
       style={{ 
-        backgroundColor: "#714D29",
-        backgroundImage: "linear-gradient(to bottom right, #714D29 0%, #5a3b20 100%)"
+        backgroundColor: "#0D6EFD",
+        backgroundImage: "linear-gradient(135deg, #0D6EFD 0%, #0a58ca 100%)",
+        padding: "40px 0 20px",
+        boxShadow: "0 -5px 20px rgba(0,0,0,0.1)"
       }}
     >
-      {/* Efek tekstur subtle */}
-      <div 
-        className="position-absolute top-0 start-0 w-100 h-100"
-        style={{ 
-          backgroundImage: "url('/assets/images/texture.png')",
-          opacity: 0.05,
-          pointerEvents: "none"
-        }}
-      ></div>
-
-      <div className="container" style={{ maxWidth: "960px", position: "relative" }}>
-        <div className="row g-4 align-items-start">
-          {/* Kolom Alamat */}
-          <div className="col-md-4 position-relative ">
-            <h5 className="fw-bold text-white mb-3 d-flex align-items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-geo-alt-fill" viewBox="0 0 16 16">
-                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-              </svg>
-              Alamat
-            </h5>
-            <p className="mb-6 text-white" style={{ fontSize: "14px", lineHeight: "1.8" }}>
-              Jl. ZA. Pagar Alam No.64,
-              Gedong Meneng, Kec. Rajabasa,
-              Kota Bandar Lampung,
-              Lampung 35141
+      <div className="container position-relative" style={{ maxWidth: "1200px" }}>
+        <div className="row g-4">
+          {/* Contact Info Column */}
+          <div className="col-lg-4">
+            <div className="d-flex align-items-center gap-3 mb-3">
+              <img 
+                src="/assets/images/lampung-logo.png" 
+                alt="Museum Logo" 
+                style={{ width: "40px", filter: "brightness(0) invert(1)" }}
+              />
+              <h4 className="mb-0 text-white fw-bold" style={{ fontSize: "1.1rem" }}>Museum Lampung</h4>
+            </div>
+            
+            <p className="text-white mb-3 fw-bold" style={{ lineHeight: "1.6", fontSize: "0.9rem" }}>
+              Museum Negeri Propinsi Lampung "Ruwa Jurai" merupakan pusat pelestarian budaya 
+              dan sejarah Lampung dengan lebih dari 15.000 koleksi bersejarah.
             </p>
+            
+            <div className="contact-info">
+              <div className="d-flex align-items-start gap-2 mb-2">
+                <FiMapPin className="mt-1 flex-shrink-0" size={16} />
+                <p className="text-white mb-0" style={{ fontSize: "0.85rem" }}>
+                  Jl. ZA. Pagar Alam No.64, Gedong Meneng, Kec. Rajabasa, Kota Bandar Lampung
+                </p>
+              </div>
+              
+              <div className="d-flex align-items-start gap-2 mb-2">
+                <FiClock className="mt-1 flex-shrink-0" size={16} />
+                <p className="text-white mb-0" style={{ fontSize: "0.85rem" }}>
+                  Selasa-Minggu: 08.00-14.00 WIB | Senin & Hari Libur: Tutup
+                </p>
+              </div>
+              
+              <div className="d-flex align-items-start gap-2 mb-2">
+                <FiPhone className="mt-1 flex-shrink-0" size={16} />
+                <p className="text-white mb-0" style={{ fontSize: "0.85rem" }}>
+                  (0721) 703417 | info@museumlampung.id
+                </p>
+              </div>
+            </div>
+          </div>
 
-            {/* Social Media */}
-            <div className="d-flex gap-3">
-              {['facebook', 'twitter', 'instagram'].map((social, index) => (
-                <a 
-                  key={index}
-                  href={`https://${social}.com`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white text-decoration-none"
-                  style={{ transition: 'transform 0.3s' }}
-                  onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                  onMouseOut={(e) => (e.currentTarget.style.transform = 'none')}
+          {/* Quick Links Column */}
+          <div className="col-lg-2 col-md-4">
+            <h5 className="text-white fw-bold mb-3" style={{ fontSize: "1rem" }}>
+              Menu Cepat
+            </h5>
+            <ul className="list-unstyled">
+              {["Beranda", "Tentang", "Sejarah", "Koleksi", "Galeri", "Ulasan"].map((item, index) => (
+                <li key={index} className="mb-1">
+                  <Link
+                    href={`#${item.toLowerCase()}`}
+                    className="text-white text-decoration-none d-block py-1 hover-lift"
+                    style={{ fontSize: "0.85rem" }}
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+
+          {/* Newsletter Column */}
+          <div className="col-lg-3 col-md-4">
+            <h5 className="text-white fw-bold mb-3" style={{ fontSize: "1rem" }}>
+              Newsletter
+            </h5>
+            <p className="text-white mb-2" style={{ fontSize: "0.85rem" }}>
+              Dapatkan informasi terbaru tentang pameran dan acara di Museum Lampung.
+            </p>
+            
+            <form className="mb-3">
+              <div className="input-group">
+                <input 
+                  type="email" 
+                  className="form-control border-0" 
+                  placeholder="Email Anda"
+                  style={{
+                    height: "40px",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "white",
+                    fontSize: "0.85rem"
+                  }}
+                />
+                <button 
+                  className="btn btn-light" 
+                  type="submit"
+                  style={{ height: "40px", width: "40px" }}
                 >
-                  <i className={`bi bi-${social} fs-5`}></i>
+                  <FiArrowRight size={16} />
+                </button>
+              </div>
+            </form>
+            
+            <h6 className="text-white fw-bold mb-2" style={{ fontSize: "0.9rem" }}>Follow Kami</h6>
+            <div className="d-flex gap-2">
+              {[
+                { icon: <FaFacebookF size={14} />, color: "#3b5998" },
+                { icon: <FaTwitter size={14} />, color: "#1da1f2" },
+                { icon: <FaInstagram size={14} />, color: "#e1306c" },
+                { icon: <FaYoutube size={14} />, color: "#ff0000" }
+              ].map((social, index) => (
+                <a
+                  key={index}
+                  href="#"
+                  className="d-flex align-items-center justify-content-center rounded-circle text-decoration-none"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "white",
+                    transition: "all 0.3s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = social.color;
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
+                    e.currentTarget.style.transform = "none";
+                  }}
+                >
+                  {social.icon}
                 </a>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Garis Vertikal */}
-          <div className="col-md-1 d-none d-md-flex justify-content-center">
-            <div
+        {/* Copyright Section */}
+        <div className="row mt-4 pt-3">
+          <div className="col-12">
+            <div 
+              className="text-center text-white-60 pt-3"
               style={{
-                width: "1px",
-                height: "100%",
-                background: "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+                fontSize: "0.8rem"
               }}
-            ></div>
-          </div>
-
-          {/* Menu + Logo */}
-          <div className="col-md-7 d-flex flex-column justify-content-between" style={{ minHeight: "160px" }}>
-            <ul
-              className="list-unstyled mb-3 d-flex flex-wrap gap-4"
-              style={{ fontSize: "14px" }}
             >
-              {["Beranda", "Destinasi Info", "Sejarah", "Koleksi", "Gallery", "Review Museum"].map(
-                (item, index) => (
-                  <li key={index} className="position-relative">
-                    <Link
-                      href={`#${item.toLowerCase().replace(/\s/g, "")}`}
-                      className="text-white text-decoration-none hover-link"
-                      style={{ 
-                        transition: "color 0.3s",
-                        paddingBottom: "2px"
-                      }}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                )
-              )}
-            </ul>
-
-            {/* Logo dengan efek hover */}
-            <div className="d-flex justify-content-end mt-auto">
-              <div style={{ transition: 'transform 0.3s' }} className="hover-lift">
-                <img
-                  src="/assets/images/lampung-logo.png"
-                  alt="Lampung Logo"
-                  style={{ 
-                    width: "140px", 
-                    filter: "brightness(0) invert(1)",
-                    opacity: 0.9
-                  }}
-                />
-              </div>
+              <p className="mb-0 text-white">
+                © {new Date().getFullYear()} Museum Negeri Propinsi Lampung "Ruwa Jurai". 
+                <span className="d-block d-sm-inline"> All Rights Reserved.</span>
+              </p>
+              <p className="mt-1 mb-0 text-white">
+                Developed by <span className="fw-bold">PKL D3 Manajemen Informatika</span> - 
+                <span className="d-block d-sm-inline"> Politeknik Negeri Lampung</span>
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Copyright dengan efek garis atas */}
-        <div
-          className="text-center text white mt-4 pt-4"
-          style={{
-            fontSize: "14px",
-            borderTop: "1px solid rgba(255,255,255,0.15)",
-          }}
-        >
-          <p className="mb-0 text-white">
-            © {new Date().getFullYear()} PKL D3 Manajemen Informatika<br />
-            <span className="opacity-75" style={{ fontSize: "12px" }}>
-              Politeknik Negeri Lampung
-            </span>
-          </p>
-        </div>
       </div>
 
-      {/* Script eksternal */}
-      <Script src="/assets/js/jquery.min.js" strategy="lazyOnload" />
-      <Script src="/assets/js/bootstrap.min.js" strategy="lazyOnload" />
-      <Script src="/assets/js/jquery.sticky.js" strategy="lazyOnload" />
-      <Script src="/assets/js/click-scroll.js" strategy="lazyOnload" />
-      <Script src="/assets/js/custom.js" strategy="lazyOnload" />
-
-      <style jsx>{`
-        .hover-link {
-          position: relative;
+      <style jsx global>{`
+        .text-white {
+          color: rgba(255,255,255,0.8);
         }
-        
-        .hover-link::after {
-          content: '';
-          position: absolute;
-          width: 0;
-          height: 1px;
-          bottom: 0;
-          left: 0;
-          background-color: #FFD700;
-          transition: width 0.3s ease-out;
+        .text-white-60 {
+          color: rgba(255,255,255,0.6);
         }
-        
-        .hover-link:hover::after {
-          width: 100%;
+        .bg-white-10 {
+          background-color: rgba(255,255,255,0.1);
         }
-        
+        .bg-white-20 {
+          background-color: rgba(255,255,255,0.2);
+        }
         .hover-lift:hover {
-          transform: translateY(-5px);
+          transform: translateY(-2px);
+          color: white !important;
+        }
+        .form-control::placeholder {
+          color: rgba(255,255,255,0.6) !important;
+        }
+        .form-control:focus {
+          background-color: rgba(255,255,255,0.2) !important;
+          color: white !important;
+          box-shadow: none !important;
+          border-color: transparent !important;
         }
       `}</style>
     </footer>
   );
 };
 
-export default Footer;
+export default CompactFooter;

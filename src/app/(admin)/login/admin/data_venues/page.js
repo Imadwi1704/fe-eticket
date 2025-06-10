@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
-import {getCookie } from "cookies-next";
-import {FiImage } from "react-icons/fi";
-
+import { getCookie } from "cookies-next";
+import { FiImage, FiEdit2, FiTrash2, FiPlus, FiCheckCircle } from "react-icons/fi";
 
 export default function VenueAdminPage() {
   const [data, setData] = useState([]);
@@ -12,16 +11,15 @@ export default function VenueAdminPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [venue, setVenue] = useState({name: "", year: "", description: "", photo: "" });
-  const [showImage, setShowImage] = useState({})
+  const [venue, setVenue] = useState({ name: "", year: "", description: "", photo: "" });
+  const [showImage, setShowImage] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const token = getCookie("token");
 
-  console.log(venue)
-
   useEffect(() => {
     if (!token) return;
-  
+
     const fetchData = async () => {
       try {
         const res = await fetch("http://localhost:5001/api/venue", {
@@ -34,19 +32,20 @@ export default function VenueAdminPage() {
         if (res.status === 200) {
           setData(result);
         } else {
-          console.error("Gagal mengambil data:", result.metaData?.message);
+          console.error("Failed to fetch data:", result.metaData?.message);
         }
       } catch (error) {
-        console.error("Terjadi kesalahan saat fetch:", error);
+        console.error("Error while fetching:", error);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [token]);
-  
 
   const handleAddVenue = () => {
-    setVenue({name: "", year: "", description: "", photo: "" });
+    setVenue({ name: "", year: "", description: "", photo: "" });
     setShowModal(true);
   };
 
@@ -55,7 +54,6 @@ export default function VenueAdminPage() {
     setShowImage(`http://localhost:5001/uploads/${item.photo}`);
     setShowEditModal(true);
   };
-  
 
   const handleDeleteVenue = (item) => {
     setVenue(item);
@@ -73,13 +71,13 @@ export default function VenueAdminPage() {
       const result = await res.json();
       if (res.ok) {
         setData(data.filter((i) => i.id !== venue.id));
-        setMessage("Koleksi berhasil dihapus");
+        setMessage("Collection successfully deleted");
       } else {
-        alert(result.metaData?.message || "Gagal menghapus");
-      }      
+        alert(result.metaData?.message || "Failed to delete");
+      }
     } catch (error) {
-      console.error("Error delete:", error);
-      alert("Terjadi kesalahan saat menghapus data.");
+      console.error("Error deleting:", error);
+      alert("Error occurred while deleting data.");
     }
     setShowConfirmModal(false);
   };
@@ -99,10 +97,9 @@ export default function VenueAdminPage() {
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Hanya file JPG atau PNG yang diperbolehkan.");
+      alert("Only JPG or PNG files are allowed.");
     }
   };
-  
 
   const handleSubmit = async () => {
     try {
@@ -110,17 +107,16 @@ export default function VenueAdminPage() {
       const url = showModal
         ? "http://localhost:5001/api/venue"
         : `http://localhost:5001/api/venue/${venue.id}`;
-  
+
       const formData = new FormData();
       formData.append("name", venue.name);
       formData.append("year", venue.year);
       formData.append("description", venue.description);
-  
-      // Cek apakah foto adalah File object
+
       if (venue.photo instanceof File) {
         formData.append("photo", venue.photo);
       }
-  
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -128,168 +124,266 @@ export default function VenueAdminPage() {
         },
         body: formData,
       });
-  
+
       const result = await res.json();
-  
+
       if (res.status < 300) {
-        // Ambil data baru dari response
         const newVenue = result.data || venue;
         if (showModal) {
           setData([...data, newVenue]);
         } else {
           setData(data.map((i) => (i.id === venue.id ? newVenue : i)));
         }
-  
-        setMessage(showModal ? "Koleksi berhasil ditambahkan" : "Koleksi berhasil diperbarui");
+
+        setMessage(showModal ? "Collection successfully added" : "Collection successfully updated");
         setShowModal(false);
         setShowEditModal(false);
-        setVenue({name: "", year: "", description: "", photo: ""});
+        setVenue({ name: "", year: "", description: "", photo: "" });
         setShowImage(null);
       } else {
-        alert(result.metaData?.message || "Gagal menyimpan data");
+        alert(result.metaData?.message || "Failed to save data");
       }
     } catch (error) {
-      console.error("Error saat menyimpan:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      console.error("Error while saving:", error);
+      alert("Error occurred while saving data.");
     }
   };
-  
-
-  console.log(data)
 
   return (
     <>
       <Template />
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="container">
-          <div className="card w-100 shadow-none">
-            <div className="card-body p-5">
-              <h2 className="fw-semibold mb-4">Data Koleksi</h2>
-              <p className="mb-4">
-                Berfungsi untuk melakukan Create, Read, Update, dan Delete Data Koleksi pada Museum Lampung.
-              </p>
-              <div className="d-flex justify-content-end mb-3">
-                <button className="btn btn-success" onClick={handleAddVenue}>
-                  + Tambah Data
+      <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
+        <div className="container-fluid py-5">
+          <div className="card shadow-sm border-0">
+            <div className="card-header bg-primary text-white">
+              <h2 className="card-title fw-semibold text-white mb-0">Data Koleksi Museum Lampung</h2>
+            </div>
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <p className="text-muted mb-0">
+                    Kelola data koleksi museum. Anda dapat menambah, mengedit, atau menghapus koleksi.
+                  </p>
+                </div>
+                <button 
+                  className="btn text-white d-flex align-items-center" 
+                  onClick={handleAddVenue}
+                  style={{ backgroundColor: '#0d6efd' }}
+                >
+                  <FiPlus className="me-2" /> Add Data
                 </button>
               </div>
-              <div className="table-responsive">
-                <table className="table">
-                  <thead style={{ backgroundColor: "rgba(116, 80, 45, 0.18)" }}>
-                    <tr>
-                      <th>No</th>
-                      <th>Kode Koleksi</th>
-                      <th>Nama Koleksi</th>
-                      <th>Tahun</th>
-                      <th>Deskripsi</th>
-                      <th>Foto</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((item, idx) => (
-                      <tr key={item.id}>  
-                        <td>{idx + 1}</td>
-                        <td>{item.id}</td>
-                        <td>{item.name}</td>
-                        <td>{item.year}</td>
-                        <td style={{ whiteSpace: "pre-wrap", maxWidth: "200px" }}>{item.description}</td>
-                        <td>
-                        <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border border-gray-200">
-                          {item.photo ? (
-                            <img
-                            style={{width: 100, height:100}}
-                              src={`http://localhost:5001/uploads/${
-                                item.photo
-                              }?t=${new Date().getTime()}`}
-                              alt={item.name}
-                              className="h-full w-full object-cover"
-                              crossOrigin="anonymous"
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src =
-                                  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
-                              }}
-                            />
-                          ) : (
-                            <FiImage className="text-gray-400 h-5 w-5" />
-                          )}
-                          </div>
 
-                        </td>
-                        <td>
-                          <button className="btn btn-warning btn-sm me-2" onClick={() => handleEditVenue(item)}>Edit</button>
-                          <button className="btn btn-danger btn-sm" onClick={() => handleDeleteVenue(item)}>Hapus</button>
-                        </td>
+              {loading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead style={{ backgroundColor: 'rgba(13, 110, 253, 0.1)' }}>
+                      <tr className="text-white">
+                        <th className="text-dark">No</th>
+                        <th className="text-dark">Kode Koleksi</th>
+                        <th className="text-dark">Nama Koleksi</th>
+                        <th className="text-dark">Tahun</th>
+                        <th className="text-dark">Deskripsi</th>
+                        <th className="text-dark">Photo</th>
+                        <th className="text-dark">Aksi</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {data.map((item, idx) => (
+                        <tr key={item.id}>
+                          <td>{idx + 1}</td>
+                          <td>{item.id}</td>
+                          <td>{item.name}</td>
+                          <td>{item.year}</td>
+                          <td style={{ whiteSpace: "pre-wrap", maxWidth: "200px" }}>{item.description}</td>
+                          <td>
+                            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border" style={{ borderColor: 'rgba(13, 110, 253, 0.2)' }}>
+                              {item.photo ? (
+                                <img
+                                  style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                  src={`http://localhost:5001/uploads/${item.photo}?t=${new Date().getTime()}`}
+                                  alt={item.name}
+                                  className="h-full w-full"
+                                  crossOrigin="anonymous"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
+                                  }}
+                                />
+                              ) : (
+                                <FiImage className="text-muted h-5 w-5" />
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="d-flex gap-2">
+                              <button 
+                                className="btn btn-sm d-flex align-items-center" 
+                                onClick={() => handleEditVenue(item)}
+                                style={{ backgroundColor: 'rgba(13, 110, 253, 0.1)', color: '#0d6efd' }}
+                              >
+                                <FiEdit2 size={14} className="me-1" /> Edit
+                              </button>
+                              <button 
+                                className="btn btn-sm d-flex align-items-center" 
+                                onClick={() => handleDeleteVenue(item)}
+                                style={{ backgroundColor: 'rgba(220, 53, 69, 0.1)', color: '#dc3545' }}
+                              >
+                                <FiTrash2 size={14} className="me-1" /> Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Add/Edit Modal */}
       {(showModal || showEditModal) && (
         <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog">
+          <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">{showModal ? "Tambah Koleksi" : "Edit Koleksi"}</h5>
-                <button className="btn-close" onClick={() => { setShowModal(false); setShowEditModal(false); }}></button>
+              <div className="modal-header" style={{ borderBottomColor: 'rgba(13, 110, 253, 0.2)' }}>
+                <h5 className="modal-title fw-bold text-dark">
+                  {showModal ? "Add Collection" : "Edit Collection"}
+                </h5>
+                <button 
+                  className="btn-close" 
+                  onClick={() => { setShowModal(false); setShowEditModal(false); }}
+                  aria-label="Close"
+                ></button>
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label className="form-label">Nama Koleksi</label>
-                  <input type="text" name="name" className="form-control" value={venue.name} onChange={handleChange} />
+                  <label className="form-label">Collection Name</label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    className="form-control" 
+                    value={venue.name} 
+                    onChange={handleChange}
+                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                  />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Tahun</label>
-                  <input type="text" name="year" className="form-control" value={venue.year} onChange={handleChange} />
+                  <label className="form-label">Year</label>
+                  <input 
+                    type="text" 
+                    name="year" 
+                    className="form-control" 
+                    value={venue.year} 
+                    onChange={handleChange}
+                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                  />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Deskripsi</label>
-                  <textarea name="description" className="form-control" rows="5" value={venue.description} onChange={handleChange}></textarea>
+                  <label className="form-label">Description</label>
+                  <textarea 
+                    name="description" 
+                    className="form-control" 
+                    rows="5" 
+                    value={venue.description} 
+                    onChange={handleChange}
+                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                  ></textarea>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label">Foto (jpg/png)</label>
-                  <input type="file" name="photo" accept="image/jpeg, image/png" className="form-control" onChange={handleFileUpload} />
+                  <label className="form-label">Photo (jpg/png)</label>
+                  <input 
+                    type="file" 
+                    name="photo" 
+                    accept="image/jpeg, image/png" 
+                    className="form-control" 
+                    onChange={handleFileUpload}
+                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                  />
                   {showImage && (
-                    <div className="mt-2">
-                      <img src={showImage} alt="Preview" style={{ maxHeight: "150px" }} />
+                    <div className="mt-3 text-center">
+                      <img 
+                        src={showImage} 
+                        alt="Preview" 
+                        style={{ 
+                          maxHeight: "200px", 
+                          maxWidth: "100%", 
+                          border: '2px dashed rgba(13, 110, 253, 0.3)',
+                          borderRadius: '8px',
+                          padding: '4px'
+                        }} 
+                      />
                     </div>
                   )}
                 </div>
               </div>
-              <div className="modal-footer">
-                <button className="btn btn-primary" onClick={handleSubmit}>Simpan</button>
+              <div className="modal-footer" style={{ borderTopColor: 'rgba(13, 110, 253, 0.2)' }}>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => { setShowModal(false); setShowEditModal(false); }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn text-white" 
+                  onClick={handleSubmit}
+                  style={{ backgroundColor: '#0d6efd' }}
+                >
+                  Save Changes
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {showConfirmModal && (
         <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <div className="modal-dialog">
+          <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Konfirmasi Hapus</h5>
-                <button className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+              <div className="modal-header" style={{ borderBottomColor: 'rgba(13, 110, 253, 0.2)' }}>
+                <h5 className="modal-title fw-bold" style={{ color: '#0d6efd' }}>Confirm Deletion</h5>
+                <button 
+                  className="btn-close" 
+                  onClick={() => setShowConfirmModal(false)}
+                  aria-label="Close"
+                ></button>
               </div>
               <div className="modal-body">
-                <p>Apakah Anda yakin ingin menghapus koleksi ini?</p>
+                <p>Are you sure you want to delete this collection?</p>
+                <p className="fw-bold">{venue.name}</p>
               </div>
-              <div className="modal-footer">
-                <button className="btn btn-danger" onClick={handleConfirmDelete}>Hapus</button>
-                <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>Batal</button>
+              <div className="modal-footer" style={{ borderTopColor: 'rgba(13, 110, 253, 0.2)' }}>
+                <button 
+                  className="btn btn-outline-secondary" 
+                  onClick={() => setShowConfirmModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn text-white" 
+                  onClick={handleConfirmDelete}
+                  style={{ backgroundColor: '#dc3545' }}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      {/* Toast Notification */}
+
+      {/* Notification */}
       {message && (
         <div 
           className="toast show position-fixed bottom-0 end-0 m-3" 
@@ -298,20 +392,21 @@ export default function VenueAdminPage() {
             minWidth: '350px',
             animation: 'slideIn 0.3s ease-out',
             backgroundColor: '#fff',
-            borderLeft: '4px solid #198754',
+            borderLeft: '4px solid #0d6efd',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}
         >
           <div className="toast-body d-flex align-items-center">
-            <i className="bi bi-check2-circle fs-4 text-success me-3"></i>
+            <FiCheckCircle className="fs-4 me-3" style={{ color: '#0d6efd' }} />
             <div>
-              <h6 className="mb-1 text-success">Berhasil!</h6>
+              <h6 className="mb-1" style={{ color: '#0d6efd' }}>Success!</h6>
               <p className="mb-0 text-secondary">{message}</p>
             </div>
             <button 
               type="button" 
               className="btn-close ms-auto" 
               onClick={() => setMessage('')}
+              aria-label="Close"
             ></button>
           </div>
         </div>

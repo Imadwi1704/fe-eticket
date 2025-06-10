@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
@@ -36,20 +37,19 @@ export default function UserPage() {
   return (
     <>
       <Template />
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="col-lg-12">
-          <div className="card w-100">
+      <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
+        <div className="container-fluid py-5">
+          <div className="card shadow-sm border-0">
+            <div className="card-header bg-primary text-white">
+              <h2 className="card-title fw-semibold mb-0 text-white">Data User Museum Lampung</h2>
+            </div>
             <div className="card-body p-4">
-              <h2 className="card-title fw-semibold text-left mb-2">Data User Pengunjung</h2>
-              <p className="mb-4">
-                Berfungsi untuk melihat data user pengunjung yang sudah mendaftar akun.
+              <p className="text-muted mb-4">
+                Melihat data user yang sudah mendaftar.
               </p>
               <div className="table-responsive">
                 <table className="table mb-0" style={{ boxShadow: "none" }}>
-                  <thead
-                    className="fs-4"
-                    style={{ backgroundColor: "rgba(116, 80, 45, 0.18)" }}
-                  >
+                  <thead className="table-primary">
                     <tr>
                       <th>No</th>
                       <th>Kode Pengunjung</th>
@@ -66,7 +66,7 @@ export default function UserPage() {
                           <td>{user.id}</td>
                           <td>{user.fullName}</td>
                           <td>{user.email}</td>
-                          <td>{user.phoneNumber || "-"}</td> {/* fallback jika tidak ada field phone */}
+                          <td>{user.phoneNumber || "-"}</td>
                         </tr>
                       ))
                     ) : (

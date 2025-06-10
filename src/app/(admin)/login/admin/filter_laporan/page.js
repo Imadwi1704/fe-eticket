@@ -53,7 +53,7 @@ const FilterLaporan = () => {
   return (
     <>
       <Template />
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
+      <div className="d-flex justify-content-center pt-5" style={{ paddingTop: "200px", minHeight: "200vh" }}>
         <div className="container">
         <div className="card shadow-sm">
           <div className="card-body p-5">

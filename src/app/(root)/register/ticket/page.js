@@ -1,19 +1,40 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import Footer from "@/components/Footer";
 import Script from "next/script";
 import { getCookie } from "cookies-next";
+import DatePicker from "react-datepicker";
+import { id } from "date-fns/locale";
+import { isMonday, format } from "date-fns";
+import "react-datepicker/dist/react-datepicker.css";
+
+// Daftar libur nasional 2025 (contoh)
+const nationalHolidays = [
+  new Date(2025, 0, 1),   // Tahun Baru
+  new Date(2025, 0, 6),   // Hari Raya Natal
+  new Date(2025, 1, 8),   // Isra Mi'raj
+  new Date(2025, 2, 11),  // Hari Raya Nyepi
+  new Date(2025, 3, 18),  // Jumat Agung
+  new Date(2025, 4, 1),   // Hari Buruh
+  new Date(2025, 4, 29), // Kenaikan Isa Almasih
+  new Date(2025, 5, 1),   // Hari Lahir Pancasila
+  new Date(2025, 5, 16),  // Idul Fitri
+  new Date(2025, 7, 17),  // Hari Kemerdekaan
+  new Date(2025, 10, 5),  // Maulid Nabi
+  new Date(2025, 11, 25), // Hari Raya Natal
+  new Date(2025, 11, 26)  // Cuti Bersama Natal
+];
 
 export default function Ticket() {
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [tickets, setTickets] = useState([]);
   const [userId, setUserId] = useState(null);
   const token = getCookie("token");
   const [loadingUser, setLoadingUser] = useState(true);
+
   // Load Midtrans Snap Script
   useEffect(() => {
     const script = document.createElement("script");
@@ -24,6 +45,7 @@ export default function Ticket() {
       document.body.removeChild(script);
     };
   }, []);
+
   const fetchTickets = async () => {
     try {
       const res = await fetch("http://localhost:5001/api/ticket", {
@@ -52,9 +74,6 @@ export default function Ticket() {
       });
 
       const data = await res.json();
-      console.log(data); // untuk debugging
-      console.log(data.user.id); // akses ID di dalam objek 'user'
-
       if (res.ok) {
         setUserId(data.user.id);
       } else {
@@ -67,7 +86,6 @@ export default function Ticket() {
     }
   };
 
-  // Fetch Ticket Data
   useEffect(() => {
     if (!token) return;
 
@@ -75,7 +93,6 @@ export default function Ticket() {
     fetchUser();
   }, [token]);
 
-  console.log(userId, "id");
   const handleSelectTicket = (ticket) => {
     const existing = selectedTicket.find((item) => item.id === ticket.id);
     let updated;
@@ -104,7 +121,6 @@ export default function Ticket() {
   };
 
   const handleConfirmOrder = async () => {
-    console.log("userId:", userId);
     if (!selectedDate) return alert("Pilih tanggal terlebih dahulu.");
     if (selectedTicket.length === 0) return alert("Pilih minimal 1 tiket.");
     if (!userId) return alert("Gagal mendapatkan data user.");
@@ -124,7 +140,7 @@ export default function Ticket() {
         body: JSON.stringify({
           userId,
           ticketList,
-          visitDate: selectedDate,
+          visitDate: format(selectedDate, 'yyyy-MM-dd'),
         }),
       });
 
@@ -169,14 +185,51 @@ export default function Ticket() {
     }
   };
 
+  // Cek apakah tanggal termasuk hari Senin atau libur nasional
+  const isDateDisabled = (date) => {
+    return isMonday(date) || 
+           nationalHolidays.some(holiday => holiday.getTime() === date.getTime());
+  };
+
+  // Custom class untuk styling kalender
+  const dayClassName = (date) => {
+    if (isMonday(date)) {
+      return "monday-day";
+    }
+    if (nationalHolidays.some(holiday => holiday.getTime() === date.getTime())) {
+      return "holiday-day";
+    }
+    return "";
+  };
+
   return (
     <>
-      {/* Midtrans Snap.js */}
       <Script
         src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="SB-Mid-client-WDRe2Jb6Aks6uNaO"
         strategy="beforeInteractive"
       />
+
+      <style jsx global>{`
+        .monday-day {
+          color: #0d6efd !important;
+          font-weight: bold;
+          position: relative;
+        }
+        .monday-day::after {
+          content: " (Senin)";
+          font-size: 0.7em;
+        }
+        .holiday-day {
+          color: #0d6efd !important;
+          font-weight: bold;
+          background-color: #e6f0ff !important;
+        }
+        .react-datepicker__day--disabled {
+          color: #ccc !important;
+          cursor: not-allowed;
+        }
+      `}</style>
 
       <main className="py-5 bg-light">
         <div className="container mt-5">
@@ -197,15 +250,21 @@ export default function Ticket() {
                   <label htmlFor="tanggal" className="form-label fw-bold">
                     Tanggal Kunjungan:
                   </label>
-                  <input
-                    type="date"
-                    id="tanggal"
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    locale={id}
+                    dateFormat="dd MMMM yyyy"
+                    minDate={new Date()}
+                    filterDate={(date) => !isDateDisabled(date)}
+                    dayClassName={dayClassName}
                     className="form-control"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]}
+                    placeholderText="Pilih tanggal"
                     required
                   />
+                  <small className="text-muted">
+                    Hari Senin dan hari libur nasional tidak dapat dipilih
+                  </small>
                 </div>
 
                 <div className="alert alert-warning">
@@ -296,7 +355,7 @@ export default function Ticket() {
                     </div>
                     <div className="modal-body">
                       <p>
-                        <strong>Tanggal:</strong> {selectedDate}
+                        <strong>Tanggal:</strong> {selectedDate && format(selectedDate, 'dd MMMM yyyy')}
                       </p>
                       <p>
                         <strong>Tiket:</strong>

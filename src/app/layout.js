@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
         <link
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;400;700&display=swap"
           rel="stylesheet"
-        />
+        />  
 
         {/* Font Awesome */}
         <link
@@ -27,6 +27,8 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/bootstrap-icons.css" />
         <link rel="stylesheet" href="/assets/css/templatemo-festava-live.css" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
       </head>
       <body>{children}</body>
     </html>
