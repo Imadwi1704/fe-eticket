@@ -115,38 +115,34 @@ export default function RootLayout() {
             }}
           >
             <h1
-              className="display-3 fw-bold mb-4"
+              className="display-3 fw-bold mb-4 text-center"
               style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.5)" }}
             >
-              Museum Lampung
-              <br />
-              <span className="text-brown">Ruwai Jurai</span>
+              Museum Lampung Ruwai Jurai
             </h1>
             <p
-              className="lead mb-5 text-white"
+              className="lead mb-5 text-white text-center"
               style={{
                 fontSize: "1.5rem",
-                maxWidth: "600px",
                 textShadow: "1px 1px 4px rgba(0,0,0,0.3)",
               }}
             >
               Menjaga Warisan Sejarah dan Budaya Lampung untuk Generasi
               Mendatang
             </p>
-            <Link
-              href="/aboutnext"
-              className="btn text-black px-2 py-1"
-              style={{
-                background: "#FFFFFF",
-                borderRadius: "16px",
-                fontSize: "0.75rem",
-                padding: "4px 10px",
-                transition: "0.3s",
-                display: "inline-block", // agar seperti tombol
-                textDecoration: "none",
-              }}
-            >
-              Jelajahi Selengkapnya
+            <Link href="/aboutnext">
+              <span
+                className="btn text-black px-2 py-1"
+                style={{
+                  background: "#FFFFFF",
+                  borderRadius: "16px",
+                  fontSize: "0.75rem",
+                  padding: "4px 10px",
+                  transition: "0.3s",
+                }}
+              >
+                Jelajahi Selengkapnya
+              </span>
             </Link>
           </motion.div>
 
@@ -178,14 +174,14 @@ export default function RootLayout() {
           <div className="container">
             <div className="row justify-content-center align-items-center">
               {/* Kolom Teks */}
-              <div className="col-lg-10 mb-5">
+              <div className="col-lg-10 mb-2">
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   className="text-center"
                 >
-                  <h2 className="text-black mb-3">
+                  <h2 className="text-black">
                     Selamat Datang di Museum Ruwai Jurai
                   </h2>
 
@@ -207,51 +203,81 @@ export default function RootLayout() {
                 >
                   {/* Card 1 */}
                   <div
-                    className="rounded-4 p-4 text-start shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
                     style={{
-                      backgroundColor: "#E8F9FD",
+                      backgroundColor: "#0D6EFD",
                       minWidth: "220px",
                       flex: "1 1 250px",
                     }}
                   >
-                    <h4 className="text-3xl fw-bold text-dark">
-                      15.000<span className="text-primary">+</span>
-                    </h4>
-                    <p className="mt-2 text-dark mb-0">
+                    <div
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        backgroundColor: "#FFFFFF",
+                      }}
+                    >
+                      <i className="bi bi-collection fs-2 text-primary"></i>
+                    </div>
+                    <h3 className="text-3xl fw-bold text-white mt-3">
+                      15.000<span className="text-white">+</span>
+                    </h3>
+                    <p className="mt-2 text-white mb-0">
                       Koleksi bersejarah yang tersimpan di museum
                     </p>
                   </div>
 
                   {/* Card 2 */}
                   <div
-                    className="rounded-4 p-4 text-start shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
                     style={{
-                      backgroundColor: "#E8F9FD",
+                      backgroundColor: "#0D6EFD",
                       minWidth: "220px",
                       flex: "1 1 250px",
                     }}
                   >
-                    <h4 className="text-3xl fw-bold text-dark">
-                      120.000<span className="text-primary">+</span>
-                    </h4>
-                    <p className="mt-2 text-dark mb-0">
+                    <div
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        backgroundColor: "#FFFFFF",
+                      }}
+                    >
+                      <i className="bi bi-people-fill fs-2 text-primary"></i>
+                    </div>
+                    <h3 className="text-3xl fw-bold text-white mt-3">
+                      120.000<span className="text-white">+</span>
+                    </h3>
+                    <p className="mt-2 text-white mb-0">
                       Pengunjung setiap tahunnya dari seluruh Indonesia
                     </p>
                   </div>
 
                   {/* Card 3 */}
                   <div
-                    className="rounded-4 p-4 text-start shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
                     style={{
-                      backgroundColor: "#E8F9FD",
+                      backgroundColor: "#0D6EFD",
                       minWidth: "220px",
                       flex: "1 1 250px",
                     }}
                   >
-                    <h4 className="text-3xl fw-bold text-dark">
-                      10<span className="text-primary">+</span>
-                    </h4>
-                    <p className="mt-2 text-dark mb-0">
+                    <div
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        backgroundColor: "#FFFFFF",
+                      }}
+                    >
+                      <i className="bi bi-award fs-2 text-primary"></i>
+                    </div>
+                    <h3 className="text-3xl fw-bold text-white mt-3">
+                      10<span className="text-white">+</span>
+                    </h3>
+                    <p className="mt-2 text-white mb-0">
                       Penghargaan nasional atas pelestarian budaya
                     </p>
                   </div>
@@ -262,202 +288,272 @@ export default function RootLayout() {
         </section>
 
         <section
-          className="section-padding "
+          className="section-padding"
           id="history"
           style={{ padding: "40px 0" }}
         >
           <div className="container">
             <div className="row justify-content-center align-items-center">
+              {/* Kolom Gambar Vertikal dengan efek menumpuk */}
+              <div
+                className="col-lg-4 col-md-5 col-12 position-relative d-flex justify-content-center mb-4 mb-lg-0"
+                style={{ minHeight: "500px" }}
+              >
+                {/* Gambar Pertama (bawah) */}
+                <div
+                  className="position-absolute"
+                  style={{
+                    bottom: "10%",
+                    zIndex: 1,
+                    width: "80%",
+                    transform: "rotate(-5deg)",
+                  }}
+                >
+                  <Image
+                    src="/assets/images/history.jpg"
+                    width={400}
+                    height={300}
+                    className="img-fluid rounded shadow-lg"
+                    alt="Museum Lampung 1"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      border: "5px solid white",
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                </div>
+
+                {/* Gambar Kedua (atas) */}
+                <div
+                  className="position-absolute"
+                  style={{
+                    top: "10%",
+                    zIndex: 2,
+                    width: "80%",
+                    transform: "rotate(5deg)",
+                  }}
+                >
+                  <Image
+                    src="/assets/images/our1.jpg"
+                    width={400}
+                    height={300}
+                    className="img-fluid rounded shadow-lg"
+                    alt="Museum Lampung 2"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      border: "5px solid white",
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+                    }}
+                  />
+                </div>
+              </div>
+
               {/* Kolom Teks */}
-              <div className="col-lg-6 col-12 mb-4 mb-lg-0">
-                <h2 className="text-black">Sejarah Museum Ruwai Jurai</h2>
-                <p className="text-black">
+              <div className="col-lg-6 col-md-7 col-12">
+                <h2 className="text-black mb-3">
+                  Sejarah Museum
+                  <span className="text-primary"> Ruwai Jurai</span>{" "}
+                </h2>
+                <p className="text-black mb-4 text-justify">
                   Lampung memiliki museum yang mengabadikan perjalanan sejarah
                   di provinsi paling selatan dari Pulau Sumatera ini. Nama
-                  museum itu adalah Museum Negeri Propinsi Lampung “Ruwa Jurai”.
+                  museum itu adalah Museum Negeri Propinsi Lampung Ruwa Jurai.
                   Museum yang terletak di Jln. Zainal Arifin Pagar Alam No. 64,
                   Rajabasa, Bandar Lampung, ini letaknya begitu strategis. Hanya
                   berjarak beberapa ratus meter dari Terminal Bus Rajabasa dan
                   dekat dengan gerbang Kampus UNILA.
                 </p>
-                <div className="mt-3">
+                <div>
                   <Link
                     href="/historynext"
-                    className="btn text-black px-2 py-1"
                     style={{
-                      background: "#FFFFFF",
-                      borderRadius: "16px",
-                      fontSize: "0.75rem",
-                      padding: "4px 10px",
-                      transition: "0.3s",
-                      display: "inline-block", // agar seperti tombol
+                      display: "inline-block",
+                      padding: "5px 12px",
+                      backgroundColor: "#0D6EFD",
+                      color: "white",
+                      borderRadius: "20px",
+                      transition: "all 0.3s ease",
                       textDecoration: "none",
+                      fontSize: "10",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#185F85";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = "#0D6EFD";
+                      e.currentTarget.style.color = "white";
                     }}
                   >
-                    Jelajahi Selengkapnya
+                    Pelajari Selengkapnya
                   </Link>
                 </div>
-              </div>
-
-              {/* Kolom Gambar Vertikal */}
-              <div className="col-lg-3 col-6 d-flex flex-column align-items-center gap-3">
-                <Image
-                  width={300}
-                  height={300}
-                  src="/assets/images/history.jpg"
-                  className="img-fluid rounded shadow-sm"
-                  alt="Museum Lampung 1"
-                  style={{
-                    maxHeight: "250px",
-                    objectFit: "cover",
-                    width: "100%",
-                  }}
-                />
-                <Image
-                  src="/assets/images/our1.jpg"
-                  className="img-fluid rounded shadow-sm"
-                  alt="Museum Lampung 2"
-                  width={300}
-                  height={300}
-                  style={{
-                    maxHeight: "250px",
-                    objectFit: "cover",
-                    width: "100%",
-                  }}
-                />
               </div>
             </div>
           </div>
         </section>
-
         <section
           className="artists-section section-padding"
           id="venues"
           style={{ padding: "40px 0" }}
         >
           <div className="container">
-            <div className="row justify-content-center">
-              {/* Header Koleksi */}
-              <div className="col-12 mb-4">
+            <div className="row">
+              {/* Header Koleksi di sebelah kiri */}
+              <div className="col-md-3 mb-4">
                 <h2 className="mb-1">Koleksi Museum Lampung</h2>
                 <p className="text-black mb-0">
                   Cari Tahu Koleksi yang dipamerkan di Museum Lampung
-                  &ldquo;Ruwa Jurai&ldquo;
+                  &rdquo;Ruwa Jurai&ldquo;
                 </p>
-              </div>
-
-              {/* Scrollable Container */}
-              <div className="position-relative" style={{ padding: "10px 0" }}>
-                <div
-                  className="d-flex hide-scrollbar"
-                  style={{
-                    overflowX: "auto",
-                    gap: "1.5rem",
-                    scrollBehavior: "smooth",
-                    scrollSnapType: "x mandatory",
-                    padding: "10px 5px",
-                  }}
-                >
-                  {venues && venues.length > 0 ? (
-                    venues
-                      .sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                      ) // terbaru dulu
-                      .slice(0, 5) // ambil maksimal 5
-                      .map((venue) => (
-                        <div
-                          key={venue.id}
-                          className="col-9 col-sm-6 col-md-4 col-lg-3"
-                          style={{
-                            scrollSnapAlign: "start",
-                            flex: "0 0 auto",
-                            minWidth: "250px",
-                          }}
-                        >
-                          <div className="artists-thumb custom-card h-100 shadow-sm rounded-3 overflow-hidden position-relative">
-                            {/* Gambar dan Nama */}
-                            <div className="image-container position-relative">
-                              {venue.photo ? (
-                                <Image
-                                  width={300}
-                                  height={300}
-                                  src={`http://localhost:5001/uploads/${
-                                    venue.photo
-                                  }?t=${Date.now()}`}
-                                  alt={venue.name}
-                                  className="main-image img-fluid"
-                                  style={{
-                                    width: "100%",
-                                    height: "250px",
-                                    objectFit: "cover",
-                                  }}
-                                  crossOrigin="anonymous"
-                                  onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src =
-                                      "/assets/images/No-image.png";
-                                  }}
-                                />
-                              ) : (
-                                <div
-                                  className="d-flex align-items-center justify-content-center bg-light"
-                                  style={{
-                                    width: "100%",
-                                    height: "250px",
-                                    border: "1px solid #ccc",
-                                  }}
-                                >
-                                  <FiImage className="text-muted" size={36} />
-                                </div>
-                              )}
-                              <div className="venue-name">{venue.name}</div>
-                            </div>
-
-                            {/* Hover Content */}
-                            <div className="hover-content">
-                              <p className="description fw-bold text-dark mb-2">
-                                {venue.name}
-                              </p>
-                              <p className="description text-dark mb-2">
-                                {venue.description.length > 100
-                                  ? `${venue.description.slice(0, 100)}...`
-                                  : venue.description}
-                              </p>
-                              <Link href={`/venues?id=${venue.id}`}>
-                                <button className="read-more-btn">
-                                  Baca Selengkapnya
-                                </button>
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                  ) : (
-                    <div className="col-12 text-center">
-                      <p className="text-muted">
-                        Belum ada data koleksi yang tersedia.
-                      </p>
-                    </div>
-                  )}
-                </div>
 
                 {/* Tombol Lihat Koleksi Lainnya */}
-                <div className="text-center mt-2">
+                <div className="mt-3">
                   <Link
                     href="/venues"
-                    className="btn text-black px-2 py-1"
+                    className="btn text-white px-2 py-1"
                     style={{
-                      background: "#FFFFFF",
+                      background: "#0d6efd",
                       borderRadius: "16px",
                       fontSize: "0.75rem",
                       padding: "4px 10px",
                       transition: "0.3s",
-                      display: "inline-block", // agar seperti tombol
+                      display: "inline-block",
                       textDecoration: "none",
+                      border: "1px solid #ddd",
                     }}
                   >
                     Jelajahi Selengkapnya
                   </Link>
+                </div>
+
+                {/* Navigation buttons */}
+                <div className="d-flex justify-content-center gap-2 mt-3">
+                  <button
+                    className="btn btn-light rounded-circle shadow-sm"
+                    style={{ width: "30px", height: "30px" }}
+                    onClick={() => {
+                      const container =
+                        document.querySelector(".scroll-container");
+                      container.scrollBy({ left: -300, behavior: "smooth" });
+                    }}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    className="btn btn-light rounded-circle shadow-sm"
+                    style={{ width: "30px", height: "30px" }}
+                    onClick={() => {
+                      const container =
+                        document.querySelector(".scroll-container");
+                      container.scrollBy({ left: 300, behavior: "smooth" });
+                    }}
+                  >
+                    &gt;
+                  </button>
+                </div>
+              </div>
+
+              {/* Konten Card dengan navigasi */}
+              <div className="col-md-9 position-relative">
+                <div
+                  className="position-relative"
+                  style={{ padding: "10px 0" }}
+                >
+                  {/* Scrollable Container */}
+                  <div
+                    className="scroll-container d-flex hide-scrollbar"
+                    style={{
+                      overflowX: "auto",
+                      gap: "1.5rem",
+                      scrollBehavior: "smooth",
+                      scrollSnapType: "x mandatory",
+                      padding: "10px 5px",
+                    }}
+                  >
+                    {venues && venues.length > 0 ? (
+                      venues
+                        .sort(
+                          (a, b) =>
+                            new Date(b.createdAt) - new Date(a.createdAt)
+                        )
+                        .slice(0, 5)
+                        .map((venue) => (
+                          <div
+                            key={venue.id}
+                            className="col-9 col-sm-6 col-md-4 col-lg-3"
+                            style={{
+                              scrollSnapAlign: "start",
+                              flex: "0 0 auto",
+                              minWidth: "250px",
+                            }}
+                          >
+                            <div className="artists-thumb custom-card h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                              {/* Gambar dan Nama */}
+                              <div className="image-container position-relative">
+                                {venue.photo ? (
+                                  <Image
+                                    width={300}
+                                    height={300}
+                                    src={`http://localhost:5001/uploads/${
+                                      venue.photo
+                                    }?t=${Date.now()}`}
+                                    alt={venue.name}
+                                    className="main-image img-fluid"
+                                    style={{
+                                      width: "100%",
+                                      height: "250px",
+                                      objectFit: "cover",
+                                    }}
+                                    crossOrigin="anonymous"
+                                    onError={(e) => {
+                                      e.currentTarget.onerror = null;
+                                      e.currentTarget.src =
+                                        "/assets/images/No-image.png";
+                                    }}
+                                  />
+                                ) : (
+                                  <div
+                                    className="d-flex align-items-center justify-content-center bg-light"
+                                    style={{
+                                      width: "100%",
+                                      height: "250px",
+                                      border: "1px solid #ccc",
+                                    }}
+                                  >
+                                    <FiImage className="text-muted" size={36} />
+                                  </div>
+                                )}
+                                <div className="venue-name">{venue.name}</div>
+                              </div>
+
+                              {/* Hover Content */}
+                              <div className="hover-content">
+                                <h3>{venue.name}</h3>
+                                <p className=" text-dark">
+                                  {venue.description.length > 100
+                                    ? `${venue.description.slice(0, 100)}...`
+                                    : venue.description}
+                                </p>
+                                <Link href={`/venues?id=${venue.id}`}>
+                                  <button className="read-more-btn">
+                                    Baca Selengkapnya
+                                  </button>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    ) : (
+                      <div className="col-12 text-center">
+                        <p className="text-muted">
+                          Belum ada data koleksi yang tersedia.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -473,8 +569,8 @@ export default function RootLayout() {
           <div className="container">
             {/* Judul + Tombol Panah */}
             <div className="row mb-4">
-              <div className="col-12 d-flex  gap-3">
-                <div className="col-12 mb-4 text-center">
+              <div className="col-12 d-flex  gap-2">
+                <div className="col-12 mb-1 text-center">
                   {/* Judul */}
                   <h2>Ulasan Pengunjung </h2>
                   <p className="text-black">
@@ -523,19 +619,32 @@ export default function RootLayout() {
                           "0 4px 12px rgba(0,0,0,0.1)";
                       }}
                     >
-                      <h5
-                        className="fw-bold mb-3"
+                      <h4
+                        className="fw-bold mb-1"
                         style={{ fontSize: "1.1rem", color: "#333" }}
                       >
                         {item.user?.fullName || "Pengunjung"}
-                      </h5>
+                      </h4>
                       <p
-                        className="mb-3"
+                        className="mb-1"
                         style={{
                           fontSize: "0.95rem",
                           color: "#555",
-                          lineHeight: "1.4",
-                          minHeight: "80px",
+                        }}
+                      >
+                        {new Date(item.createdAt).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+
+                      <p className="mb-2"
+                        style={{
+                          fontSize: "0.95rem",
+                          color: "#555",
+                          lineHeight: "1",
+                          minHeight: "10px",
                         }}
                       >
                         {item.comment}
@@ -553,7 +662,7 @@ export default function RootLayout() {
                   ))
                 ) : (
                   <div className="text-center w-100">
-                    <p className="text-muted" style={{ fontStyle: "italic" }}>
+                    <p className="text-muted">
                       Belum ada review yang tersedia.
                     </p>
                   </div>
@@ -656,7 +765,9 @@ export default function RootLayout() {
         .gallery-item:hover .gallery-overlay {
           opacity: 1;
         }
-
+        .text-justify {
+          text-align: justify;
+        }
         .scroll-container {
           display: flex;
           gap: 2rem;
@@ -760,6 +871,9 @@ export default function RootLayout() {
           .hero-section {
             margin: 0 -25px !important;
           }
+        }
+        .text-white {
+          color: rgba(255, 255, 255, 255);
         }
 
         @media (max-width: 576px) {

@@ -88,6 +88,8 @@ export default function Aboutnext() {
                   src="/assets/images/museum.jpg"
                   className="img-fluid"
                   alt="Museum Lampung"
+                  width={"600"}
+                  height={"200"}
                 />
               </div>
             </div>
@@ -216,6 +218,8 @@ export default function Aboutnext() {
                   src="/assets/images/history.jpg"
                   className="img-fluid rounded shadow"
                   alt="Sejarah Museum"
+                  width={"400"}
+                  height={"200"}
                 />
               </div>
               <Link href="/historynext">

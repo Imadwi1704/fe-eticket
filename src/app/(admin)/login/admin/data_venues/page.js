@@ -207,7 +207,9 @@ export default function VenueAdminPage() {
                             <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border" style={{ borderColor: 'rgba(13, 110, 253, 0.2)' }}>
                               {item.photo ? (
                                 <Image
-                                  style={{ width: 100, height: 100, objectFit: 'cover' }}
+                                  style={{objectFit: 'cover' }}
+                                  width={"400"}
+                                  height={"200"}
                                   src={`http://localhost:5001/uploads/${item.photo}?t=${new Date().getTime()}`}
                                   alt={item.name}
                                   className="h-full w-full"

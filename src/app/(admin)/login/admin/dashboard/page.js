@@ -138,12 +138,12 @@ useEffect(() => {
   return (
     <div
       className="dashboard-container"
-      style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}
+      style={{backgroundColor: "#f8f9fa" }}
     >
       <Template />
 
-      <div className="container-fluid py-4">
-        <div className="row mb-4">
+      <div className="container-fluid p-2">
+        <div className="row mb-2">
           <div className="col-12">
             <h2 className="fw-bold mb-0 text-primary">
               Dashboard Admin ERUWAIJURAI
