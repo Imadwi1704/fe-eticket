@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Template from "@/components/admin/Template";
+import Image from "next/image";
 
 export default function AdminProfile() {
   const [admin, setAdmin] = useState({
@@ -44,7 +45,7 @@ export default function AdminProfile() {
           <h3 className="mb-4">Profil Admin</h3>
           <div className="row">
             <div className="col-md-4 text-center">
-              <img
+              <Image
                 src={admin.foto || "/default-avatar.png"}
                 alt="Foto Admin"
                 className="img-thumbnail rounded-circle mb-3"

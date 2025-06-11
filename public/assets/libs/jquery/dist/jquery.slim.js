@@ -1,3 +1,5 @@
+"use client"
+
 /*!
  * jQuery JavaScript Library v3.4.0 -ajax,-ajax/jsonp,-ajax/load,-ajax/parseXML,-ajax/script,-ajax/var/location,-ajax/var/nonce,-ajax/var/rquery,-ajax/xhr,-manipulation/_evalUrl,-event/ajax,-effects,-effects/Tween,-effects/animatedSelector
  * https://jquery.com/

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getCookie } from "cookies-next";
+import Image from "next/image";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -59,7 +60,8 @@ export default function AdminLayout({ children }) {
     if (token) fetchReviews();
   }, [token]);
 
-  const isActive = (path) => pathname === path ? "sidebar-item active" : "sidebar-item";
+  const isActive = (path) =>
+    pathname === path ? "sidebar-item active" : "sidebar-item";
 
   const renderSidebarItem = (href, iconClass, text) => (
     <li className={isActive(href)}>
@@ -82,9 +84,15 @@ export default function AdminLayout({ children }) {
       >
         <i className={iconClass} />
         <span className="hide-menu flex-grow-1">{title}</span>
-        <i className={`bi ${activeDropdown === key ? "bi-chevron-up" : "bi-chevron-down"} ms-auto`} />
+        <i
+          className={`bi ${
+            activeDropdown === key ? "bi-chevron-up" : "bi-chevron-down"
+          } ms-auto`}
+        />
       </a>
-      {activeDropdown === key && <ul className="sidebar-dropdown ps-4">{children}</ul>}
+      {activeDropdown === key && (
+        <ul className="sidebar-dropdown ps-4">{children}</ul>
+      )}
     </li>
   );
 
@@ -99,80 +107,80 @@ export default function AdminLayout({ children }) {
           --sidebar-text: #ffffff;
           --sidebar-hover: rgba(255, 255, 255, 0.1);
           --sidebar-active: rgba(255, 255, 255, 0.2);
-          --bs-body-font-family: 'Poppins', sans-serif;
+          --bs-body-font-family: "Poppins", sans-serif;
         }
-        
+
         .left-sidebar {
           background-color: var(--sidebar-bg) !important;
           color: var(--sidebar-text);
         }
-        
+
         .sidebar-nav .sidebar-item .sidebar-link {
           color: var(--sidebar-text);
         }
-        
+
         .sidebar-nav .sidebar-item:hover {
           background-color: var(--sidebar-hover);
         }
-        
+
         .sidebar-nav .sidebar-item.active {
           background-color: var(--sidebar-active);
           border-left: 3px solid white;
         }
-        
+
         .sidebar-dropdown {
           background-color: rgba(0, 0, 0, 0.1);
         }
-        
+
         .sidebar-subitem .sidebar-link {
           color: rgba(255, 255, 255, 0.8) !important;
         }
-        
+
         .sidebar-subitem:hover {
           background-color: var(--sidebar-hover);
         }
-        
+
         .brand-logo {
           background-color: var(--primary-dark);
           padding: 15px;
         }
-        
+
         .btn-primary {
           background-color: var(--primary-color);
           border-color: var(--primary-color);
         }
-        
+
         .btn-primary:hover {
           background-color: var(--primary-dark);
           border-color: var(--primary-dark);
         }
-        
+
         .bg-primary {
           background-color: var(--primary-color) !important;
         }
-        
+
         .text-primary {
           color: var(--primary-color) !important;
         }
-        
+
         .badge.bg-primary {
           background-color: var(--primary-color) !important;
         }
-        
+
         .modal-header {
           background-color: var(--primary-color) !important;
           color: white;
         }
-        
+
         .navbar {
           background-color: white;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .dropdown-menu {
           border: 1px solid var(--primary-light);
         }
-        
+
         .dropdown-item:hover {
           background-color: var(--primary-light);
         }
@@ -200,11 +208,31 @@ export default function AdminLayout({ children }) {
 
             <nav className="sidebar-nav scroll-sidebar" data-simplebar="init">
               <ul id="sidebarnav">
-                {renderSidebarItem("/login/admin/dashboard", "ti ti-layout-dashboard", "Dashboard")}
-                {renderSidebarItem("/login/admin/data_tiket", "ti ti-id", "Data Tiket")}
-                {renderSidebarItem("/login/admin/data_venues", "ti ti-grid-dots", "Data Koleksi")}
-                {renderSidebarItem("/login/admin/data_gallery", "ti ti-photo", "Data Gallery")}
-                {renderSidebarItem("/login/admin/data_user", "bi bi-people-fill me-2", "Data User")}
+                {renderSidebarItem(
+                  "/login/admin/dashboard",
+                  "ti ti-layout-dashboard",
+                  "Dashboard"
+                )}
+                {renderSidebarItem(
+                  "/login/admin/data_tiket",
+                  "ti ti-id",
+                  "Data Tiket"
+                )}
+                {renderSidebarItem(
+                  "/login/admin/data_venues",
+                  "ti ti-grid-dots",
+                  "Data Koleksi"
+                )}
+                {renderSidebarItem(
+                  "/login/admin/data_gallery",
+                  "ti ti-photo",
+                  "Data Gallery"
+                )}
+                {renderSidebarItem(
+                  "/login/admin/data_user",
+                  "bi bi-people-fill me-2",
+                  "Data User"
+                )}
 
                 {renderDropdown(
                   "kunjungan",
@@ -229,8 +257,16 @@ export default function AdminLayout({ children }) {
                   )
                 )}
 
-                {renderSidebarItem("/login/admin/data_pembayaran", "bi bi-receipt", "Data Pembayaran")}
-                {renderSidebarItem("/login/admin/pemesanan", "ti ti-file-description", "Data Pemesanan")}
+                {renderSidebarItem(
+                  "/login/admin/data_pembayaran",
+                  "bi bi-receipt",
+                  "Data Pembayaran"
+                )}
+                {renderSidebarItem(
+                  "/login/admin/pemesanan",
+                  "ti ti-file-description",
+                  "Data Pemesanan"
+                )}
 
                 {renderDropdown(
                   "laporan",
@@ -238,13 +274,19 @@ export default function AdminLayout({ children }) {
                   "Laporan",
                   <>
                     <li className="sidebar-subitem">
-                      <a href="/login/admin/laporan_penilaian" className="sidebar-link d-block py-2 ps-3">
+                      <a
+                        href="/login/admin/laporan_penilaian"
+                        className="sidebar-link d-block py-2 ps-3"
+                      >
                         <i className="bi bi-star-fill me-2"></i>
                         Penilaian Museum Lampung
                       </a>
                     </li>
                     <li className="sidebar-subitem">
-                      <a href="/login/admin/filter_laporan" className="sidebar-link d-block py-2 ps-4">
+                      <a
+                        href="/login/admin/filter_laporan"
+                        className="sidebar-link d-block py-2 ps-4"
+                      >
                         <i className="bi bi-receipt-cutoff me-2"></i>
                         Pemesanan
                       </a>
@@ -260,21 +302,21 @@ export default function AdminLayout({ children }) {
           <header className="app-header">
             <nav className="navbar navbar-expand-lg navbar-light">
               <div className="d-flex align-items-center w-100">
-              <button
-                    className="btn sidebartoggler nav-icon me-3 d-block d-lg-none"
-                    id="headerCollapse"
-                    type="button"
-                  >
-                    <i className="ti ti-menu-2" />
-              </button>
+                <button
+                  className="btn sidebartoggler nav-icon me-3 d-block d-lg-none"
+                  id="headerCollapse"
+                  type="button"
+                >
+                  <i className="ti ti-menu-2" />
+                </button>
 
                 <div className="d-flex align-items-center justify-content-between w-100">
                   <div className="d-flex align-items-center">
-                    <button 
-                      className="btn position-relative" 
-                      type="button" 
+                    <button
+                      className="btn position-relative"
+                      type="button"
                       onClick={() => setShowModal(true)}
-                      style={{ color: 'var(--primary-color)' }}
+                      style={{ color: "var(--primary-color)" }}
                     >
                       <i className="ti ti-bell-ringing fs-5" />
                       {reviews.length > 0 && (
@@ -293,8 +335,7 @@ export default function AdminLayout({ children }) {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      
-                      <img
+                      <Image
                         src="/assets/images/profile/user-1.jpg"
                         alt="Foto Profil Admin"
                         width={40}
@@ -302,16 +343,29 @@ export default function AdminLayout({ children }) {
                         className="rounded-circle border border-2 border-primary"
                       />
                     </button>
-                    <ul className="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="profileDropdown">
+                    <ul
+                      className="dropdown-menu dropdown-menu-end mt-2 shadow"
+                      aria-labelledby="profileDropdown"
+                    >
                       <li>
-                        <a className="dropdown-item d-flex align-items-center" href="/login/admin/profile">
-                          <i className="ti ti-user me-2 text-primary"></i> Profile
+                        <a
+                          className="dropdown-item d-flex align-items-center"
+                          href="/login/admin/profile"
+                        >
+                          <i className="ti ti-user me-2 text-primary"></i>{" "}
+                          Profile
                         </a>
                       </li>
-                      <li><hr className="dropdown-divider" /></li>
                       <li>
-                        <a className="dropdown-item d-flex align-items-center" href="/login">
-                          <i className="ti ti-logout me-2 text-primary"></i> Logout
+                        <hr className="dropdown-divider" />
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item d-flex align-items-center"
+                          href="/login"
+                        >
+                          <i className="ti ti-logout me-2 text-primary"></i>{" "}
+                          Logout
                         </a>
                       </li>
                     </ul>
@@ -321,24 +375,35 @@ export default function AdminLayout({ children }) {
             </nav>
           </header>
 
-          <div className="container-fluid p-4" style={{ minHeight: "calc(100vh - 80px)" }}>
+          <div
+            className="container-fluid p-4"
+            style={{ minHeight: "calc(100vh - 80px)" }}
+          >
             {children}
           </div>
         </div>
       </div>
 
       {showModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg">
               <div className="modal-header">
                 <h5 className="modal-title text-white">
-                  {selectedReview ? "Detail Review" : "Daftar Review Pengunjung"}
+                  {selectedReview
+                    ? "Detail Review"
+                    : "Daftar Review Pengunjung"}
                 </h5>
-                <button 
-                  type="button" 
-                  className="btn-close btn-close-white" 
-                  onClick={() => { setShowModal(false); setSelectedReview(null); }} 
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => {
+                    setShowModal(false);
+                    setSelectedReview(null);
+                  }}
                 />
               </div>
 
@@ -351,7 +416,9 @@ export default function AdminLayout({ children }) {
                     </div>
                     <div className="col-md-6">
                       <label className="fw-bold text-primary">Rating:</label>
-                      <div className="text-warning">{'★'.repeat(selectedReview.score)}</div>
+                      <div className="text-warning">
+                        {"★".repeat(selectedReview.score)}
+                      </div>
                     </div>
                     <div className="col-md-6">
                       <label className="fw-bold text-primary">Tanggal:</label>
@@ -359,7 +426,9 @@ export default function AdminLayout({ children }) {
                     </div>
                     <div className="col-12">
                       <label className="fw-bold text-primary">Komentar:</label>
-                      <p className="border p-3 rounded bg-light">{selectedReview.comment}</p>
+                      <p className="border p-3 rounded bg-light">
+                        {selectedReview.comment}
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -372,14 +441,21 @@ export default function AdminLayout({ children }) {
                           onClick={() => setSelectedReview(review)}
                         >
                           <div>
-                            <span className="fw-bold text-primary">{review.user?.fullName}</span><br />
+                            <span className="fw-bold text-primary">
+                              {review.user?.fullName}
+                            </span>
+                            <br />
                             <small className="text-muted">{review.date}</small>
                           </div>
-                          <span className="badge bg-primary rounded-pill">{review.score}/5</span>
+                          <span className="badge bg-primary rounded-pill">
+                            {review.score}/5
+                          </span>
                         </button>
                       ))
                     ) : (
-                      <div className="text-center py-4 text-muted">Tidak ada review tersedia</div>
+                      <div className="text-center py-4 text-muted">
+                        Tidak ada review tersedia
+                      </div>
                     )}
                   </div>
                 )}
@@ -387,9 +463,9 @@ export default function AdminLayout({ children }) {
 
               {selectedReview && (
                 <div className="modal-footer">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
                     onClick={() => setSelectedReview(null)}
                   >
                     Kembali ke Daftar

@@ -1,3 +1,5 @@
+"use client"
+
 /*!
  * ApexCharts v3.36.2
  * (c) 2018-2022 ApexCharts

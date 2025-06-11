@@ -1,3 +1,5 @@
+"use client"
+
 /*!
 * svg.js - A lightweight library for manipulating and animating SVG.
 * @version 2.6.6

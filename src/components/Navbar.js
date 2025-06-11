@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import Spinner from "../../src/components/spinner";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -545,7 +546,7 @@ export default function Navbar() {
                       transition: 'all 0.3s ease'
                     }}
                   >
-                    <img
+                    <Image
                       src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                       alt="Google"
                       width="20"

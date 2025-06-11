@@ -67,9 +67,11 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+  fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
+
 
   // Data chart dummy
   const generateSalesData = () => {

@@ -8,6 +8,7 @@ import { FiImage, FiChevronLeft, FiChevronRight, FiInfo } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Image from "next/image";
 
 export default function VenuesPage() {
   const searchParam = useSearchParams();
@@ -110,7 +111,7 @@ export default function VenuesPage() {
         <div className="position-relative text-white text-center z-2 p-3" style={{ zIndex: 2 }}>
           <h1 className="fw-bold display-4 mb-3">Koleksi Museum Lampung</h1>
           <p className="lead mb-4 mx-auto text-white" style={{maxWidth: "600px"}}>
-            Telusuri kekayaan budaya dan sejarah Lampung melalui koleksi unggulan Museum Negeri "Ruwa Jurai"
+            Telusuri kekayaan budaya dan sejarah Lampung melalui koleksi unggulan Museum Negeri &ldquo;Ruwa Jurai&ldquo;
           </p>
         </div>
         
@@ -134,7 +135,7 @@ export default function VenuesPage() {
               <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div className="position-relative">
                   {handleSelectedVenue.photo ? (
-                    <img
+                    <Image
                       src={`http://localhost:5001/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
@@ -235,7 +236,7 @@ export default function VenuesPage() {
                 >
                   <div className="overflow-hidden rounded-top-4 position-relative">
                     {venue.photo ? (
-                      <img
+                      <Image
                         style={{ width: "100%", height: "180px", objectFit: "cover" }}
                         src={`http://localhost:5001/uploads/${venue.photo}?t=${new Date().getTime()}`}
                         alt={venue.name}

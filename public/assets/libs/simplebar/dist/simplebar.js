@@ -1,3 +1,5 @@
+"use client"
+
 /**
  * SimpleBar.js - v5.3.6
  * Scrollbars, simpler.

@@ -1,3 +1,5 @@
+"use client"
+
 /*!
  * jQuery JavaScript Library v3.4.0
  * https://jquery.com/

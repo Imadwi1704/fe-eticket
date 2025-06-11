@@ -6,6 +6,7 @@ import "aos/dist/aos.css";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Aboutnext() {
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function Aboutnext() {
           <div className="row align-items-center">
             <div className="col-lg-5 col-10 mb-5 mb-lg-5" data-aos="fade-right">
               <div className="image-container rounded overflow-hidden shadow-lg">
-                <img
+                <Image
                   src="/assets/images/museum.jpg"
                   className="img-fluid"
                   alt="Museum Lampung"
@@ -95,7 +96,7 @@ export default function Aboutnext() {
                 Selamat Datang di Museum Ruwai Jurai
               </h2>
               <p className="text-dark mb-4">
-                Museum Negeri Propinsi Lampung "Ruwa Jurai" terletak di Jln. Zainal Arifin Pagar Alam No. 64,
+                Museum Negeri Propinsi Lampung &ldquo;Ruwa Jurai&ldquo; terletak di Jln. Zainal Arifin Pagar Alam No. 64,
                 Rajabasa, Bandar Lampung. Letaknya strategis, dekat Terminal Rajabasa dan gerbang Kampus UNILA.
               </p>
               <p className="text-dark">
@@ -211,7 +212,7 @@ export default function Aboutnext() {
                 museum pertama dan terbesar di Provinsi Lampung.
               </p>
               <div className="mb-4">
-                <img
+                <Image
                   src="/assets/images/history.jpg"
                   className="img-fluid rounded shadow"
                   alt="Sejarah Museum"
@@ -241,7 +242,7 @@ export default function Aboutnext() {
                   <li className="mb-4 position-relative ps-4">
                     <div className="timeline-badge"></div>
                     <h5 className="fw-bold mb-2 text-white">1988 - Peresmian</h5>
-                    <p className="text-white">Diresmikan oleh Gubernur Lampung dengan nama "Ruwa Jurai".</p>
+                    <p className="text-white">Diresmikan oleh Gubernur Lampung dengan nama &ldquo;Ruwa Jurai&ldquo;.</p>
                   </li>
                   <li className="position-relative ps-4">
                     <div className="timeline-badge"></div>

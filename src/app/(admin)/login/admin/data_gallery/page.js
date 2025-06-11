@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
 import { FiCheckCircle, FiAlertCircle, FiX, FiTrash2, FiEdit, FiPlus, FiImage } from "react-icons/fi";
+import Image from "next/image";
 
 export default function GalleryAdminPage() {
   const [data, setData] = useState([]);
@@ -329,7 +331,7 @@ const NotificationToast = ({ notification, setNotification }) => {
                           <td>
                             <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border" style={{ borderColor: 'rgba(13, 110, 253, 0.2)' }}>
                               {item.imageUrl ? (
-                                <img
+                                <Image
                                   style={{ width: 100, height: 100, objectFit: 'cover' }}
                                   src={`http://localhost:5001/uploads/${item.imageUrl}?t=${new Date().getTime()}`}
                                   alt={item.title}
@@ -441,7 +443,7 @@ const NotificationToast = ({ notification, setNotification }) => {
                   />
                   {(gallery.existingImageUrl || gallery.image) && (
                     <div className="mt-3 text-center">
-                      <img 
+                      <Image 
                         src={
                           gallery.image 
                             ? URL.createObjectURL(gallery.image) 

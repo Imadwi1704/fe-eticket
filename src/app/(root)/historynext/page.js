@@ -101,14 +101,14 @@ export default function Historynext() {
                   <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{
                     background: "linear-gradient(to top, rgba(13, 110, 253, 0.8), transparent)"
                   }}>
-                    <h3 className="text-white mb-0">Museum Negeri Provinsi Lampung "Ruwa Jurai"</h3>
+                    <h3 className="text-white mb-0">Museum Negeri Provinsi Lampung &ldquo;Ruwa Jurai&ldquo;</h3>
                   </div>
                 </div>
                 
                 <div className="card-body p-4 p-lg-5">
                   <div className="lead text-muted mb-4">
                     <p data-aos="fade-up">
-                      Museum Lampung atau Museum Negeri Provinsi Lampung "Ruwa Jurai" 
+                      Museum Lampung atau Museum Negeri Provinsi Lampung &ldquo;Ruwa Jurai&ldquo;
                       mulai dibangun pada tahun 1975, dan diresmikan pada tanggal 24 September 1988. 
                       Museum ini merupakan museum pertama dan terbesar di Provinsi Lampung, 
                       menyimpan warisan budaya dan sejarah yang tak ternilai harganya.
@@ -116,10 +116,10 @@ export default function Historynext() {
                     
                     <div className="bg-primary bg-opacity-10 p-4 rounded-3 my-5" data-aos="fade-up">
                       <h4 className="mb-3 fw-bold text-dark">
-                        Filosofi Nama "Ruwa Jurai"
+                        Filosofi Nama &ldquo;Ruwa Jurai&ldquo;
                       </h4>
                       <p className="mb-0">
-                        "Ruwa Jurai" berasal dari bahasa Lampung yang berarti "Dua Aliran". 
+                        &ldquo;Ruwa Jurai&ldquo; berasal dari bahasa Lampung yang berarti &ldquo;Dua Aliran&ldquo;. 
                         Nama ini mencerminkan dua kelompok masyarakat adat utama di Lampung, 
                         yaitu Saibatin (Peminggir) dan Pepadun (Adat Pedalaman), 
                         yang hidup rukun dalam keberagaman budaya.
@@ -200,7 +200,7 @@ export default function Historynext() {
                           <h4 className="fw-bold mb-3 text-white">Kunjungi Museum Lampung</h4>
                           <p className="mb-0 text-white">
                             Jelajahi kekayaan budaya dan sejarah Lampung dengan mengunjungi 
-                            Museum Negeri "Ruwa Jurai". Dapatkan pengalaman edukatif yang tak terlupakan.
+                            Museum Negeri &ldquo;Ruwa Jurai&ldquo;. Dapatkan pengalaman edukatif yang tak terlupakan.
                           </p>
                         </div>
                         <div className="col-md-4 text-md-end mt-3 mt-md-0">

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -141,7 +142,7 @@ export default function Review() {
         <div className="position-relative text-white text-center z-2 p-3" style={{ zIndex: 2 }}>
           <h1 className="fw-bold display-4 mb-3">Kontak & Ulasan Museum Lampung</h1>
           <p className="lead mb-4 mx-auto text-white" style={{maxWidth: "600px"}}>
-            Berikan ulasan Anda dan temukan informasi kontak untuk Museum Negeri "Ruwa Jurai"
+            Berikan ulasan Anda dan temukan informasi kontak untuk Museum Negeri &ldquo;Ruwa Jurai&ldquo;
           </p>
         </div>
         
@@ -289,7 +290,7 @@ export default function Review() {
                               <div className="mb-3">
                                 {renderStars(item.score)}
                               </div>
-                              <p className="mb-0" style={{color: "#555"}}>"{item.comment}"</p>
+                              <p className="mb-0" style={{color: "#555"}}>&ldquo;{item.comment}&ldquo;</p>
                             </div>
                           </div>
                         ))}
@@ -334,7 +335,7 @@ export default function Review() {
                   <div className="p-4 bg-light border-top">
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
-                        <h5 className="fw-bold mb-1">Museum Negeri Provinsi Lampung "Ruwa Jurai"</h5>
+                        <h5 className="fw-bold mb-1">Museum Negeri Provinsi Lampung &ldquo;Ruwa Jurai&ldquo;</h5>
                         <p className="text-muted mb-0">Jl. Z.A. Pagar Alam No.64, Bandar Lampung</p>
                       </div>
                       <a 

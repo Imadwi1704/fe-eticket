@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Template from "@/components/admin/Template";
 import { FiDownload, FiFilter, FiSearch, FiCalendar } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
+import Image from "next/image";
 
 export default function AdminPage() {
   const [data, setData] = useState([]);
@@ -227,7 +229,7 @@ export default function AdminPage() {
                           <tr>
                             <td colSpan="10" className="text-center py-4">
                               <div className="d-flex flex-column align-items-center">
-                                <img
+                                <Image
                                   src="/empty-state.svg"
                                   alt="No data"
                                   style={{ width: "120px", opacity: 0.7 }}

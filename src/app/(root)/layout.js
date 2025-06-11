@@ -11,6 +11,7 @@ export default function IndexLayout({ children }) {
   return (
     <div>
       <Navbar />
+      
       {children}
 
       {pathname !== "/register/ticket" && (
