@@ -281,7 +281,7 @@ const NotificationToast = ({ notification, setNotification }) => {
     <>
       <Template />
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
-        <div className="container-fluid py-5">
+        <div className="container-fluid p-5">
           <div className="card shadow-sm border-0">
             <div className="card-header bg-primary text-white">
               <h2 className="card-title fw-semibold text-white mb-0">Data Gallery Museum Lampung</h2>

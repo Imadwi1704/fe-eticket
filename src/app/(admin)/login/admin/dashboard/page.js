@@ -142,7 +142,7 @@ useEffect(() => {
     >
       <Template />
 
-      <div className="container-fluid p-2">
+      <div className="container-fluid p-5">
         <div className="row mb-2">
           <div className="col-12">
             <h2 className="fw-bold mb-0 text-primary">
