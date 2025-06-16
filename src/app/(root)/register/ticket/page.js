@@ -12,19 +12,19 @@ import "react-datepicker/dist/react-datepicker.css";
 
 // Daftar libur nasional 2025 (contoh)
 const nationalHolidays = [
-  new Date(2025, 0, 1),   // Tahun Baru
-  new Date(2025, 0, 6),   // Hari Raya Natal
-  new Date(2025, 1, 8),   // Isra Mi'raj
-  new Date(2025, 2, 11),  // Hari Raya Nyepi
-  new Date(2025, 3, 18),  // Jumat Agung
-  new Date(2025, 4, 1),   // Hari Buruh
-  new Date(2025, 4, 29),  // Kenaikan Isa Almasih
-  new Date(2025, 5, 1),   // Hari Lahir Pancasila
-  new Date(2025, 5, 16),  // Idul Fitri
-  new Date(2025, 7, 17),  // Hari Kemerdekaan
-  new Date(2025, 10, 5),  // Maulid Nabi
+  new Date(2025, 0, 1), // Tahun Baru
+  new Date(2025, 0, 6), // Hari Raya Natal
+  new Date(2025, 1, 8), // Isra Mi'raj
+  new Date(2025, 2, 11), // Hari Raya Nyepi
+  new Date(2025, 3, 18), // Jumat Agung
+  new Date(2025, 4, 1), // Hari Buruh
+  new Date(2025, 4, 29), // Kenaikan Isa Almasih
+  new Date(2025, 5, 1), // Hari Lahir Pancasila
+  new Date(2025, 5, 16), // Idul Fitri
+  new Date(2025, 7, 17), // Hari Kemerdekaan
+  new Date(2025, 10, 5), // Maulid Nabi
   new Date(2025, 11, 25), // Hari Raya Natal
-  new Date(2025, 11, 26)  // Cuti Bersama Natal
+  new Date(2025, 11, 26), // Cuti Bersama Natal
 ];
 
 export default function Ticket() {
@@ -102,26 +102,26 @@ export default function Ticket() {
     fetchUser();
   }, [token]);
 
- const handleQuantityChange = (ticket, newQty) => {
-  // Ensure quantity is a number between 0 and 10
-  const quantity = Math.min(Math.max(parseInt(newQty) || 0, 0), 10);
-  
-  let updated;
-  if (quantity === 0) {
-    updated = selectedTicket.filter((item) => item.id !== ticket.id);
-  } else {
-    const existing = selectedTicket.find((item) => item.id === ticket.id);
-    if (existing) {
-      updated = selectedTicket.map((item) =>
-        item.id === ticket.id ? { ...item, qty: quantity } : item
-      );
+  const handleQuantityChange = (ticket, newQty) => {
+    // Ensure quantity is a number between 0 and 10
+    const quantity = Math.min(Math.max(parseInt(newQty) || 0, 0), 10);
+
+    let updated;
+    if (quantity === 0) {
+      updated = selectedTicket.filter((item) => item.id !== ticket.id);
     } else {
-      updated = [...selectedTicket, { ...ticket, qty: quantity }];
+      const existing = selectedTicket.find((item) => item.id === ticket.id);
+      if (existing) {
+        updated = selectedTicket.map((item) =>
+          item.id === ticket.id ? { ...item, qty: quantity } : item
+        );
+      } else {
+        updated = [...selectedTicket, { ...ticket, qty: quantity }];
+      }
     }
-  }
-  setSelectedTicket(updated);
-  updateTotal(updated);
-};
+    setSelectedTicket(updated);
+    updateTotal(updated);
+  };
   const updateTotal = (list) => {
     const total = list.reduce((sum, item) => sum + item.price * item.qty, 0);
     setTotalPrice(total);
@@ -148,7 +148,7 @@ export default function Ticket() {
         body: JSON.stringify({
           userId,
           ticketList,
-          visitDate: format(selectedDate, 'yyyy-MM-dd'),
+          visitDate: format(selectedDate, "yyyy-MM-dd"),
         }),
       });
 
@@ -201,8 +201,10 @@ export default function Ticket() {
 
   // Cek apakah tanggal termasuk hari Senin atau libur nasional
   const isDateDisabled = (date) => {
-    return isMonday(date) || 
-           nationalHolidays.some(holiday => holiday.getTime() === date.getTime());
+    return (
+      isMonday(date) ||
+      nationalHolidays.some((holiday) => holiday.getTime() === date.getTime())
+    );
   };
 
   // Custom class untuk styling kalender
@@ -210,7 +212,9 @@ export default function Ticket() {
     if (isMonday(date)) {
       return "monday-day";
     }
-    if (nationalHolidays.some(holiday => holiday.getTime() === date.getTime())) {
+    if (
+      nationalHolidays.some((holiday) => holiday.getTime() === date.getTime())
+    ) {
       return "holiday-day";
     }
     return "";
@@ -251,7 +255,7 @@ export default function Ticket() {
         }
         .ticket-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         .ticket-card.selected {
           border: 2px solid #0d6efd;
@@ -264,15 +268,11 @@ export default function Ticket() {
           border: 1px solid #ced4da;
           padding: 5px;
         }
-        .quantity-input:focus {
-          border-color: #86b7fe;
-          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
         .total-box {
           background-color: #f8f9fa;
           border-radius: 10px;
           padding: 20px;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         .date-picker-container {
           position: relative;
@@ -291,7 +291,7 @@ export default function Ticket() {
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(255,255,255,0.8);
+          background-color: rgba(255, 255, 255, 0.8);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -300,6 +300,21 @@ export default function Ticket() {
         .spinner {
           width: 3rem;
           height: 3rem;
+        }
+
+        /* Perbaikan untuk form-control focus */
+        .ticket-page .form-control:focus {
+          background-color: #fff !important;
+          border-color: #86b7fe !important;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+          color: #000 !important;
+        }
+
+        /* Khusus untuk quantity input */
+        .quantity-input:focus {
+          border-color: #86b7fe !important;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+          outline: none;
         }
       `}</style>
 
@@ -316,7 +331,6 @@ export default function Ticket() {
           <div className="row justify-content-center">
             <div className="col-lg-8">
               <div className="text-center mb-5">
-                <h1 className="fw-bold text-primary">Pembelian Tiket Museum</h1>
                 <p className="lead text-muted">
                   Pilih tanggal kunjungan dan jumlah tiket yang diinginkan
                 </p>
@@ -340,7 +354,10 @@ export default function Ticket() {
                     <div className="row">
                       <div className="col-md-6 mb-4 mb-md-0">
                         <div className="date-picker-container mb-4">
-                          <label htmlFor="tanggal" className="form-label fw-bold">
+                          <label
+                            htmlFor="tanggal"
+                            className="form-label fw-bold"
+                          >
                             <i className="fas fa-calendar-alt me-2"></i>
                             Tanggal Kunjungan
                           </label>
@@ -389,26 +406,36 @@ export default function Ticket() {
                             const quantity = selected?.qty || 0;
 
                             return (
-                              <div 
-                                key={ticket.id} 
-                                className={`ticket-card card mb-3 ${quantity > 0 ? 'selected' : ''}`}
+                              <div
+                                key={ticket.id}
+                                className={`ticket-card card mb-3 ${
+                                  quantity > 0 ? "selected" : ""
+                                }`}
                               >
                                 <div className="card-body">
                                   <div className="d-flex justify-content-between align-items-center">
                                     <div>
-                                      <h5 className="fw-bold mb-1">{ticket.type}</h5>
+                                      <h5 className="fw-bold mb-1">
+                                        {ticket.type}
+                                      </h5>
                                       <p className="text-muted small mb-2">
                                         {ticket.terms}
                                       </p>
                                       <p className="text-success mb-0">
-                                        Rp {ticket.price.toLocaleString("id-ID")}
+                                        Rp{" "}
+                                        {ticket.price.toLocaleString("id-ID")}
                                       </p>
                                     </div>
                                     <div className="d-flex align-items-center gap-2">
                                       <button
                                         type="button"
                                         className="btn btn-outline-danger btn-sm"
-                                        onClick={() => handleQuantityChange(ticket, quantity - 1)}
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            ticket,
+                                            quantity - 1
+                                          )
+                                        }
                                         disabled={quantity <= 0}
                                       >
                                         <i className="fas fa-minus"></i>
@@ -418,13 +445,23 @@ export default function Ticket() {
                                         min="0"
                                         max="10"
                                         value={quantity}
-                                        onChange={(e) => handleQuantityChange(ticket, e.target.value)}
+                                        onChange={(e) =>
+                                          handleQuantityChange(
+                                            ticket,
+                                            e.target.value
+                                          )
+                                        }
                                         className="quantity-input"
                                       />
                                       <button
                                         type="button"
                                         className="btn btn-outline-success btn-sm"
-                                        onClick={() => handleQuantityChange(ticket, quantity + 1)}
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            ticket,
+                                            quantity + 1
+                                          )
+                                        }
                                         disabled={quantity >= 10}
                                       >
                                         <i className="fas fa-plus"></i>
@@ -450,12 +487,19 @@ export default function Ticket() {
                             data-bs-toggle="modal"
                             data-bs-target="#confirmationModal"
                             disabled={
-                              !selectedDate || selectedTicket.length === 0 || !userId || loading
+                              !selectedDate ||
+                              selectedTicket.length === 0 ||
+                              !userId ||
+                              loading
                             }
                           >
                             {loading ? (
                               <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span
+                                  className="spinner-border spinner-border-sm me-2"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
                                 Memproses...
                               </>
                             ) : (
@@ -501,17 +545,24 @@ export default function Ticket() {
                   <p className="text-dark">Detail Pesanan</p>
                   <div className="d-flex justify-content-between mb-2">
                     <span>Tanggal Kunjungan:</span>
-                    <strong>{selectedDate && format(selectedDate, 'dd MMMM yyyy')}</strong>
+                    <strong>
+                      {selectedDate && format(selectedDate, "dd MMMM yyyy")}
+                    </strong>
                   </div>
                 </div>
 
                 <p className="text-dark">Tiket yang dibeli:</p>
                 <ul className="list-group mb-4">
                   {selectedTicket.map((item) => (
-                    <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                    <li
+                      key={item.id}
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                    >
                       <div>
                         <strong>{item.type}</strong>
-                        <div className="text-muted small">Rp {item.price.toLocaleString("id-ID")} x {item.qty}</div>
+                        <div className="text-muted small">
+                          Rp {item.price.toLocaleString("id-ID")} x {item.qty}
+                        </div>
                       </div>
                       <span className="badge bg-primary rounded-pill">
                         Rp {(item.price * item.qty).toLocaleString("id-ID")}
@@ -528,10 +579,7 @@ export default function Ticket() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button
-                  className="btn btn-danger"
-                  data-bs-dismiss="modal"
-                >
+                <button className="btn btn-danger" data-bs-dismiss="modal">
                   <i className="fas fa-times me-2"></i>
                   Batal
                 </button>
@@ -542,7 +590,11 @@ export default function Ticket() {
                 >
                   {loading ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Memproses...
                     </>
                   ) : (

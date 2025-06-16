@@ -604,6 +604,12 @@ export default function Register() {
           background-color: #0d6efd;
           transition: all 0.3s ease;
         }
+        .form-control:focus {
+            border-color: #0d6efd !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+            background-color: #fff !important;
+          }
+
         
         .btn-primary:hover {
           background-color: #0b5ed7;

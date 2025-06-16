@@ -64,7 +64,7 @@ const LoginPage = () => {
           router.push("/");
         }
       } else {
-        toast.error(data.message || "Login gagal");
+        toast.error(data.message || "Login Gagal Email atau Password Salah!");
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -97,33 +97,31 @@ export default function Navbar() {
     fetchUserData();
   }, []);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogout = async () => {
     setLoading(true);
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-
     try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (res.ok && data.data?.token) {
-        setCookie("token", data.data.token, { maxAge: 86400 });
-        const userName = data.data.user.fullName || data.data.user.name;
-        setCookie("fullName", userName, { maxAge: 86400 });
-        setCookie("role", data.data.user.role, { maxAge: 86400 });
-        setIsLoggedIn(true);
-        setFullName(userName);
-        setShowLogin(false);
-      } else {
-        alert(data.msg || data.message || "Login failed");
+      const token = getCookie("token");
+      if (token) {
+        // Panggil API logout jika diperlukan
+        await fetch("http://localhost:5001/api/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
+
+      // Hapus semua cookies dan state
+      deleteCookie("token");
+      deleteCookie("fullName");
+      setIsLoggedIn(false);
+      setFullName("");
+      setShowProfileMenu(false);
+
+      // Redirect ke halaman home setelah logout
+      window.location.href = "/";
     } catch (error) {
-      alert("An error occurred during login.");
+      console.error("Logout error:", error);
     } finally {
       setLoading(false);
     }
@@ -192,7 +190,7 @@ export default function Navbar() {
           {!isLoggedIn ? (
             <>
               <Link href="/register" className="btn btn-light btn-sm">
-                Register
+                Daftar
               </Link>
               <Link href="/login" className="btn btn-light btn-sm">
                 Login
@@ -255,7 +253,7 @@ export default function Navbar() {
                   isSticky ? "btn-outline-dark" : "btn-light"
                 }`}
               >
-                Register
+                Daftar
               </Link>
               <Link
                 href="/login"
