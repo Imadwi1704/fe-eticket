@@ -139,7 +139,9 @@ export default function VenuesPage() {
                       src={`http://localhost:5001/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
-                      style={{ height: "400px", objectFit: "cover", width: "100%" }}
+                      style={{objectFit: "cover"}}
+                      width={"100"}
+                      height={"400"}
                       crossOrigin="anonymous"
                       onError={(e) => {
                         e.target.onerror = null;
@@ -237,7 +239,9 @@ export default function VenuesPage() {
                   <div className="overflow-hidden rounded-top-4 position-relative">
                     {venue.photo ? (
                       <Image
-                        style={{ width: "100%", height: "180px", objectFit: "cover" }}
+                        style={{ objectFit: "cover" }}
+                        width={"200"}
+                        height={"400"}
                         src={`http://localhost:5001/uploads/${venue.photo}?t=${new Date().getTime()}`}
                         alt={venue.name}
                         className="img-fluid"

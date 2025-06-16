@@ -39,7 +39,7 @@ export default function PaymentPage() {
       <Template />
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container-fluid py-5">
-          <div className="card shadow-sm border-0">
+          <div className="card shadow-sm border-0 mt-5">
             <div className="card-header bg-primary text-white">
               <h2 className="card-title fw-semibold mb-0 text-white">Data Pembayaran Pengunjung</h2>
             </div>

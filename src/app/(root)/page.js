@@ -82,25 +82,55 @@ export default function RootLayout() {
             height: "100vh",
             position: "relative",
             overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
           }}
         >
+          {/* Video Background - Now only covering right half */}
           <div
-            className="video-overlay"
             style={{
               position: "absolute",
               top: 0,
               left: 0,
               width: "100%",
               height: "100%",
-              background:
-                "linear-gradient(45deg, rgba(113,77,41,0.3) 0%, rgba(0,0,0,0.6) 100%)",
-              zIndex: 2,
+              overflow: "hidden",
+              zIndex: 1,
             }}
-          ></div>
+          >
+            <iframe
+              src="https://www.youtube.com/embed/gR8kj6ti-s4?start=180&autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4&controls=0&modestbranding=1&rel=0"
+              title="YouTube video player"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                filter: "brightness(0.7)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                background: "rgba(0,0,0,0.4)",
+                zIndex: 2,
+              }}
+            ></div>
+          </div>
 
+          {/* Content Container - Left Side */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             className="hero-content"
             style={{
@@ -108,63 +138,128 @@ export default function RootLayout() {
               zIndex: 3,
               color: "white",
               padding: "0 5%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
+              width: "100%",
+              maxWidth: "1000px",
             }}
           >
             <h1
-              className="display-3 fw-bold mb-4 text-center"
-              style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.5)" }}
-            >
-              Museum Lampung Ruwai Jurai
-            </h1>
-            <p
-              className="lead mb-5 text-white text-center"
+              className="fw-bold text-white"
               style={{
-                fontSize: "1.5rem",
-                textShadow: "1px 1px 4px rgba(0,0,0,0.3)",
+                fontSize: "50px",
+                lineHeight: "1.1",
+                textShadow: "2px 2px 8px rgba(0,0,0,0.5)",
+                marginBottom: "1.5rem",
               }}
             >
-              Menjaga Warisan Sejarah dan Budaya Lampung untuk Generasi
-              Mendatang
-            </p>
-            <Link href="/aboutnext">
-              <span
-                className="btn text-black px-2 py-1"
+              Museum Lampung Ruwa Jurai
+            </h1>
+
+            <div
+              style={{
+                marginBottom: "2.5rem",
+                maxWidth: "1000px",
+              }}
+            >
+              <p
+                className="lead text-white"
                 style={{
-                  background: "#FFFFFF",
-                  borderRadius: "16px",
-                  fontSize: "0.75rem",
-                  padding: "4px 10px",
-                  transition: "0.3s",
+                  fontSize: "1.25rem",
+                  textShadow: "1px 1px 4px rgba(0,0,0,0.3)",
+                  lineHeight: "1.6",
+                  marginBottom: "0.5rem",
                 }}
               >
-                Jelajahi Selengkapnya
-              </span>
-            </Link>
+                Melestarikan Warisan Sejarah dan Budaya Lampung sebagai Cerminan
+                Jati Diri, Demi Mewariskannya kepada Generasi Mendatang dengan
+                Penuh Kebanggaan.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <Link href="/aboutnext">
+                <button
+                  className="btn"
+                  style={{
+                    background: "#FFFFFF",
+                    color: "#000",
+                    borderRadius: "50px",
+                    fontSize: "1rem",
+                    padding: "0.75rem 2rem",
+                    transition: "0.3s",
+                    fontWeight: "600",
+                    border: "none",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                  }}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.transform = "translateY(-2px)")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.transform = "translateY(0)")
+                  }
+                >
+                  Jelajahi Museum
+                </button>
+              </Link>
+
+              <Link href="/venues">
+                <button
+                  className="btn"
+                  style={{
+                    background: "transparent",
+                    color: "#FFF",
+                    borderRadius: "50px",
+                    fontSize: "1rem",
+                    padding: "0.75rem 2rem",
+                    transition: "0.3s",
+                    fontWeight: "600",
+                    border: "2px solid #FFF",
+                    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  Koleksi Kami
+                </button>
+              </Link>
+            </div>
           </motion.div>
 
-          {/* Video Background */}
-          <iframe
-            src="https://www.youtube.com/embed/gR8kj6ti-s4?start=180&autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4&controls=0&modestbranding=1&rel=0"
-            title="YouTube video player"
-            allow="autoplay; encrypted-media"
-            allowFullScreen
+          {/* Decorative Elements */}
+          <div
             style={{
               position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "100vw",
-              height: "100vh",
-              objectFit: "cover",
-              zIndex: "-1",
-              filter: "grayscale(50%)",
+              bottom: "5%",
+              left: "5%",
+              zIndex: 4,
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
             }}
-          />
+          >
+            <div
+              style={{
+                width: "50px",
+                height: "2px",
+                background: "rgba(255,255,255,0.5)",
+              }}
+            ></div>
+            <span
+              style={{
+                color: "rgba(255,255,255,0.8)",
+                fontSize: "0.9rem",
+              }}
+            >
+              Scroll untuk menjelajahi
+            </span>
+          </div>
         </section>
+
         {/* About Section */}
         <section
           className="section-padding bg-white"
@@ -182,7 +277,7 @@ export default function RootLayout() {
                   className="text-center"
                 >
                   <h2 className="text-black">
-                    Selamat Datang di Museum Ruwai Jurai
+                    Selamat Datang di Museum Ruwa Jurai
                   </h2>
 
                   <p className="lead text-black" style={{ lineHeight: 1.7 }}>
@@ -203,81 +298,87 @@ export default function RootLayout() {
                 >
                   {/* Card 1 */}
                   <div
-                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
                     style={{
-                      backgroundColor: "#0D6EFD",
+                      backgroundColor: "#FFFFFF",
                       minWidth: "220px",
                       flex: "1 1 250px",
+                      border: "2px solid #0D6EFD",
+                      color: "#000000",
                     }}
                   >
                     <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
                       style={{
                         width: "60px",
                         height: "60px",
-                        backgroundColor: "#FFFFFF",
+                        backgroundColor: "#0D6EFD",
                       }}
                     >
-                      <i className="bi bi-collection fs-2 text-primary"></i>
+                      <i className="bi bi-collection fs-2 text-white"></i>
                     </div>
-                    <h3 className="text-3xl fw-bold text-white mt-3">
-                      15.000<span className="text-white">+</span>
+                    <h3 className="text-3xl fw-bold mt-3">
+                      15.000<span>+</span>
                     </h3>
-                    <p className="mt-2 text-white mb-0">
+                    <p className="mt-2 mb-0 text-dark">
                       Koleksi bersejarah yang tersimpan di museum
                     </p>
                   </div>
 
                   {/* Card 2 */}
                   <div
-                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
                     style={{
-                      backgroundColor: "#0D6EFD",
+                      backgroundColor: "#FFFFFF",
                       minWidth: "220px",
                       flex: "1 1 250px",
+                      border: "2px solid #0D6EFD",
+                      color: "#000000",
                     }}
                   >
                     <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
                       style={{
                         width: "60px",
                         height: "60px",
-                        backgroundColor: "#FFFFFF",
+                        backgroundColor: "#0D6EFD",
                       }}
                     >
-                      <i className="bi bi-people-fill fs-2 text-primary"></i>
+                      <i className="bi bi-people-fill fs-2 text-white"></i>
                     </div>
-                    <h3 className="text-3xl fw-bold text-white mt-3">
-                      120.000<span className="text-white">+</span>
+                    <h3 className="text-3xl fw-bold mt-3">
+                      120.000<span>+</span>
                     </h3>
-                    <p className="mt-2 text-white mb-0">
+                    <p className="mt-2 mb-0 text-dark">
                       Pengunjung setiap tahunnya dari seluruh Indonesia
                     </p>
                   </div>
 
                   {/* Card 3 */}
                   <div
-                    className="rounded-4 p-4 text-center shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
                     style={{
-                      backgroundColor: "#0D6EFD",
+                      backgroundColor: "#FFFFFF",
                       minWidth: "220px",
                       flex: "1 1 250px",
+                      border: "2px solid #0D6EFD",
+                      color: "#000000",
                     }}
                   >
                     <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle"
+                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
                       style={{
                         width: "60px",
                         height: "60px",
-                        backgroundColor: "#FFFFFF",
+                        backgroundColor: "#0D6EFD",
                       }}
                     >
-                      <i className="bi bi-award fs-2 text-primary"></i>
+                      <i className="bi bi-award fs-2 text-white"></i>
                     </div>
-                    <h3 className="text-3xl fw-bold text-white mt-3">
-                      10<span className="text-white">+</span>
+                    <h3 className="text-3xl fw-bold mt-3">
+                      10<span>+</span>
                     </h3>
-                    <p className="mt-2 text-white mb-0">
+                    <p className="mt-2 mb-0 text-dark">
                       Penghargaan nasional atas pelestarian budaya
                     </p>
                   </div>
@@ -352,11 +453,11 @@ export default function RootLayout() {
 
               {/* Kolom Teks */}
               <div className="col-lg-6 col-md-7 col-12">
-                <h2 className="text-black mb-3">
+                <h2 className="text-black mb-4">
                   Sejarah Museum
                   <span className="text-primary"> Ruwai Jurai</span>{" "}
                 </h2>
-                <p className="text-black mb-4 text-justify">
+                <p className="text-black mb-5 text-justify">
                   Lampung memiliki museum yang mengabadikan perjalanan sejarah
                   di provinsi paling selatan dari Pulau Sumatera ini. Nama
                   museum itu adalah Museum Negeri Propinsi Lampung Ruwa Jurai.
@@ -379,12 +480,16 @@ export default function RootLayout() {
                       fontSize: "10",
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.backgroundColor = "#185F85";
+                      e.currentTarget.style.backgroundColor = "#0D6EFD";
                       e.currentTarget.style.color = "white";
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = "#0D6EFD";
-                      e.currentTarget.style.color = "white";
+                      const button = e.currentTarget;
+                      button.style.backgroundColor = "white";
+                      button.style.color = "#0D6EFD";
+                      button.style.outlineColor = "#0D6EFD";
+                      button.style.outlineStyle = "solid";
+                      button.style.outlineWidth = "1px";
                     }}
                   >
                     Pelajari Selengkapnya
@@ -409,50 +514,46 @@ export default function RootLayout() {
                   &rdquo;Ruwa Jurai&ldquo;
                 </p>
 
-                {/* Tombol Lihat Koleksi Lainnya */}
-                <div className="mt-3">
+                {/* Explore Button and Navigation Controls */}
+                <div className="d-flex justify-content-between align-items-center mt-4">
+                  {/* Explore Button */}
                   <Link
                     href="/venues"
-                    className="btn text-white px-2 py-1"
                     style={{
-                      background: "#0d6efd",
-                      borderRadius: "16px",
-                      fontSize: "0.75rem",
-                      padding: "4px 10px",
-                      transition: "0.3s",
                       display: "inline-block",
+                      padding: "5px 12px",
+                      backgroundColor: "#0D6EFD",
+                      color: "white",
+                      borderRadius: "20px",
+                      transition: "all 0.3s ease",
                       textDecoration: "none",
-                      border: "1px solid #ddd",
+                      fontSize: "10",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = "#0D6EFD";
+                      e.currentTarget.style.color = "white";
+                    }}
+                    onMouseOut={(e) => {
+                      const button = e.currentTarget;
+                      button.style.backgroundColor = "white";
+                      button.style.color = "#0D6EFD";
+                      button.style.outlineColor = "#0D6EFD";
+                      button.style.outlineStyle = "solid";
+                      button.style.outlineWidth = "1px";
                     }}
                   >
-                    Jelajahi Selengkapnya
+                    <span>Koleksi Lainnya</span>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                   </Link>
-                </div>
-
-                {/* Navigation buttons */}
-                <div className="d-flex justify-content-center gap-2 mt-3">
-                  <button
-                    className="btn btn-light rounded-circle shadow-sm"
-                    style={{ width: "30px", height: "30px" }}
-                    onClick={() => {
-                      const container =
-                        document.querySelector(".scroll-container");
-                      container.scrollBy({ left: -300, behavior: "smooth" });
-                    }}
-                  >
-                    &lt;
-                  </button>
-                  <button
-                    className="btn btn-light rounded-circle shadow-sm"
-                    style={{ width: "30px", height: "30px" }}
-                    onClick={() => {
-                      const container =
-                        document.querySelector(".scroll-container");
-                      container.scrollBy({ left: 300, behavior: "smooth" });
-                    }}
-                  >
-                    &gt;
-                  </button>
                 </div>
               </div>
 
@@ -462,6 +563,78 @@ export default function RootLayout() {
                   className="position-relative"
                   style={{ padding: "10px 0" }}
                 >
+                  {/* Navigation buttons - Positioned absolutely below the first card */}
+                  <div
+                    className="d-flex gap-2 mb-3"
+                    style={{
+                      position: "absolute",
+                      bottom: "-40px",
+                      left: "15px",
+                      zIndex: 10,
+                    }}
+                  >
+                    <button
+                      className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        transition: "all 0.3s ease",
+                      }}
+                      onClick={() => {
+                        const container =
+                          document.querySelector(".scroll-container");
+                        container.scrollBy({ left: -300, behavior: "smooth" });
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.1)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M15 18l-6-6 6-6" />
+                      </svg>
+                    </button>
+                    <button
+                      className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        transition: "all 0.3s ease",
+                      }}
+                      onClick={() => {
+                        const container =
+                          document.querySelector(".scroll-container");
+                        container.scrollBy({ left: 300, behavior: "smooth" });
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.1)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M9 18l6-6-6-6" />
+                      </svg>
+                    </button>
+                  </div>
+
                   {/* Scrollable Container */}
                   <div
                     className="scroll-container d-flex hide-scrollbar"
@@ -533,7 +706,7 @@ export default function RootLayout() {
                               <div className="hover-content">
                                 <h3>{venue.name}</h3>
                                 <p className=" text-dark">
-                                  {venue.description.length > 100
+                                  {venue.description.length > 150
                                     ? `${venue.description.slice(0, 100)}...`
                                     : venue.description}
                                 </p>
@@ -562,33 +735,35 @@ export default function RootLayout() {
 
         {/* Review Section */}
         <section
-          className="section-padding"
+          className="section-padding bg-white"
           id="review"
           style={{ padding: "40px 0" }}
         >
           <div className="container">
-            {/* Judul + Tombol Panah */}
+            {/* Title + Arrow Buttons */}
             <div className="row mb-4">
-              <div className="col-12 d-flex  gap-2">
-                <div className="col-12 mb-1 text-center">
-                  {/* Judul */}
-                  <h2>Ulasan Pengunjung </h2>
-                  <p className="text-black">
-                    Bagaimana Kata Mereka setelah berkunjung di Museum Lampung
-                  </p>
-                </div>
+              <div className="col-12 text-center">
+                <h2 className="mb-2" style={{ color: "#333" }}>
+                  Ulasan Pengunjung
+                </h2>
+                <p className="text-muted mb-4">
+                  Bagaimana Kata Mereka setelah berkunjung di Museum Lampung
+                </p>
               </div>
             </div>
 
-            {/* Konten review */}
+            {/* Review Content with Navigation */}
             <div className="position-relative">
+
+
+              {/* Reviews Container */}
               <div
                 ref={containerRef}
-                className="d-flex overflow-auto"
+                className="d-flex overflow-auto hide-scrollbar"
                 style={{
                   gap: "1.5rem",
                   scrollSnapType: "x mandatory",
-                  padding: "1rem 0",
+                  padding: "1rem 0.5rem",
                   scrollBehavior: "smooth",
                 }}
               >
@@ -596,13 +771,11 @@ export default function RootLayout() {
                   review.map((item, index) => (
                     <div
                       key={index}
-                      className="shadow bg-white rounded-4 p-4"
+                      className="shadow bg-white rounded-4 p-4 d-flex flex-column"
                       style={{
                         minWidth: "320px",
                         maxWidth: "320px",
                         flex: "0 0 auto",
-                        whiteSpace: "normal",
-                        wordBreak: "break-word",
                         scrollSnapAlign: "start",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
@@ -611,7 +784,7 @@ export default function RootLayout() {
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = "translateY(-8px)";
                         e.currentTarget.style.boxShadow =
-                          "0 10px 30px rgba(0,0,0,0.2)";
+                          "0 10px 30px rgba(0,0,0,0.15)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = "translateY(0)";
@@ -619,49 +792,103 @@ export default function RootLayout() {
                           "0 4px 12px rgba(0,0,0,0.1)";
                       }}
                     >
-                      <h4
-                        className="fw-bold mb-1"
-                        style={{ fontSize: "1.1rem", color: "#333" }}
-                      >
-                        {item.user?.fullName || "Pengunjung"}
-                      </h4>
-                      <p
-                        className="mb-1"
-                        style={{
-                          fontSize: "0.95rem",
-                          color: "#555",
-                        }}
-                      >
-                        {new Date(item.createdAt).toLocaleDateString("id-ID", {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </p>
+                      {/* User Profile Section */}
+                      <div className="d-flex align-items-center mb-3">
+                        {/* Profile Picture with Fallback */}
+                        <div
+                          className="rounded-circle overflow-hidden me-3"
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            backgroundColor: "#e9ecef",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {item.user?.profilePicture ? (
+                            <Image
+                              src={item.user.profilePicture}
+                              alt={item.user.fullName || "Pengunjung"}
+                              width={50}
+                              height={50}
+                              className="img-fluid"
+                              style={{ objectFit: "cover" }}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "/default-profile.png";
+                              }}
+                            />
+                          ) : (
+                            <div
+                              className="d-flex align-items-center justify-content-center w-100 h-100"
+                              style={{
+                                backgroundColor: "#0d6efd",
+                                color: "white",
+                              }}
+                            >
+                              <span style={{ fontSize: "1.25rem" }}>
+                                {item.user?.fullName?.charAt(0) || "P"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
 
-                      <p className="mb-2"
+                        {/* User Info */}
+                        <div>
+                          <h4
+                            className="fw-bold mb-0"
+                            style={{ fontSize: "1.1rem", color: "#333" }}
+                          >
+                            {item.user?.fullName || "Pengunjung"}
+                          </h4>
+                          <p
+                            className="mb-0 text-muted"
+                            style={{ fontSize: "0.85rem" }}
+                          >
+                            {new Date(item.createdAt).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Rating Stars */}
+                      <div
+                        className="mb-3"
+                        style={{ fontSize: "1.25rem", color: "#ffc107" }}
+                        aria-label={`Rating: ${item.score} dari 5`}
+                      >
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span
+                            key={i}
+                            style={{ opacity: i < item.score ? 1 : 0.3 }}
+                          >
+                            {i < item.score ? "★" : "☆"}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Review Comment */}
+                      <p
+                        className="mb-0 flex-grow-1"
                         style={{
                           fontSize: "0.95rem",
                           color: "#555",
-                          lineHeight: "1",
-                          minHeight: "10px",
+                          lineHeight: "1.5",
                         }}
                       >
                         {item.comment}
                       </p>
-                      <div
-                        className="text-warning"
-                        style={{ fontSize: "1.25rem", letterSpacing: "0.1rem" }}
-                        aria-label={`Rating: ${item.score} dari 5`}
-                      >
-                        {Array.from({ length: item.score }, (_, i) => (
-                          <span key={i}>★</span>
-                        ))}
-                      </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center w-100">
+                  <div className="text-center w-100 py-4">
                     <p className="text-muted">
                       Belum ada review yang tersedia.
                     </p>
@@ -733,6 +960,22 @@ export default function RootLayout() {
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
           overflow: hidden;
           transition: transform 0.3s ease;
+        }
+
+        .hover-card:hover {
+          background-color: #0d6efd !important;
+          color: #ffffff !important;
+          cursor: pointer;
+        }
+        .hover-card:hover h3,
+        .hover-card:hover p {
+          color: #ffffff !important;
+        }
+        .hover-card:hover .hover-icon {
+          background-color: #ffffff !important;
+        }
+        .hover-card:hover .hover-icon i {
+          color: #0d6efd !important;
         }
 
         .review-card {
@@ -837,6 +1080,7 @@ export default function RootLayout() {
           position: absolute;
           bottom: -100%;
           width: 100%;
+          height: 100%;
           background: white;
           transition: bottom 0.4s ease;
           z-index: 2;

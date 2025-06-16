@@ -44,7 +44,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/users/me", {
+        const res = await fetch("http://localhost:5001/api/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

@@ -77,9 +77,9 @@ export default function OrderPage() {
       <Template />
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container-fluid py-5">
-          <div className="card shadow-sm border-0">
+          <div className="card shadow-sm border-0 mt-5">
             <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-              <h2 className="card-title mb-0 fw-semibold">Data Pemesanan Tiket</h2>
+              <h2 className="card-title mb-0 fw-semibold text-white">Data Pemesanan Tiket</h2>
               <button
                 onClick={handleDownloadPDF}
                 className="btn btn-success btn-sm"

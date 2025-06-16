@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
-import { FiImage, FiEdit2, FiTrash2, FiPlus, FiCheckCircle } from "react-icons/fi";
+import {
+  FiImage,
+  FiEdit2,
+  FiTrash2,
+  FiPlus,
+  FiCheckCircle,
+} from "react-icons/fi";
 import Image from "next/image";
 
 export default function VenueAdminPage() {
@@ -12,7 +18,12 @@ export default function VenueAdminPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [venue, setVenue] = useState({ name: "", year: "", description: "", photo: "" });
+  const [venue, setVenue] = useState({
+    name: "",
+    year: "",
+    description: "",
+    photo: "",
+  });
   const [showImage, setShowImage] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +37,7 @@ export default function VenueAdminPage() {
         const res = await fetch("http://localhost:5001/api/venue", {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         const result = await res.json();
@@ -66,7 +77,7 @@ export default function VenueAdminPage() {
       const res = await fetch(`http://localhost:5001/api/venue/${venue.id}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       const result = await res.json();
@@ -121,7 +132,7 @@ export default function VenueAdminPage() {
       const res = await fetch(url, {
         method,
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -136,7 +147,11 @@ export default function VenueAdminPage() {
           setData(data.map((i) => (i.id === venue.id ? newVenue : i)));
         }
 
-        setMessage(showModal ? "Collection successfully added" : "Collection successfully updated");
+        setMessage(
+          showModal
+            ? "Collection successfully added"
+            : "Collection successfully updated"
+        );
         setShowModal(false);
         setShowEditModal(false);
         setVenue({ name: "", year: "", description: "", photo: "" });
@@ -155,23 +170,27 @@ export default function VenueAdminPage() {
       <Template />
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container-fluid py-5">
-          <div className="card shadow-sm border-0">
+          <div className="card shadow-sm border-0 mt-5">
             <div className="card-header bg-primary text-white">
-              <h2 className="card-title fw-semibold text-white mb-0">Data Koleksi Museum Lampung</h2>
+              <h2 className="card-title fw-semibold text-white mb-0">
+                Data Koleksi Museum Lampung
+              </h2>
             </div>
             <div className="card-body p-4">
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
+              <div>
                   <p className="text-muted mb-0">
-                    Kelola data koleksi museum. Anda dapat menambah, mengedit, atau menghapus koleksi.
+                    Kelola data koleksi museum. Anda dapat menambah, mengedit,
+                    atau menghapus koleksi.
                   </p>
                 </div>
-                <button 
-                  className="btn text-white d-flex align-items-center" 
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
+                <button
+                  className="btn btn-primary d-flex align-items-center"
                   onClick={handleAddVenue}
-                  style={{ backgroundColor: '#0d6efd' }}
                 >
-                  <FiPlus className="me-2" /> Add Data
+                  <i className="bi bi-plus-circle me-2"></i>
+                  Tambah Koleksi
                 </button>
               </div>
 
@@ -184,7 +203,9 @@ export default function VenueAdminPage() {
               ) : (
                 <div className="table-responsive">
                   <table className="table table-hover">
-                    <thead style={{ backgroundColor: 'rgba(13, 110, 253, 0.1)' }}>
+                    <thead
+                      style={{ backgroundColor: "rgba(13, 110, 253, 0.1)" }}
+                    >
                       <tr className="text-white">
                         <th className="text-dark">No</th>
                         <th className="text-dark">Kode Koleksi</th>
@@ -202,21 +223,34 @@ export default function VenueAdminPage() {
                           <td>{item.id}</td>
                           <td>{item.name}</td>
                           <td>{item.year}</td>
-                          <td style={{ whiteSpace: "pre-wrap", maxWidth: "200px" }}>{item.description}</td>
+                          <td
+                            style={{
+                              whiteSpace: "pre-wrap",
+                              maxWidth: "200px",
+                            }}
+                          >
+                            {item.description}
+                          </td>
                           <td>
-                            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border" style={{ borderColor: 'rgba(13, 110, 253, 0.2)' }}>
+                            <div
+                              className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border"
+                              style={{ borderColor: "rgba(13, 110, 253, 0.2)" }}
+                            >
                               {item.photo ? (
                                 <Image
-                                  style={{objectFit: 'cover' }}
-                                  width={"400"}
-                                  height={"200"}
-                                  src={`http://localhost:5001/uploads/${item.photo}?t=${new Date().getTime()}`}
+                                  style={{ objectFit: "cover" }}
+                                  width={"200"}
+                                  height={"100"}
+                                  src={`http://localhost:5001/uploads/${
+                                    item.photo
+                                  }?t=${new Date().getTime()}`}
                                   alt={item.name}
                                   className="h-full w-full"
                                   crossOrigin="anonymous"
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
+                                    e.target.src =
+                                      "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
                                   }}
                                 />
                               ) : (
@@ -226,19 +260,25 @@ export default function VenueAdminPage() {
                           </td>
                           <td>
                             <div className="d-flex gap-2">
-                              <button 
-                                className="btn btn-sm d-flex align-items-center" 
+                              <button
+                                className="btn btn-sm d-flex align-items-center"
                                 onClick={() => handleEditVenue(item)}
-                                style={{ backgroundColor: 'rgba(13, 110, 253, 0.1)', color: '#0d6efd' }}
+                                style={{
+                                  backgroundColor: "rgba(13, 110, 253, 0.1)",
+                                  color: "#0d6efd",
+                                }}
                               >
                                 <FiEdit2 size={14} className="me-1" /> Edit
                               </button>
-                              <button 
-                                className="btn btn-sm d-flex align-items-center" 
+                              <button
+                                className="btn btn-sm d-flex align-items-center"
                                 onClick={() => handleDeleteVenue(item)}
-                                style={{ backgroundColor: 'rgba(220, 53, 69, 0.1)', color: '#dc3545' }}
+                                style={{
+                                  backgroundColor: "rgba(220, 53, 69, 0.1)",
+                                  color: "#dc3545",
+                                }}
                               >
-                                <FiTrash2 size={14} className="me-1" /> Delete
+                                <FiTrash2 size={14} className="me-1" /> Hapus
                               </button>
                             </div>
                           </td>
@@ -255,91 +295,108 @@ export default function VenueAdminPage() {
 
       {/* Add/Edit Modal */}
       {(showModal || showEditModal) && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header" style={{ borderBottomColor: 'rgba(13, 110, 253, 0.2)' }}>
-                <h5 className="modal-title fw-bold text-dark">
-                  {showModal ? "Add Collection" : "Edit Collection"}
+              <div
+                className="modal-header"
+                style={{ borderBottomColor: "rgba(13, 110, 253, 0.2)" }}
+              >
+                <h5 className="modal-title fw-bold text-white">
+                  {showModal ? "Tambah Koleksi" : "Edit Koleksi"}
                 </h5>
-                <button 
-                  className="btn-close" 
-                  onClick={() => { setShowModal(false); setShowEditModal(false); }}
+                <button
+                  className="btn-close"
+                  onClick={() => {
+                    setShowModal(false);
+                    setShowEditModal(false);
+                  }}
                   aria-label="Close"
                 ></button>
               </div>
               <div className="modal-body">
                 <div className="mb-3">
                   <label className="form-label">Collection Name</label>
-                  <input 
-                    type="text" 
-                    name="name" 
-                    className="form-control" 
-                    value={venue.name} 
+                  <input
+                    type="text"
+                    name="name"
+                    className="form-control"
+                    value={venue.name}
                     onChange={handleChange}
-                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                    style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
                   />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Year</label>
-                  <input 
-                    type="text" 
-                    name="year" 
-                    className="form-control" 
-                    value={venue.year} 
+                  <input
+                    type="text"
+                    name="year"
+                    className="form-control"
+                    value={venue.year}
                     onChange={handleChange}
-                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                    style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
                   />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Description</label>
-                  <textarea 
-                    name="description" 
-                    className="form-control" 
-                    rows="5" 
-                    value={venue.description} 
+                  <textarea
+                    name="description"
+                    className="form-control"
+                    rows="5"
+                    value={venue.description}
                     onChange={handleChange}
-                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                    style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
                   ></textarea>
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Photo (jpg/png)</label>
-                  <input 
-                    type="file" 
-                    name="photo" 
-                    accept="image/jpeg, image/png" 
-                    className="form-control" 
+                  <input
+                    type="file"
+                    name="photo"
+                    accept="image/jpeg, image/png"
+                    className="form-control"
                     onChange={handleFileUpload}
-                    style={{ borderColor: 'rgba(13, 110, 253, 0.3)' }}
+                    style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
                   />
                   {showImage && (
                     <div className="mt-3 text-center">
-                      <Image 
-                        src={showImage} 
-                        alt="Preview" 
-                        style={{ 
-                          maxHeight: "200px", 
-                          maxWidth: "100%", 
-                          border: '2px dashed rgba(13, 110, 253, 0.3)',
-                          borderRadius: '8px',
-                          padding: '4px'
-                        }} 
+                      <Image
+                        src={showImage}
+                        alt="Preview"
+                        width={50} // pastikan menambahkan width dan height jika pakai next/image
+                        height={50}
+                        style={{
+                     
+                          border: "2px dashed rgba(13, 110, 253, 0.3)",
+                          borderRadius: "8px",
+                          padding: "4px",
+                        }}
                       />
                     </div>
                   )}
+                
                 </div>
               </div>
-              <div className="modal-footer" style={{ borderTopColor: 'rgba(13, 110, 253, 0.2)' }}>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={() => { setShowModal(false); setShowEditModal(false); }}
+              <div
+                className="modal-footer"
+                style={{ borderTopColor: "rgba(13, 110, 253, 0.2)" }}
+              >
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowModal(false);
+                    setShowEditModal(false);
+                  }}
                 >
                   Cancel
                 </button>
-                <button 
-                  className="btn text-white" 
+                <button
+                  className="btn text-white"
                   onClick={handleSubmit}
-                  style={{ backgroundColor: '#0d6efd' }}
+                  style={{ backgroundColor: "#0d6efd" }}
                 >
                   Save Changes
                 </button>
@@ -351,34 +408,47 @@ export default function VenueAdminPage() {
 
       {/* Delete Confirmation Modal */}
       {showConfirmModal && (
-        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header" style={{ borderBottomColor: 'rgba(13, 110, 253, 0.2)' }}>
-                <h5 className="modal-title fw-bold" style={{ color: '#0d6efd' }}>Confirm Deletion</h5>
-                <button 
-                  className="btn-close" 
+              <div
+                className="modal-header"
+                style={{ borderBottomColor: "rgba(13, 110, 253, 0.2)" }}
+              >
+                <h5
+                  className="modal-title fw-bold text-white"
+                >
+                  Konfirmasi Hapus
+                </h5>
+                <button
+                  className="btn-close"
                   onClick={() => setShowConfirmModal(false)}
                   aria-label="Close"
                 ></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to delete this collection?</p>
+                <p>Apakah Kamu Yakin Menghapus Data Koleksi</p>
                 <p className="fw-bold">{venue.name}</p>
               </div>
-              <div className="modal-footer" style={{ borderTopColor: 'rgba(13, 110, 253, 0.2)' }}>
-                <button 
-                  className="btn btn-outline-secondary" 
+              <div
+                className="modal-footer"
+                style={{ borderTopColor: "rgba(13, 110, 253, 0.2)" }}
+              >
+                <button
+                  className="btn btn-outline-secondary"
                   onClick={() => setShowConfirmModal(false)}
                 >
                   Cancel
                 </button>
-                <button 
-                  className="btn text-white" 
+                <button
+                  className="btn text-white"
                   onClick={handleConfirmDelete}
-                  style={{ backgroundColor: '#dc3545' }}
+                  style={{ backgroundColor: "#dc3545" }}
                 >
-                  Delete
+                  Hapus
                 </button>
               </div>
             </div>
@@ -388,32 +458,64 @@ export default function VenueAdminPage() {
 
       {/* Notification */}
       {message && (
-        <div 
-          className="toast show position-fixed bottom-0 end-0 m-3" 
-          role="alert" 
-          style={{ 
-            minWidth: '350px',
-            animation: 'slideIn 0.3s ease-out',
-            backgroundColor: '#fff',
-            borderLeft: '4px solid #0d6efd',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        <div
+          className="toast show position-fixed bottom-0 end-0 m-3"
+          role="alert"
+          style={{
+            minWidth: "350px",
+            animation: "slideIn 0.3s ease-out",
+            backgroundColor: "#fff",
+            borderLeft: "4px solid #0d6efd",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           }}
         >
           <div className="toast-body d-flex align-items-center">
-            <FiCheckCircle className="fs-4 me-3" style={{ color: '#0d6efd' }} />
+            <FiCheckCircle className="fs-4 me-3" style={{ color: "#0d6efd" }} />
             <div>
-              <h6 className="mb-1" style={{ color: '#0d6efd' }}>Success!</h6>
+              <h6 className="mb-1" style={{ color: "#0d6efd" }}>
+                Success!
+              </h6>
               <p className="mb-0 text-secondary">{message}</p>
             </div>
-            <button 
-              type="button" 
-              className="btn-close ms-auto" 
-              onClick={() => setMessage('')}
+            <button
+              type="button"
+              className="btn-close ms-auto"
+              onClick={() => setMessage("")}
               aria-label="Close"
             ></button>
           </div>
         </div>
       )}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes progress {
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .animate-progress {
+          animation: progress 10s linear forwards;
+        }
+        
+      `}</style>
     </>
   );
 }

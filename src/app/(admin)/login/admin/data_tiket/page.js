@@ -239,7 +239,9 @@ export default function TicketAdminPage() {
 
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container py-5">
-          <div className="card shadow-sm border-0">
+          <div className="card shadow-sm border-0 mt-5">
+            {" "}
+            {/* <-- Tambah jarak di sini */}
             <div className="card-header bg-primary text-white">
               <h2 className="card-title fw-semibold mb-0 text-white">
                 Data Tiket Museum Lampung
@@ -563,9 +565,7 @@ export default function TicketAdminPage() {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5
-                  className="modal-title text-white"
-                >
+                <h5 className="modal-title text-white">
                   <i className="bi bi-exclamation-triangle me-2"></i>
                   Konfirmasi Hapus
                 </h5>

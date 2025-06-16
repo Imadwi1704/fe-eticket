@@ -55,7 +55,7 @@ const FilterLaporan = () => {
       <Template />
       <div className="d-flex justify-content-center pt-5" style={{ paddingTop: "200px", minHeight: "200vh" }}>
         <div className="container">
-        <div className="card shadow-sm">
+          <div className="card shadow-sm border-0 mt-5">
           <div className="card-body p-5">
             <h2 className="card-title fw-semibold mb-4">Filter Laporan Pemesanan</h2>
             <p className="mb-4 text-muted">
