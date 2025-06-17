@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
+import page from "@/config/page"
 import {
   FiCheckCircle,
   FiAlertCircle,
@@ -52,7 +53,7 @@ export default function GalleryAdminPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5001/api/gallery", {
+      const res = await fetch(page.baseUrl+"/api/gallery", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -113,7 +114,7 @@ export default function GalleryAdminPage() {
   const handleConfirmDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/gallery/${gallery.id}`,
+        page.baseUrl+"/api/gallery/${gallery.id}",
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -200,10 +201,10 @@ export default function GalleryAdminPage() {
       let url, method;
 
       if (modal.type === "add") {
-        url = "http://localhost:5001/api/gallery";
+        url = page.baseUrl+"/api/gallery";
         method = "POST";
       } else {
-        url = `http://localhost:5001/api/gallery/${gallery.id}`;
+        url = page.baseUrl+"/api/gallery/${gallery.id}";
         method = "PUT";
       }
 
@@ -358,7 +359,8 @@ export default function GalleryAdminPage() {
                                 <Image
                                   width={100}
                                   height={100}
-                                  src={`http://localhost:5001/uploads/${
+                                  src={page.baseUrl
+                          +`/uploads/${
                                     item.imageUrl
                                   }?t=${new Date().getTime()}`}
                                   alt={item.title}
@@ -491,7 +493,8 @@ export default function GalleryAdminPage() {
                         src={
                           gallery.image
                             ? URL.createObjectURL(gallery.image)
-                            : `http://localhost:5001/uploads/${gallery.existingImageUrl}`
+                            : page.baseUrl
+                  +"/uploads/${gallery.existingImageUrl}"
                         }
                         alt="Preview"
                         width={300} // atau sesuaikan dengan desain

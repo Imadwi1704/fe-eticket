@@ -16,6 +16,7 @@ import {
 import { AsYouType } from "libphonenumber-js";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import page from '@/config/page';
 
 export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -53,7 +54,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/users/profile", {
+        const res = await fetch(page.baseUrl+"/api/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -109,7 +110,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5001/api/users/profile", {
+      const res = await fetch(page.baseUrl+"/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

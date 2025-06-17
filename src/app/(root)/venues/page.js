@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Image from "next/image";
+import page from '@/config/page';
 
 export default function VenuesPage() {
   const searchParam = useSearchParams();
@@ -34,7 +35,7 @@ export default function VenuesPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/venue", {
+        const res = await fetch(page.baseUrl+"/api/venue", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -136,7 +137,7 @@ export default function VenuesPage() {
                 <div className="position-relative">
                   {handleSelectedVenue.photo ? (
                     <Image
-                      src={`http://localhost:5001/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
+                      src={page.baseUrl+`/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
                       style={{objectFit: "cover"}}
@@ -242,7 +243,7 @@ export default function VenuesPage() {
                         style={{ objectFit: "cover" }}
                         width={"200"}
                         height={"400"}
-                        src={`http://localhost:5001/uploads/${venue.photo}?t=${new Date().getTime()}`}
+                        src={page.baseUrl+`/uploads/${venue.photo}?t=${new Date().getTime()}`}
                         alt={venue.name}
                         className="img-fluid"
                         crossOrigin="anonymous"

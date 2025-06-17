@@ -10,6 +10,9 @@ import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiChevronLeft } from "re
 import { FcGoogle } from "react-icons/fc";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import page from '@/config/page';
+
+console.log(page.baseUrl)
 
 const LoginPage = () => {
   const router = useRouter();
@@ -46,11 +49,11 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
+      const res = await fetch(page.baseUrl+"/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      });
+      }); 
 
       const data = await res.json();
 
@@ -76,13 +79,13 @@ const LoginPage = () => {
 
   const handleGoogleLogin = () => {
     setCookie("redirectAfterLogin", window.location.pathname, { maxAge: 60 * 5, path: "/" });
-    window.location.href = "http://localhost:5001/api/auth/google";
+    window.location.href = `${page.baseUrl}/api/auth/google`;
   };
 
   useEffect(() => {
     const checkGoogleAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/auth/login/success", {
+        const res = await fetch(page.baseUrl+"/api/auth/login/success", {
           credentials: "include"
         });
         
@@ -116,7 +119,7 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/forgot-password", {
+      const res = await fetch(page.baseUrl+"/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryData.email }),
@@ -147,7 +150,7 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/verify-code", {
+      const res = await fetch(page.baseUrl+"/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -186,7 +189,7 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/reset-password", {
+      const res = await fetch(page.baseUrl+"/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

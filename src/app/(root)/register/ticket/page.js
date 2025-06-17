@@ -9,6 +9,7 @@ import DatePicker from "react-datepicker";
 import { id } from "date-fns/locale";
 import { isMonday, format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
+import page from '@/config/page';
 
 // Daftar libur nasional 2025 (contoh)
 const nationalHolidays = [
@@ -51,7 +52,7 @@ export default function Ticket() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/ticket", {
+      const res = await fetch(page.baseUrl+"/api/ticket", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -74,7 +75,7 @@ export default function Ticket() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/users/profile", {
+      const res = await fetch(page.baseUrl+"/api/users/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -139,7 +140,7 @@ export default function Ticket() {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5001/api/payments", {
+      const res = await fetch(page.baseUrl+"/api/payments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

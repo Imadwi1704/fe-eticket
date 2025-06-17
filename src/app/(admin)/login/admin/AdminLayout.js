@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { getCookie } from "cookies-next";
 import Image from "next/image";
 
+
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
@@ -233,29 +234,12 @@ export default function AdminLayout({ children }) {
                   "bi bi-people-fill me-2",
                   "Data User"
                 )}
-
-                {renderDropdown(
-                  "kunjungan",
-                  "bi bi-ticket-detailed-fill me-2",
-                  "Data Status Kunjungan",
-                  tickets.length > 0 ? (
-                    tickets.map((ticket) => (
-                      <li key={ticket.id} className="sidebar-subitem">
-                        <a
-                          href={`/login/admin/data_kunjungan/${ticket.id}`}
-                          className="sidebar-link d-block py-2 ps-3"
-                        >
-                          <i className="bi bi-tag-fill me-2"></i>
-                          {ticket.type}
-                        </a>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="sidebar-subitem">
-                      <span className="text-muted small">Tidak ada tiket</span>
-                    </li>
-                  )
+                {renderSidebarItem(
+                  "/login/admin/data_kunjungan",
+                  "bi bi-people-fill me-2",
+                  "Data Kunjungan"
                 )}
+               
 
                 {renderSidebarItem(
                   "/login/admin/data_pembayaran",

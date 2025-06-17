@@ -17,6 +17,7 @@
     "cookies-next": "^5.1.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.18.1",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",

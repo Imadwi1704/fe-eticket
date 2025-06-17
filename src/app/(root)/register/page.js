@@ -8,6 +8,7 @@ import Link from "next/link";
 import Script from "next/script";
 import Footer from "@/components/Footer";
 import { getCookie } from "cookies-next";
+import page from '@/config/page';
 
 export default function Register() {
   const router = useRouter();
@@ -117,7 +118,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch("http://localhost:5001/api/auth/register", {
+      const res = await fetch(page.baseUrl+"/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fullName, phoneNumber, email, password }),
@@ -180,7 +181,7 @@ export default function Register() {
         return showModal("Sesi verifikasi tidak valid. Silakan daftar ulang.");
       }
 
-      const res = await fetch("http://localhost:5001/api/auth/verify-email", {
+      const res = await fetch(page.baseUrl+"/api/auth/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -229,7 +230,7 @@ export default function Register() {
         return showModal("Email tidak ditemukan. Silakan daftar ulang.");
       }
 
-      const res = await fetch("http://localhost:5001/api/auth/resend-verification", {
+      const res = await fetch(page.baseUrl+"/api/auth/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: resendEmail }),
@@ -261,7 +262,7 @@ export default function Register() {
 
   const handleGoogleLogin = () => {
     sessionStorage.setItem("preAuthPath", window.location.pathname);
-    window.location.href = "http://localhost:5001/api/auth/google";
+    window.location.href = page.baseUrl+"/api/auth/google";
   };
 
   return (

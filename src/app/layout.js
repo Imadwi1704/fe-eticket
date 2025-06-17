@@ -6,6 +6,7 @@
 import link from "next/link";
 import Script from "next/script";
 import { Suspense } from "react";
+import page from '@/config/page';
 
 export const metadata = {
   title: "Home EruwaiJurai",

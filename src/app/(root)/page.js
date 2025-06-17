@@ -502,7 +502,7 @@ export default function RootLayout() {
         <section
           className="artists-section section-padding"
           id="venues"
-          style={{ padding: "40px 0" }}
+          style={{ padding: "40px 0", backgroundColor: "#f0f8ff" }}
         >
           <div className="container">
             <div className="row">
@@ -656,14 +656,14 @@ export default function RootLayout() {
                         .map((venue) => (
                           <div
                             key={venue.id}
-                            className="col-9 col-sm-6 col-md-4 col-lg-3"
+                            className="col-8 col-sm-6 col-md-4 col-lg-3"
                             style={{
                               scrollSnapAlign: "start",
                               flex: "0 0 auto",
                               minWidth: "250px",
                             }}
                           >
-                            <div className="artists-thumb custom-card h-100 shadow-sm rounded-3 overflow-hidden position-relative">
+                            <div className="artists-thumb custom-card h-100 shadow-sm rounded-1 overflow-hidden position-relative">
                               {/* Gambar dan Nama */}
                               <div className="image-container position-relative">
                                 {venue.photo ? (
@@ -677,7 +677,7 @@ export default function RootLayout() {
                                     className="main-image img-fluid"
                                     style={{
                                       width: "100%",
-                                      height: "250px",
+                                      height: "350px",
                                       objectFit: "cover",
                                     }}
                                     crossOrigin="anonymous"
@@ -706,8 +706,8 @@ export default function RootLayout() {
                               <div className="hover-content">
                                 <h3>{venue.name}</h3>
                                 <p className=" text-dark">
-                                  {venue.description.length > 150
-                                    ? `${venue.description.slice(0, 100)}...`
+                                  {venue.description.length > 500
+                                    ? `${venue.description.slice(0, 500)}...`
                                     : venue.description}
                                 </p>
                                 <Link href={`/venues?id=${venue.id}`}>
@@ -754,8 +754,6 @@ export default function RootLayout() {
 
             {/* Review Content with Navigation */}
             <div className="position-relative">
-
-
               {/* Reviews Container */}
               <div
                 ref={containerRef}
@@ -771,25 +769,21 @@ export default function RootLayout() {
                   review.map((item, index) => (
                     <div
                       key={index}
-                      className="shadow bg-white rounded-4 p-4 d-flex flex-column"
+                      className="bg-white rounded-2 p-4 d-flex flex-column"
                       style={{
-                        minWidth: "320px",
-                        maxWidth: "320px",
+                        minWidth: "360px",
+                        maxWidth: "360px",
                         flex: "0 0 auto",
                         scrollSnapAlign: "start",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                        transition: "transform 0.3s ease, 0.3s ease",
                         cursor: "default",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = "translateY(-8px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 10px 30px rgba(0,0,0,0.15)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 12px rgba(0,0,0,0.1)";
                       }}
                     >
                       {/* User Profile Section */}
@@ -905,6 +899,13 @@ export default function RootLayout() {
           style={{ padding: "40px 0" }}
         >
           <div className="container-fluid">
+            <div className="row mb-4">
+              <div className="col-12 text-center">
+                <h2 className="mb-2" style={{ color: "#333" }}>
+                  Our Gallery
+                </h2>
+              </div>
+            </div>
             <div className="row g-3">
               {["our1.jpg", "our2.jpeg", "our3.jpg", "our4.jpg"].map(
                 (image, index) => (

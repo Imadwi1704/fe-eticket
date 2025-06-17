@@ -7,6 +7,7 @@ import Template from "@/components/admin/Template";
 import { FiDownload, FiFilter, FiSearch, FiCalendar } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
 import Image from "next/image";
+import page from "@/config/page"
 
 export default function AdminPage() {
   const [data, setData] = useState([]);
@@ -20,33 +21,41 @@ export default function AdminPage() {
   const bulan = searchParams.get("bulan");
   const tahun = searchParams.get("tahun");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!bulan || !tahun) return;
-        setLoading(true);
-        
-        const res = await fetch(`/api/some-data?ticket=${ticket}&bulan=${bulan}&tahun=${tahun}`);
-        if (!res.ok) throw new Error("Failed to fetch data");
-        
-        const result = await res.json();
-        setData(result);
-        setFilteredData(result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      if (!bulan || !tahun) return;
+      setLoading(true);
 
-    fetchData();
-  }, [bulan, tahun]);
+      const res = await fetch(page.baseUrl + "/api/admin/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bulan, tahun }),
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch data");
+
+      const result = await res.json();
+      setData(result);
+      setFilteredData(result);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [bulan, tahun]);
+
 
   // Filter data based on search term
   useEffect(() => {
     if (searchTerm) {
       const filtered = data.filter(item => 
-        item.nama_pengunjung.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.kode_pemesanan.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.tiket_dipilih.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -150,7 +159,6 @@ export default function AdminPage() {
                   </div>
                   <div className="col-md-4 text-end">
                     <a
-                      href={`/login/admin/pemesanan/cetak_pdf?bulan=${bulan}&tahun=${tahun}`}
                       className="btn btn-success"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -230,7 +238,7 @@ export default function AdminPage() {
                             <td colSpan="10" className="text-center py-4">
                               <div className="d-flex flex-column align-items-center">
                                 <Image
-                                  src="/empty-state.svg"
+                                  
                                   alt="No data"
                                   style={{ width: "120px", opacity: 0.7 }}
                                 />
