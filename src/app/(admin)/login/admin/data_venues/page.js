@@ -11,6 +11,7 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 import Image from "next/image";
+import page from "@/config/page";
 
 export default function VenueAdminPage() {
   const [data, setData] = useState([]);
@@ -34,7 +35,7 @@ export default function VenueAdminPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch(page.baseUrl+"/api/venue", {
+        const res = await fetch(`${page.baseUrl}/api/venue`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
