@@ -96,14 +96,13 @@ export default function GalleryAdminPage() {
 
   const handleEditGallery = (item) => {
     setGallery({
-      id: data.id,
-      title: data.title,
-      category: data.category,
-      description: data.description,
-      existingImageUrl: data.image, // nama file gambar
-      image: null, // kosongkan input file
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      category: item.category,
+      image: null,
+      existingImageUrl: item.imageUrl,
     });
-
     setModal({ show: true, type: "edit", title: "Edit Gallery" });
   };
 
