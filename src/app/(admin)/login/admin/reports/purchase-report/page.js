@@ -15,7 +15,7 @@ export default function AdminPage() {
   const [filteredData, setFilteredData] = useState([]);
   const [summary, setSummary] = useState({
     totalByCategory: {},
-    totalAll: 0
+    totalAll: 0,
   });
   const searchParams = useSearchParams();
 
@@ -33,34 +33,37 @@ export default function AdminPage() {
         const queryString = new URLSearchParams({
           startDate,
           endDate,
-          ...(category && { category })
+          ...(category && { category }),
         }).toString();
 
-        const res = await fetch(`${page.baseUrl}/api/admin/reports/purchase-report?${queryString}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${page.baseUrl}/api/admin/reports/purchase-report?${queryString}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch data");
 
         const result = await res.json();
-        
+
         if (result.status === "success") {
           setData(result.data);
           setFilteredData(result.data);
           setSummary({
             totalByCategory: result.totalByCategory,
-            totalAll: result.totalAll
+            totalAll: result.totalAll,
           });
         } else if (result.status === "empty") {
           setData([]);
           setFilteredData([]);
           setSummary({
             totalByCategory: {},
-            totalAll: 0
+            totalAll: 0,
           });
         } else {
           throw new Error(result.message || "Failed to fetch data");
@@ -79,12 +82,15 @@ export default function AdminPage() {
   // Filter data based on search term
   useEffect(() => {
     if (searchTerm) {
-      const filtered = data.filter(item => 
-        item.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.orderItems?.some(oi => 
-          oi.ticket?.type.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+      const filtered = data.filter(
+        (item) =>
+          item.user?.fullName
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          item.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.orderItems?.some((oi) =>
+            oi.ticket?.type.toLowerCase().includes(searchTerm.toLowerCase())
+          )
       );
       setFilteredData(filtered);
     } else {
@@ -113,19 +119,19 @@ export default function AdminPage() {
           </span>
         );
       default:
-        return <span className="badge bg-secondary rounded-pill">{status}</span>;
+        return (
+          <span className="badge bg-secondary rounded-pill">{status}</span>
+        );
     }
   };
 
   const getVisitStatus = (visitDate) => {
     const today = new Date();
     const visit = new Date(visitDate);
-    
+
     if (visit > today) {
       return (
-        <span className="badge bg-info rounded-pill">
-          Akan Berkunjung
-        </span>
+        <span className="badge bg-info rounded-pill">Akan Berkunjung</span>
       );
     } else if (visit.toDateString() === today.toDateString()) {
       return (
@@ -144,7 +150,9 @@ export default function AdminPage() {
 
   const calculateTotalTickets = () => {
     return filteredData.reduce((total, order) => {
-      return total + order.orderItems?.reduce((sum, oi) => sum + oi.quantity, 0) || 0;
+      return (
+        total + order.orderItems?.reduce((sum, oi) => sum + oi.quantity, 0) || 0
+      );
     }, 0);
   };
 
@@ -154,24 +162,30 @@ export default function AdminPage() {
         startDate,
         endDate,
         category: category || undefined,
-        generatePdf: true
+        generatePdf: true,
       };
-      
-      const res = await fetch(`${page.baseUrl}/api/admin/reports`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-        credentials: "include",
-      });
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/reports`,
+        {
+          method: "POST", // ✅ Ganti jadi POST
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody), // ✅ Body hanya diizinkan di POST/PUT
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to generate PDF");
 
       const result = await res.json();
-      
+
       if (result.status === "success") {
-        window.open(`${page.baseUrl}${result.fileUrl}`, '_blank');
+        window.open(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}${result.fileUrl}`,
+          "_blank"
+        );
       } else {
         throw new Error(result.message || "Failed to generate PDF");
       }
@@ -196,7 +210,8 @@ export default function AdminPage() {
                   <div className="d-flex align-items-center">
                     <span className="badge bg-white text-primary fs-6 me-3">
                       <FiCalendar className="me-1" />
-                      {new Date(startDate).toLocaleDateString('id-ID')} - {new Date(endDate).toLocaleDateString('id-ID')}
+                      {new Date(startDate).toLocaleDateString("id-ID")} -{" "}
+                      {new Date(endDate).toLocaleDateString("id-ID")}
                     </span>
                     {category && (
                       <span className="badge bg-light text-dark fs-6">
@@ -206,7 +221,7 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="card-body p-4">
                 {/* Filter and Search Section */}
                 <div className="row mb-4">
@@ -222,7 +237,10 @@ export default function AdminPage() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
-                      <button className="btn btn-outline-secondary" type="button">
+                      <button
+                        className="btn btn-outline-secondary"
+                        type="button"
+                      >
                         <FiFilter className="me-1" />
                         Filter
                       </button>
@@ -258,8 +276,12 @@ export default function AdminPage() {
                           <th className="fw-semibold">Tiket</th>
                           <th className="fw-semibold text-center">Jumlah</th>
                           <th className="fw-semibold">Tanggal Kunjungan</th>
-                          <th className="fw-semibold text-center">Pembayaran</th>
-                          <th className="fw-semibold text-center">Status Kunjungan</th>
+                          <th className="fw-semibold text-center">
+                            Pembayaran
+                          </th>
+                          <th className="fw-semibold text-center">
+                            Status Kunjungan
+                          </th>
                           <th className="fw-semibold">Metode</th>
                           <th className="fw-semibold text-end">Total</th>
                         </tr>
@@ -274,8 +296,12 @@ export default function AdminPage() {
                               </td>
                               <td>
                                 <div className="d-flex flex-column">
-                                  <span className="fw-medium">{item.user?.fullName}</span>
-                                  <small className="text-muted">{item.user?.email}</small>
+                                  <span className="fw-medium">
+                                    {item.user?.fullName}
+                                  </span>
+                                  <small className="text-muted">
+                                    {item.user?.email}
+                                  </small>
                                 </div>
                               </td>
                               <td>
@@ -286,14 +312,20 @@ export default function AdminPage() {
                                 ))}
                               </td>
                               <td className="text-center">
-                                {item.orderItems?.reduce((sum, oi) => sum + oi.quantity, 0)}
+                                {item.orderItems?.reduce(
+                                  (sum, oi) => sum + oi.quantity,
+                                  0
+                                )}
                               </td>
                               <td>
-                                {new Date(item.visitDate).toLocaleDateString('id-ID', {
-                                  day: 'numeric',
-                                  month: 'long',
-                                  year: 'numeric'
-                                })}
+                                {new Date(item.visitDate).toLocaleDateString(
+                                  "id-ID",
+                                  {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                  }
+                                )}
                               </td>
                               <td className="text-center">
                                 {getStatusBadge(item.payment?.paymentStatus)}
@@ -307,7 +339,10 @@ export default function AdminPage() {
                                 </span>
                               </td>
                               <td className="text-end fw-bold">
-                                Rp {item.payment?.totalAmount?.toLocaleString("id-ID")}
+                                Rp{" "}
+                                {item.payment?.totalAmount?.toLocaleString(
+                                  "id-ID"
+                                )}
                               </td>
                             </tr>
                           ))
@@ -323,7 +358,7 @@ export default function AdminPage() {
                                   style={{ opacity: 0.7 }}
                                 />
                                 <p className="text-muted mt-3">
-                                  {searchTerm 
+                                  {searchTerm
                                     ? "Tidak ditemukan data yang sesuai dengan pencarian"
                                     : "Tidak ada data transaksi untuk periode ini"}
                                 </p>
@@ -355,7 +390,9 @@ export default function AdminPage() {
                       <div className="card border-0 bg-light">
                         <div className="card-body py-3">
                           <div className="d-flex justify-content-between align-items-center">
-                            <span className="text-muted">Total Tiket Terjual</span>
+                            <span className="text-muted">
+                              Total Tiket Terjual
+                            </span>
                             <span className="fw-bold fs-5">
                               {calculateTotalTickets()}
                             </span>
@@ -386,11 +423,16 @@ export default function AdminPage() {
                         <div className="card-body py-3">
                           <h6 className="fw-bold mb-3">Rincian Per Kategori</h6>
                           <div className="d-flex flex-wrap gap-3">
-                            {Object.entries(summary.totalByCategory).map(([category, total]) => (
-                              <div key={category} className="badge bg-info text-dark p-2">
-                                {category}: Rp {total.toLocaleString("id-ID")}
-                              </div>
-                            ))}
+                            {Object.entries(summary.totalByCategory).map(
+                              ([category, total]) => (
+                                <div
+                                  key={category}
+                                  className="badge bg-info text-dark p-2"
+                                >
+                                  {category}: Rp {total.toLocaleString("id-ID")}
+                                </div>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>
