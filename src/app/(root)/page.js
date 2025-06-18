@@ -671,7 +671,7 @@ export default function RootLayout() {
                                   <Image
                                     width={300}
                                     height={300}
-                                    src={`${page.baseUrl}/uploads/${
+                                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${
                                       venue.photo
                                     }?t=${Date.now()}`}
                                     alt={venue.name}

@@ -358,7 +358,7 @@ export default function GalleryAdminPage() {
                                   height={100}
                                   src={
                                   
-                                    `${page.baseUrl}/uploads/${
+                                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${
                                       item.imageUrl
                                     }?t=${new Date().getTime()}`
                                   }
@@ -493,7 +493,7 @@ export default function GalleryAdminPage() {
                           gallery.image
                             ? URL.createObjectURL(gallery.image)
                             : page.baseUrl +
-                              "$page{page.baseUrl}/uploads/${gallery.existingImageUrl}"
+                              `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${gallery.existingImageUrl}`
                         }
                         alt="Preview"
                         width={300} // atau sesuaikan dengan desain
