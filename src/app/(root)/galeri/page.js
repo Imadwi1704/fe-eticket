@@ -40,7 +40,7 @@ export default function Gallery() {
   const fetchGalleries = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(page.baseUrl + "/api/gallery/public");
+      const response = await fetch(page.baseUrl + "/api/gallery");
       
       if (!response.ok) {
         throw new Error("Gagal memuat galeri");
