@@ -158,84 +158,12 @@ export default function TicketAdminPage() {
     }).format(price);
   };
 
-  const NotificationToast = ({ notification }) => {
-    if (!notification) return null;
-
-    const bgColor = {
-      success: "bg-green-500",
-      error: "bg-red-500",
-      info: "bg-blue-500",
-    }[notification.type];
-
-    const icon = {
-      success: (
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      ),
-      error: (
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      ),
-    }[notification.type];
-
-    return (
-      <div
-        className={`fixed top-6 right-6 z-50 transition-all duration-300 transform ${bgColor} text-white rounded-lg shadow-lg overflow-hidden animate-fade-in`}
-      >
-        <div className="flex items-center p-4 w-full max-w-xs">
-          <div className="flex-shrink-0">{icon}</div>
-          <div className="ml-3 text-sm font-normal flex-1">
-            {notification.message}
-          </div>
-          <button
-            type="button"
-            className="ml-2 p-1 rounded-full hover:bg-white hover:bg-opacity-20 focus:outline-none"
-            onClick={() => setNotification(null)}
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <div className="h-1 bg-white bg-opacity-30 w-full">
-          <div className="h-full bg-white bg-opacity-70 animate-progress" />
-        </div>
-      </div>
-    );
-  };
 
   return (
     <>
       <Template />
 
-      {/* Notification Toast */}
-      <NotificationToast notification={notification} />
+    
 
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container py-5">
@@ -341,7 +269,7 @@ export default function TicketAdminPage() {
       {showModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0)" }}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.42)" }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">
@@ -432,7 +360,7 @@ export default function TicketAdminPage() {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-danger"
                       onClick={() => setShowModal(false)}
                     >
                       Batal
@@ -452,7 +380,7 @@ export default function TicketAdminPage() {
       {showEditModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{ backgroundColor: "#0000006b" }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">
@@ -539,7 +467,7 @@ export default function TicketAdminPage() {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-danger"
                       onClick={() => setShowEditModal(false)}
                     >
                       Batal
@@ -559,7 +487,7 @@ export default function TicketAdminPage() {
       {showConfirmModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{ backgroundColor: "#0000006b" }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">

@@ -268,7 +268,7 @@ export default function AdminLayout({ children }) {
                     </li>
                     <li className="sidebar-subitem">
                       <a
-                        href="/login/admin/filter_laporan"
+                        href="/login/admin/reports"
                         className="sidebar-link d-block py-2 ps-4"
                       >
                         <i className="bi bi-receipt-cutoff me-2"></i>

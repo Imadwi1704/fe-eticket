@@ -10,6 +10,7 @@ import { Spinner, Alert } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 import { useParams } from "next/navigation";
+// import Cookies from "js-cookie";
 
 export default function DetailPage() {
   const params = useParams();
@@ -64,11 +65,16 @@ export default function DetailPage() {
   };
 
   const calculateTotal = (items) => {
-    return items?.reduce((sum, item) => sum + (item.ticketPrice || 0) * (item.quantity || 0), 0) || 0;
+    return (
+      items?.reduce(
+        (sum, item) => sum + (item.ticketPrice || 0) * (item.quantity || 0),
+        0
+      ) || 0
+    );
   };
 
   const handleDownload = () => {
-    window.open(`${page.baseUrl}/api/orders/${id}/download`, "_blank");
+    window.open(`${page.baseUrl}/api/orders/${id}/download?token=${token}`, "_blank");
   };
 
   if (!token) {
@@ -86,9 +92,9 @@ export default function DetailPage() {
       <section
         className="section-padding py-5"
         id="detail-order"
-        style={{ 
+        style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #e4f0ff 100%)"
+          background: "linear-gradient(135deg, #f5f7fa 0%, #e4f0ff 100%)",
         }}
       >
         <div className="container">
@@ -96,7 +102,9 @@ export default function DetailPage() {
             <div className="col-lg-8 col-md-10">
               <div className="text-center mb-5">
                 <h2 className="fw-bold text-primary">Detail Pemesanan</h2>
-                <p className="text-muted">Berikut detail tiket kunjungan Anda</p>
+                <p className="text-muted">
+                  Berikut detail tiket kunjungan Anda
+                </p>
               </div>
 
               {isLoading ? (
@@ -111,14 +119,15 @@ export default function DetailPage() {
               ) : order ? (
                 <div className="card border-0 shadow-lg overflow-hidden">
                   {/* Header with decorative element */}
-                  <div 
+                  <div
                     className="bg-primary py-3 px-4 text-white position-relative"
                     style={{
-                      background: "linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%)"
+                      background:
+                        "linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%)",
                     }}
                   >
                     <h3 className="fw-bold text-white">E-RUWAJURAI</h3>
-                    <div 
+                    <div
                       className="position-absolute top-0 end-0 bg-white text-primary fw-bold px-3 py-1 rounded-start-pill m-0 shadow-sm"
                       style={{ fontSize: "0.9rem" }}
                     >
@@ -134,7 +143,9 @@ export default function DetailPage() {
                           <i className="bi bi-receipt-cutoff fs-4 text-primary me-3"></i>
                           <div>
                             <h6 className="mb-0 fw-bold">Kode Pemesanan</h6>
-                            <p className="fw-bold text-primary small mb-1">{order.orderCode}</p>
+                            <p className="fw-bold text-primary small mb-1">
+                              {order.orderCode}
+                            </p>
                           </div>
                         </div>
 
@@ -142,7 +153,9 @@ export default function DetailPage() {
                           <i className="bi bi-calendar-check fs-4 text-primary me-3"></i>
                           <div>
                             <h6 className="mb-0 fw-bold">Tanggal Berkunjung</h6>
-                            <p className="fw-bold text-primary small mb-1">{formatDate(order.visitDate)}</p>
+                            <p className="fw-bold text-primary small mb-1">
+                              {formatDate(order.visitDate)}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -151,10 +164,19 @@ export default function DetailPage() {
                         <div className="d-flex align-items-center mb-3">
                           <i className="bi bi-credit-card fs-4 text-primary me-3"></i>
                           <div>
-                            <p className="text-muted small mb-1">Status Pembayaran</p>
+                            <p className="text-muted small mb-1">
+                              Status Pembayaran
+                            </p>
                             <h5 className="mb-0">
-                              <span className={`badge ${order.payment?.paymentStatus === 'success' ? 'bg-success' : 'bg-warning'} text-white`}>
-                                {order.payment?.paymentStatus?.toUpperCase() || 'PENDING'}
+                              <span
+                                className={`badge ${
+                                  order.payment?.paymentStatus === "success"
+                                    ? "bg-success"
+                                    : "bg-warning"
+                                } text-white`}
+                              >
+                                {order.payment?.paymentStatus?.toUpperCase() ||
+                                  "PENDING"}
                               </span>
                             </h5>
                           </div>
@@ -163,8 +185,10 @@ export default function DetailPage() {
                         <div className="d-flex align-items-center">
                           <i className="bi bi-cash-coin fs-4 text-primary me-3"></i>
                           <div>
-                            <p className="text-muted small mb-1">Metode Pembayaran</p>
-                            <h5 className="mb-0 fw-bold">Transfer Bank</h5>
+                            <h6 className="mb-0 fw-bold">Metode Pembayaran</h6>
+                            <p className="fw-bold text-primary small mb-1">
+                              {formatDate(order.payment?.paymentMethod)}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -172,7 +196,9 @@ export default function DetailPage() {
 
                     {/* Ticket items */}
                     <div className="mb-4">
-                      <h5 className="fw-bold mb-3 border-bottom pb-2">Rincian Tiket</h5>
+                      <h5 className="fw-bold mb-3 border-bottom pb-2">
+                        Rincian Tiket
+                      </h5>
                       <div className="table-responsive">
                         <table className="table table-hover">
                           <thead className="bg-light">
@@ -187,19 +213,29 @@ export default function DetailPage() {
                             {order.orderItems?.map((item) => (
                               <tr key={item.id}>
                                 <td>{item.ticket?.type || "Tiket Museum"}</td>
-                                <td className="text-end">Rp{item.ticketPrice?.toLocaleString("id-ID")}</td>
+                                <td className="text-end">
+                                  Rp{item.ticketPrice?.toLocaleString("id-ID")}
+                                </td>
                                 <td className="text-end">{item.quantity}</td>
                                 <td className="text-end fw-bold">
-                                  Rp{(item.ticketPrice * item.quantity).toLocaleString("id-ID")}
+                                  Rp
+                                  {(
+                                    item.ticketPrice * item.quantity
+                                  ).toLocaleString("id-ID")}
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                           <tfoot className="bg-light">
                             <tr>
-                              <td colSpan="3" className="fw-bold text-end">Total Pembayaran</td>
+                              <td colSpan="3" className="fw-bold text-end">
+                                Total Pembayaran
+                              </td>
                               <td className="text-end fw-bold text-primary fs-5">
-                                Rp{calculateTotal(order.orderItems).toLocaleString("id-ID")}
+                                Rp
+                                {calculateTotal(
+                                  order.orderItems
+                                ).toLocaleString("id-ID")}
                               </td>
                             </tr>
                           </tfoot>
@@ -216,20 +252,22 @@ export default function DetailPage() {
                         <i className="bi bi-download fs-5"></i>
                         Download Tiket
                       </button>
-                      
-                      {order.payment?.paymentStatus !== 'success' && (
+
+                      {order.payment?.paymentStatus !== "success" && (
                         <button
-                          onClick={() => window.open(order.payment?.paymentUrl, "_blank")}
+                          onClick={() =>
+                            window.open(order.payment?.paymentUrl, "_blank")
+                          }
                           className="btn btn-warning text-white d-flex align-items-center justify-content-center gap-2 py-3 px-4 flex-grow-1"
                         >
-                          <i className="bi bi-credit-card fs-5"></i>
+                          <i className="bi bi-credit-card fs-3"></i>
                           Lanjutkan Pembayaran
                         </button>
                       )}
                     </div>
 
                     {/* Decorative elements */}
-                    <div 
+                    <div
                       className="position-absolute bottom-0 end-0 me-3 mb-2 opacity-10"
                       style={{ width: "150px", zIndex: 0 }}
                     >

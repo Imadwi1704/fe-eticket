@@ -1,47 +1,69 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getCookie, setCookie } from "cookies-next";
 import Image from "next/image";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowRight, FiChevronLeft } from "react-icons/fi";
+import {
+  FiEye,
+  FiEyeOff,
+  FiMail,
+  FiLock,
+  FiArrowRight,
+  FiChevronLeft,
+} from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import page from '@/config/page';
-
-console.log(page.baseUrl)
+import page from "@/config/page";
 
 const LoginPage = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const searchParams = useSearchParams();
+  const emailParam = searchParams.get("email");
+
+  // State management
+  const [formData, setFormData] = useState({
+    email: emailParam || "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
+  const [activeTab, setActiveTab] = useState(emailParam ? "verify" : "login");
   const [recoveryData, setRecoveryData] = useState({
-    email: "",
+    email: emailParam || "",
     verificationCode: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
+  // Initialize animations
   useEffect(() => {
-    AOS.init({ duration: 800, once: true, easing: 'ease-in-out-quad' });
+    AOS.init({
+      duration: 800,
+      once: true,
+      easing: "ease-in-out-quad",
+      offset: 50,
+    });
   }, []);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (activeTab === "login") {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     } else {
-      setRecoveryData({ ...recoveryData, [name]: value });
+      setRecoveryData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // Handle login form submission
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Validation
     if (!formData.email || !formData.password) {
       toast.error("Email dan password harus diisi!");
       return;
@@ -49,57 +71,72 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(page.baseUrl+"/api/auth/login", {
+      const res = await fetch(`${page.baseUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      }); 
+      });
 
       const data = await res.json();
 
       if (res.ok && data.status === "success") {
-        setCookie("token", data.data.token, { maxAge: 60 * 60 * 24, path: "/" });
-        setCookie("userRole", data.data.role, { maxAge: 60 * 60 * 24, path: "/" });
-        
-        if (data.data.role === "ADMIN") {
-          router.push("/login/admin/dashboard");
-        } else {
-          router.push("/");
-        }
+        // Set cookies
+        setCookie("token", data.data.token, {
+          maxAge: 60 * 60 * 24,
+          path: "/",
+        });
+        setCookie("userRole", data.data.role, {
+          maxAge: 60 * 60 * 24,
+          path: "/",
+        });
+
+        // Redirect based on role
+        const redirectPath =
+          data.data.role === "ADMIN" ? "/login/admin/dashboard" : "/";
+        router.push(redirectPath);
       } else {
-        toast.error(data.message || "Login Gagal Email atau Password Salah!");
+        toast.error(data.message || "Login gagal. Email atau password salah!");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Terjadi kesalahan saat login.");
+      toast.error("Terjadi kesalahan saat login");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle Google login
   const handleGoogleLogin = () => {
-    setCookie("redirectAfterLogin", window.location.pathname, { maxAge: 60 * 5, path: "/" });
+    setCookie("redirectAfterLogin", window.location.pathname, {
+      maxAge: 60 * 5,
+      path: "/",
+    });
     window.location.href = `${page.baseUrl}/api/auth/google`;
   };
 
+  // Check Google auth status
   useEffect(() => {
     const checkGoogleAuth = async () => {
       try {
-        const res = await fetch(page.baseUrl+"/api/auth/login/success", {
-          credentials: "include"
+        const res = await fetch(`${page.baseUrl}/api/auth/login/success`, {
+          credentials: "include",
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            setCookie("token", data.token, { maxAge: 60 * 60 * 24, path: "/" });
-            setCookie("userRole", data.user.role, { maxAge: 60 * 60 * 24, path: "/" });
-            
-            if (data.user.role === "admin") {
-              router.push("/admin/dashboard");
-            } else {
-              router.push("/");
-            }
+            setCookie("token", data.token, {
+              maxAge: 60 * 60 * 24,
+              path: "/",
+            });
+            setCookie("userRole", data.user.role, {
+              maxAge: 60 * 60 * 24,
+              path: "/",
+            });
+
+            const redirectPath =
+              data.user.role === "admin" ? "/admin/dashboard" : "/";
+            router.push(redirectPath);
           }
         }
       } catch (error) {
@@ -110,8 +147,10 @@ const LoginPage = () => {
     checkGoogleAuth();
   }, [router]);
 
+  // Handle forgot password
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+
     if (!recoveryData.email) {
       toast.error("Email harus diisi!");
       return;
@@ -119,7 +158,7 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(page.baseUrl+"/api/auth/forgot-password", {
+      const res = await fetch(`${page.baseUrl}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryData.email }),
@@ -127,9 +166,15 @@ const LoginPage = () => {
 
       const data = await res.json();
 
-      if (res.ok && data.status === "success") {
+      if (res.ok) {
         toast.success("Kode verifikasi telah dikirim ke email Anda");
         setActiveTab("verify");
+        // Update URL without refresh
+        router.push(
+          `/login?email=${encodeURIComponent(recoveryData.email)}`,
+          undefined,
+          { shallow: true }
+        );
       } else {
         toast.error(data.message || "Gagal mengirim kode verifikasi");
       }
@@ -141,8 +186,10 @@ const LoginPage = () => {
     }
   };
 
+  // Handle verification code submission
   const handleVerifyCode = async (e) => {
     e.preventDefault();
+
     if (!recoveryData.verificationCode) {
       toast.error("Kode verifikasi harus diisi!");
       return;
@@ -150,12 +197,12 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(page.baseUrl+"/api/auth/verify-code", {
+      const res = await fetch(`${page.baseUrl}/api/auth/verify-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: recoveryData.email,
-          code: recoveryData.verificationCode
+          code: recoveryData.verificationCode,
         }),
       });
 
@@ -175,43 +222,62 @@ const LoginPage = () => {
     }
   };
 
+  // Handle password reset
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!recoveryData.newPassword || !recoveryData.confirmPassword) {
-      toast.error("Password baru dan konfirmasi password harus diisi!");
+
+    // Validation
+    const { verificationCode, newPassword, confirmPassword } = recoveryData;
+    if (!verificationCode || !newPassword || !confirmPassword) {
+      toast.error("Semua kolom harus diisi!");
       return;
     }
 
-    if (recoveryData.newPassword !== recoveryData.confirmPassword) {
-      toast.error("Password baru dan konfirmasi password tidak cocok!");
+    if (newPassword !== confirmPassword) {
+      toast.error("Password baru dan konfirmasi tidak cocok!");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("Password minimal 8 karakter!");
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await fetch(page.baseUrl+"/api/auth/reset-password", {
+      const res = await fetch(`${page.baseUrl}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: recoveryData.email,
-          code: recoveryData.verificationCode,
-          newPassword: recoveryData.newPassword
+          code: verificationCode,
+          newPassword,
+          confirmPassword,
         }),
       });
 
       const data = await res.json();
-
-      if (res.ok && data.status === "success") {
-        toast.success("Password berhasil direset. Silakan login dengan password baru Anda");
+      if (
+        res.ok &&
+        (data.status === "success" ||
+          data.message?.toLowerCase().includes("berhasil") ||
+          data.msg?.toLowerCase().includes("berhasil"))
+      ) {
+        toast.success(
+          data.message ||
+            data.msg ||
+            "Password berhasil direset. Silakan login."
+        );
         setActiveTab("login");
         setRecoveryData({
           email: "",
           verificationCode: "",
           newPassword: "",
-          confirmPassword: ""
+          confirmPassword: "",
         });
+        router.push("/login", undefined, { shallow: true });
       } else {
-        toast.error(data.message || "Gagal mereset password");
+        toast.error(data.message || data.msg || "Gagal mereset password");
       }
     } catch (error) {
       console.error("Reset password error:", error);
@@ -221,18 +287,25 @@ const LoginPage = () => {
     }
   };
 
+  // Render login form
   const renderLoginForm = () => (
     <div data-aos="fade-up">
       <div className="text-center mb-5">
         <h2 className="fw-bold">Masuk ke Akun Anda</h2>
-        <p className="text-muted">Silakan masuk menggunakan email dan password</p>
+        <p className="text-muted">
+          Silakan masuk menggunakan email dan password
+        </p>
       </div>
 
       <form onSubmit={handleLogin}>
         <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email</label>
+          <label htmlFor="email" className="form-label">
+            Email
+          </label>
           <div className="input-group">
-            <span className="input-group-text"><FiMail /></span>
+            <span className="input-group-text">
+              <FiMail />
+            </span>
             <input
               type="email"
               className="form-control"
@@ -247,9 +320,13 @@ const LoginPage = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
+          <label htmlFor="password" className="form-label">
+            Password
+          </label>
           <div className="input-group">
-            <span className="input-group-text"><FiLock /></span>
+            <span className="input-group-text">
+              <FiLock />
+            </span>
             <input
               type={showPassword ? "text" : "password"}
               className="form-control"
@@ -259,11 +336,15 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="Masukkan password"
               required
+              minLength={8}
             />
             <button
               type="button"
-              className="input-group-text"
+              className="input-group-text bg-transparent border-0"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={
+                showPassword ? "Sembunyikan password" : "Tampilkan password"
+              }
             >
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
@@ -272,11 +353,7 @@ const LoginPage = () => {
 
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div className="form-check">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="remember"
-            />
+            <input type="checkbox" className="form-check-input" id="remember" />
             <label className="form-check-label" htmlFor="remember">
               Ingat saya
             </label>
@@ -284,7 +361,10 @@ const LoginPage = () => {
           <button
             type="button"
             className="btn btn-link p-0 text-decoration-none"
-            onClick={() => setActiveTab("forgot")}
+            onClick={() => {
+              setActiveTab("forgot");
+              setRecoveryData((prev) => ({ ...prev, email: formData.email }));
+            }}
           >
             Lupa password?
           </button>
@@ -296,9 +376,19 @@ const LoginPage = () => {
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              />
+              Memproses...
+            </>
           ) : (
-            <span>Masuk</span>
+            <>
+              <FiArrowRight className="me-2" />
+              Masuk
+            </>
           )}
         </button>
 
@@ -319,6 +409,7 @@ const LoginPage = () => {
     </div>
   );
 
+  // Render forgot password form
   const renderForgotPasswordForm = () => (
     <div data-aos="fade-up">
       <button
@@ -339,9 +430,13 @@ const LoginPage = () => {
 
       <form onSubmit={handleForgotPassword}>
         <div className="mb-3">
-          <label htmlFor="recoveryEmail" className="form-label">Email</label>
+          <label htmlFor="recoveryEmail" className="form-label">
+            Email
+          </label>
           <div className="input-group">
-            <span className="input-group-text"><FiMail /></span>
+            <span className="input-group-text">
+              <FiMail />
+            </span>
             <input
               type="email"
               className="form-control"
@@ -361,21 +456,32 @@ const LoginPage = () => {
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              />
+              Mengirim...
+            </>
           ) : (
-            <span>Kirim Kode Verifikasi</span>
+            "Kirim Kode Verifikasi"
           )}
         </button>
       </form>
     </div>
   );
 
+  // Render verification code form
   const renderVerifyCodeForm = () => (
     <div data-aos="fade-up">
       <button
         type="button"
         className="btn btn-link p-0 mb-3 d-flex align-items-center"
-        onClick={() => setActiveTab("forgot")}
+        onClick={() => {
+          setActiveTab("forgot");
+          router.push("/login", undefined, { shallow: true });
+        }}
       >
         <FiChevronLeft className="me-1" />
         Kembali
@@ -384,13 +490,15 @@ const LoginPage = () => {
       <div className="text-center mb-4">
         <h2 className="fw-bold">Verifikasi Kode</h2>
         <p className="text-muted">
-          Masukkan kode verifikasi yang dikirim ke email Anda
+          Masukkan kode verifikasi yang dikirim ke {recoveryData.email}
         </p>
       </div>
 
-      <form onSubmit={handleVerifyCode}>
+      <form onSubmit={handleResetPassword}>
         <div className="mb-3">
-          <label htmlFor="verificationCode" className="form-label">Kode Verifikasi</label>
+          <label htmlFor="verificationCode" className="form-label">
+            Kode Verifikasi
+          </label>
           <input
             type="text"
             className="form-control"
@@ -403,44 +511,14 @@ const LoginPage = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary w-100 py-2"
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          ) : (
-            <span>Verifikasi Kode</span>
-          )}
-        </button>
-      </form>
-    </div>
-  );
-
-  const renderResetPasswordForm = () => (
-    <div data-aos="fade-up">
-      <button
-        type="button"
-        className="btn btn-link p-0 mb-3 d-flex align-items-center"
-        onClick={() => setActiveTab("verify")}
-      >
-        <FiChevronLeft className="me-1" />
-        Kembali
-      </button>
-
-      <div className="text-center mb-4">
-        <h2 className="fw-bold">Reset Password</h2>
-        <p className="text-muted">
-          Masukkan password baru Anda
-        </p>
-      </div>
-
-      <form onSubmit={handleResetPassword}>
         <div className="mb-3">
-          <label htmlFor="newPassword" className="form-label">Password Baru</label>
+          <label htmlFor="newPassword" className="form-label">
+            Password Baru
+          </label>
           <div className="input-group">
-            <span className="input-group-text"><FiLock /></span>
+            <span className="input-group-text">
+              <FiLock />
+            </span>
             <input
               type={showPassword ? "text" : "password"}
               className="form-control"
@@ -450,11 +528,15 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="Masukkan password baru"
               required
+              minLength={8}
             />
             <button
               type="button"
-              className="input-group-text"
+              className="input-group-text bg-transparent border-0"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={
+                showPassword ? "Sembunyikan password" : "Tampilkan password"
+              }
             >
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
@@ -462,9 +544,13 @@ const LoginPage = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="confirmPassword" className="form-label">Konfirmasi Password</label>
+          <label htmlFor="confirmPassword" className="form-label">
+            Konfirmasi Password
+          </label>
           <div className="input-group">
-            <span className="input-group-text"><FiLock /></span>
+            <span className="input-group-text">
+              <FiLock />
+            </span>
             <input
               type={showPassword ? "text" : "password"}
               className="form-control"
@@ -474,11 +560,15 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="Konfirmasi password baru"
               required
+              minLength={8}
             />
             <button
               type="button"
-              className="input-group-text"
+              className="input-group-text bg-transparent border-0"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={
+                showPassword ? "Sembunyikan password" : "Tampilkan password"
+              }
             >
               {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
@@ -491,9 +581,16 @@ const LoginPage = () => {
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              />
+              Memproses...
+            </>
           ) : (
-            <span>Reset Password</span>
+            "Reset Password"
           )}
         </button>
       </form>
@@ -502,7 +599,19 @@ const LoginPage = () => {
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
-      <ToastContainer position="top-center" autoClose={5000} />
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <div className="container-fluid">
         <div className="row g-0">
           {/* Image Section */}
@@ -511,9 +620,10 @@ const LoginPage = () => {
               <Image
                 src="/assets/images/lampung-logo.png"
                 alt="Logo Lampung"
-                width={400}
-                height={400}
+                width={300}
+                height={300}
                 className="img-fluid"
+                priority
               />
               <div className="mt-4">
                 <h4 className="fw-bold mb-1 text-primary">ERUWAIJUARAI</h4>
@@ -524,16 +634,16 @@ const LoginPage = () => {
 
           {/* Form Section */}
           <div className="col-lg-6 d-flex align-items-center justify-content-center">
-            <div className="p-5 w-100" style={{ maxWidth: "500px" }}>
+            <div className="p-4 p-md-5 w-100" style={{ maxWidth: "500px" }}>
               {activeTab === "login" && renderLoginForm()}
               {activeTab === "forgot" && renderForgotPasswordForm()}
               {activeTab === "verify" && renderVerifyCodeForm()}
-              {activeTab === "reset" && renderResetPasswordForm()}
 
               {activeTab === "login" && (
                 <div className="text-center mt-4 pt-3">
                   <p className="small text-muted">
-                    © {new Date().getFullYear()} ERUWAIJUARAI. All rights reserved.
+                    © {new Date().getFullYear()} ERUWAIJUARAI. All rights
+                    reserved.
                   </p>
                 </div>
               )}

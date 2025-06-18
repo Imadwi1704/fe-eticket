@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,57 +6,85 @@ import Template from "@/components/admin/Template";
 import { FiDownload, FiFilter, FiSearch, FiCalendar } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
 import Image from "next/image";
-import page from "@/config/page"
+import page from "@/config/page";
 
 export default function AdminPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [summary, setSummary] = useState({
+    totalByCategory: {},
+    totalAll: 0
+  });
   const searchParams = useSearchParams();
 
   // Get parameters from URL
-  const ticket = searchParams.get("ticket");
-  const bulan = searchParams.get("bulan");
-  const tahun = searchParams.get("tahun");
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  const category = searchParams.get("category");
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      if (!bulan || !tahun) return;
-      setLoading(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!startDate || !endDate) return;
+        setLoading(true);
 
-      const res = await fetch(page.baseUrl + "/api/admin/reports", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ bulan, tahun }),
-      });
+        const queryString = new URLSearchParams({
+          startDate,
+          endDate,
+          ...(category && { category })
+        }).toString();
 
-      if (!res.ok) throw new Error("Failed to fetch data");
+        const res = await fetch(`${page.baseUrl}/api/admin/reports/purchase-report?${queryString}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
 
-      const result = await res.json();
-      setData(result);
-      setFilteredData(result);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (!res.ok) throw new Error("Failed to fetch data");
 
-  fetchData();
-}, [bulan, tahun]);
+        const result = await res.json();
+        
+        if (result.status === "success") {
+          setData(result.data);
+          setFilteredData(result.data);
+          setSummary({
+            totalByCategory: result.totalByCategory,
+            totalAll: result.totalAll
+          });
+        } else if (result.status === "empty") {
+          setData([]);
+          setFilteredData([]);
+          setSummary({
+            totalByCategory: {},
+            totalAll: 0
+          });
+        } else {
+          throw new Error(result.message || "Failed to fetch data");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert(`Error: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchData();
+  }, [startDate, endDate, category]);
 
   // Filter data based on search term
   useEffect(() => {
     if (searchTerm) {
       const filtered = data.filter(item => 
-        item.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.kode_pemesanan.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tiket_dipilih.toLowerCase().includes(searchTerm.toLowerCase())
+        item.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.orderItems?.some(oi => 
+          oi.ticket?.type.toLowerCase().includes(searchTerm.toLowerCase())
+        )
       );
       setFilteredData(filtered);
     } else {
@@ -67,19 +94,19 @@ export default function AdminPage() {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "paid":
+      case "PAID":
         return (
           <span className="badge bg-success rounded-pill d-flex align-items-center">
             <FaCheckCircle className="me-1" /> Lunas
           </span>
         );
-      case "pending":
+      case "PENDING":
         return (
           <span className="badge bg-warning text-dark rounded-pill d-flex align-items-center">
             <FaClock className="me-1" /> Pending
           </span>
         );
-      case "failed":
+      case "FAILED":
         return (
           <span className="badge bg-danger rounded-pill d-flex align-items-center">
             <FaTimesCircle className="me-1" /> Gagal
@@ -115,12 +142,51 @@ export default function AdminPage() {
     }
   };
 
+  const calculateTotalTickets = () => {
+    return filteredData.reduce((total, order) => {
+      return total + order.orderItems?.reduce((sum, oi) => sum + oi.quantity, 0) || 0;
+    }, 0);
+  };
+
+  const handleGeneratePDF = async () => {
+    try {
+      const requestBody = {
+        startDate,
+        endDate,
+        category: category || undefined,
+        generatePdf: true
+      };
+      
+      const res = await fetch(`${page.baseUrl}/api/admin/reports`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error("Failed to generate PDF");
+
+      const result = await res.json();
+      
+      if (result.status === "success") {
+        window.open(`${page.baseUrl}${result.fileUrl}`, '_blank');
+      } else {
+        throw new Error(result.message || "Failed to generate PDF");
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
   return (
     <>
       <Template />
       <div className="container-fluid py-4" style={{ minHeight: "100vh" }}>
         <div className="row">
-          <div className="col-12">
+          <div className="col-12 mt-5">
             <div className="card shadow-sm border-0">
               <div className="card-header bg-primary text-white">
                 <div className="d-flex justify-content-between align-items-center">
@@ -130,8 +196,13 @@ export default function AdminPage() {
                   <div className="d-flex align-items-center">
                     <span className="badge bg-white text-primary fs-6 me-3">
                       <FiCalendar className="me-1" />
-                      {bulan}/{tahun}
+                      {new Date(startDate).toLocaleDateString('id-ID')} - {new Date(endDate).toLocaleDateString('id-ID')}
                     </span>
+                    {category && (
+                      <span className="badge bg-light text-dark fs-6">
+                        Kategori: {category}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -158,14 +229,13 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="col-md-4 text-end">
-                    <a
+                    <button
                       className="btn btn-success"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={handleGeneratePDF}
                     >
                       <FiDownload className="me-2" />
                       Cetak Laporan
-                    </a>
+                    </button>
                   </div>
                 </div>
 
@@ -187,9 +257,9 @@ export default function AdminPage() {
                           <th className="fw-semibold">Pengunjung</th>
                           <th className="fw-semibold">Tiket</th>
                           <th className="fw-semibold text-center">Jumlah</th>
-                          <th className="fw-semibold">Tanggal</th>
+                          <th className="fw-semibold">Tanggal Kunjungan</th>
                           <th className="fw-semibold text-center">Pembayaran</th>
-                          <th className="fw-semibold text-center">Kunjungan</th>
+                          <th className="fw-semibold text-center">Status Kunjungan</th>
                           <th className="fw-semibold">Metode</th>
                           <th className="fw-semibold text-end">Total</th>
                         </tr>
@@ -197,39 +267,47 @@ export default function AdminPage() {
                       <tbody>
                         {filteredData.length > 0 ? (
                           filteredData.map((item, index) => (
-                            <tr key={index} className="hover-highlight">
+                            <tr key={item.id} className="hover-highlight">
                               <td>{index + 1}</td>
                               <td className="fw-semibold text-primary">
-                                {item.kode_pemesanan}
+                                {item.orderCode}
                               </td>
                               <td>
                                 <div className="d-flex flex-column">
-                                  <span className="fw-medium">{item.nama_pengunjung}</span>
-                                  <small className="text-muted">{item.email}</small>
+                                  <span className="fw-medium">{item.user?.fullName}</span>
+                                  <small className="text-muted">{item.user?.email}</small>
                                 </div>
                               </td>
-                              <td>{item.tiket_dipilih}</td>
-                              <td className="text-center">{item.banyak_tiket}</td>
                               <td>
-                                {new Date(item.tanggal_berkunjung).toLocaleDateString('id-ID', {
+                                {item.orderItems?.map((oi, i) => (
+                                  <div key={i}>
+                                    {oi.ticket?.type} ({oi.quantity})
+                                  </div>
+                                ))}
+                              </td>
+                              <td className="text-center">
+                                {item.orderItems?.reduce((sum, oi) => sum + oi.quantity, 0)}
+                              </td>
+                              <td>
+                                {new Date(item.visitDate).toLocaleDateString('id-ID', {
                                   day: 'numeric',
                                   month: 'long',
                                   year: 'numeric'
                                 })}
                               </td>
                               <td className="text-center">
-                                {getStatusBadge(item.status_pembayaran)}
+                                {getStatusBadge(item.payment?.paymentStatus)}
                               </td>
                               <td className="text-center">
-                                {getVisitStatus(item.tanggal_berkunjung)}
+                                {getVisitStatus(item.visitDate)}
                               </td>
                               <td>
                                 <span className="badge bg-light text-dark">
-                                  {item.metode_pembayaran}
+                                  {item.payment?.paymentMethod}
                                 </span>
                               </td>
                               <td className="text-end fw-bold">
-                                Rp {item.total_pembelian.toLocaleString("id-ID")}
+                                Rp {item.payment?.totalAmount?.toLocaleString("id-ID")}
                               </td>
                             </tr>
                           ))
@@ -238,14 +316,16 @@ export default function AdminPage() {
                             <td colSpan="10" className="text-center py-4">
                               <div className="d-flex flex-column align-items-center">
                                 <Image
-                                  
+                                  src="/images/no-data.svg"
+                                  width={120}
+                                  height={120}
                                   alt="No data"
-                                  style={{ width: "120px", opacity: 0.7 }}
+                                  style={{ opacity: 0.7 }}
                                 />
                                 <p className="text-muted mt-3">
                                   {searchTerm 
                                     ? "Tidak ditemukan data yang sesuai dengan pencarian"
-                                    : "Tidak ada data transaksi untuk bulan ini"}
+                                    : "Tidak ada data transaksi untuk periode ini"}
                                 </p>
                               </div>
                             </td>
@@ -277,7 +357,7 @@ export default function AdminPage() {
                           <div className="d-flex justify-content-between align-items-center">
                             <span className="text-muted">Total Tiket Terjual</span>
                             <span className="fw-bold fs-5">
-                              {filteredData.reduce((sum, item) => sum + item.banyak_tiket, 0)}
+                              {calculateTotalTickets()}
                             </span>
                           </div>
                         </div>
@@ -289,10 +369,28 @@ export default function AdminPage() {
                           <div className="d-flex justify-content-between align-items-center">
                             <span className="text-muted">Total Pendapatan</span>
                             <span className="fw-bold fs-5 text-success">
-                              Rp {filteredData
-                                .reduce((sum, item) => sum + item.total_pembelian, 0)
-                                .toLocaleString("id-ID")}
+                              Rp {summary.totalAll.toLocaleString("id-ID")}
                             </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Category Breakdown */}
+                {Object.keys(summary.totalByCategory).length > 0 && (
+                  <div className="row mt-3">
+                    <div className="col-12">
+                      <div className="card border-0 bg-light">
+                        <div className="card-body py-3">
+                          <h6 className="fw-bold mb-3">Rincian Per Kategori</h6>
+                          <div className="d-flex flex-wrap gap-3">
+                            {Object.entries(summary.totalByCategory).map(([category, total]) => (
+                              <div key={category} className="badge bg-info text-dark p-2">
+                                {category}: Rp {total.toLocaleString("id-ID")}
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
