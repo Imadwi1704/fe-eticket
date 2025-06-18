@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Footer from "@/components/Footer";
 import Script from "next/script";
-import { getCookie } from "cookies-next";
 import { FiImage, FiChevronLeft, FiChevronRight, FiInfo } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import AOS from "aos";
@@ -18,7 +17,7 @@ export default function VenuesPage() {
   const [selectedVenue, setSelectedVenue] = useState(id || null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(15); // Show 15 items per page
-  const token = getCookie("token");
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleSelectedVenue = venues.find((item) => item.id === Number(selectedVenue));
 
@@ -31,17 +30,11 @@ export default function VenuesPage() {
   }, []);
 
   useEffect(() => {
-    if (!token) return;
-
     const fetchData = async () => {
       try {
-        const res = await fetch(page.baseUrl+"/api/venue", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        setIsLoading(true);
+        const res = await fetch(page.baseUrl+"/api/venue/public");
+        
         const result = await res.json();
         if (res.ok) {
           setVenues(result);
@@ -50,11 +43,13 @@ export default function VenuesPage() {
         }
       } catch (error) {
         console.error("Terjadi kesalahan saat fetch:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -129,21 +124,32 @@ export default function VenuesPage() {
       </section>
 
       <div className="container py-5">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="row">
+            <div className="col-12 text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3">Memuat data koleksi...</p>
+            </div>
+          </div>
+        )}
+
         {/* Detail Venue */}
-        {handleSelectedVenue && (
+        {!isLoading && handleSelectedVenue && (
           <div className="row mb-5 justify-content-center" data-aos="fade-up">
             <div className="col-lg-10">
               <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div className="position-relative">
                   {handleSelectedVenue.photo ? (
                     <Image
-                      src={`${page.baseUrl}/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
+                      src={`${page.baseUrl}/uploads/${handleSelectedVenue.photo}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
                       style={{objectFit: "cover"}}
-                      width={"100"}
-                      height={"400"}
-                      crossOrigin="anonymous"
+                      width={800}
+                      height={400}
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = "https://via.placeholder.com/800x400?text=Image+Not+Found";
@@ -178,134 +184,139 @@ export default function VenuesPage() {
         )}
 
         {/* Header Koleksi */}
-        <div className="row justify-content-center mb-4" data-aos="fade-up">
-          <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center flex-wrap">
-              <div>
-                <h3 className="mb-1 text-dark">Koleksi Museum Lampung</h3>
-                <p className="text-black mb-0">
-                  Menampilkan {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, venues.length)} dari {venues.length} koleksi
-                </p>
-              </div>
-              {venues.length > itemsPerPage && (
-                <div className="d-flex align-items-center">
-                  <button
-                    onClick={prevPage}
-                    disabled={currentPage === 1}
-                    className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-2 me-2"
-                    style={{ width: "40px", height: "40px" }}
-                  >
-                    <FiChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={nextPage}
-                    disabled={currentPage === totalPages}
-                    className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-2"
-                    style={{ width: "40px", height: "40px" }}
-                  >
-                    <FiChevronRight size={20} />
-                  </button>
+        {!isLoading && (
+          <div className="row justify-content-center mb-4" data-aos="fade-up">
+            <div className="col-12">
+              <div className="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                  <h3 className="mb-1 text-dark">Koleksi Museum Lampung</h3>
+                  <p className="text-black mb-0">
+                    Menampilkan {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, venues.length)} dari {venues.length} koleksi
+                  </p>
                 </div>
-              )}
+                {venues.length > itemsPerPage && (
+                  <div className="d-flex align-items-center">
+                    <button
+                      onClick={prevPage}
+                      disabled={currentPage === 1}
+                      className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-2 me-2"
+                      style={{ width: "40px", height: "40px" }}
+                    >
+                      <FiChevronLeft size={20} />
+                    </button>
+                    <button
+                      onClick={nextPage}
+                      disabled={currentPage === totalPages}
+                      className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center p-2"
+                      style={{ width: "40px", height: "40px" }}
+                    >
+                      <FiChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Venues Grid */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4">
-          {currentItems.length > 0 ? (
-            currentItems.map((venue, index) => (
-              <div
-                key={venue.id}
-                className="col"
-                data-aos="zoom-in-up"
-                data-aos-delay={index % 5 * 100}
-              >
+        {!isLoading && (
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4">
+            {currentItems.length > 0 ? (
+              currentItems.map((venue, index) => (
                 <div
-                  className="card h-100 border-0 shadow rounded-4 bg-white"
-                  onClick={() => setSelectedVenue(venue.id)}
-                  style={{
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-8px)";
-                    e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                  }}
+                  key={venue.id}
+                  className="col"
+                  data-aos="zoom-in-up"
+                  data-aos-delay={index % 5 * 100}
                 >
-                  <div className="overflow-hidden rounded-top-4 position-relative">
-                    {venue.photo ? (
-                      <Image
-                        style={{ objectFit: "cover" }}
-                        width={"200"}
-                        height={"400"}
-                        src={`${page.baseUrl}/uploads/${venue.photo}?t=${new Date().getTime()}`}
-                        alt={venue.name}
-                        className="img-fluid"
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "https://via.placeholder.com/300x180?text=No+Image";
-                        }}
-                      />
-                    ) : (
+                  <div
+                    className="card h-100 border-0 shadow rounded-4 bg-white"
+                    onClick={() => setSelectedVenue(venue.id)}
+                    style={{
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-8px)";
+                      e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                    }}
+                  >
+                    <div className="overflow-hidden rounded-top-4 position-relative">
+                      {venue.photo ? (
+                        <Image
+                          style={{ objectFit: "cover" }}
+                          width={200}
+                          height={180}
+                          src={`${page.baseUrl}/uploads/${venue.photo}`}
+                          alt={venue.name}
+                          className="img-fluid"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "https://via.placeholder.com/300x180?text=No+Image";
+                          }}
+                        />
+                      ) : (
+                        <div
+                          className="d-flex justify-content-center align-items-center bg-light"
+                          style={{ width: "100%", height: "180px" }}
+                        >
+                          <FiImage className="text-muted" size={32} />
+                        </div>
+                      )}
                       <div
-                        className="d-flex justify-content-center align-items-center bg-light"
-                        style={{ width: "100%", height: "180px" }}
+                        className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-primary text-white rounded-pill"
+                        style={{ fontSize: "12px" }}
                       >
-                        <FiImage className="text-muted" size={32} />
+                        {venue.year}
                       </div>
-                    )}
-                    <div
-                      className="position-absolute top-0 end-0 m-2 px-2 py-1 bg-primary text-white rounded-pill"
-                      style={{ fontSize: "12px" }}
-                    >
-                      {venue.year}
                     </div>
-                  </div>
 
-                  <div className="card-body p-3">
-                    <h6 className="card-title fw-bold text-dark mb-2">{venue.name}</h6>
-                    <p className="text-muted mb-2" style={{
-                      fontSize: "0.85rem",
-                      display: "-webkit-box",
-                      WebkitLineClamp: "3",
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      minHeight: "60px"
-                    }}>
-                      {venue.description}
-                    </p>
-                    <div className="d-flex justify-content-between align-items-center mt-auto">
-                      <span className="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill" style={{ fontSize: "0.75rem" }}>
-                        Koleksi
-                      </span>
-                      <div className="d-flex align-items-center text-primary" style={{ fontSize: "0.8rem" }}>
-                        <FiInfo className="me-1" size={14} />
-                        <small>Detail</small>
+                    <div className="card-body p-3">
+                      <h6 className="card-title fw-bold text-dark mb-2">{venue.name}</h6>
+                      <p className="text-muted mb-2" style={{
+                        fontSize: "0.85rem",
+                        display: "-webkit-box",
+                        WebkitLineClamp: "3",
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        minHeight: "60px"
+                      }}>
+                        {venue.description}
+                      </p>
+                      <div className="d-flex justify-content-between align-items-center mt-auto">
+                        <span className="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill" style={{ fontSize: "0.75rem" }}>
+                          Koleksi
+                        </span>
+                        <div className="d-flex align-items-center text-primary" style={{ fontSize: "0.8rem" }}>
+                          <FiInfo className="me-1" size={14} />
+                          <small>Detail</small>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-12 text-center py-5">
-              <div className="bg-light rounded-circle p-4 d-inline-flex mb-4">
-                <FiImage size={48} className="text-muted" />
-              </div>
-              <h5 className="fw-bold mb-2">Belum ada data koleksi</h5>
-              <p className="text-muted">Koleksi akan segera ditambahkan</p>
-            </div>
-          )}
-        </div>
+              ))
+            ) : (
+              !isLoading && (
+                <div className="col-12 text-center py-5">
+                  <div className="bg-light rounded-circle p-4 d-inline-flex mb-4">
+                    <FiImage size={48} className="text-muted" />
+                  </div>
+                  <h5 className="fw-bold mb-2">Belum ada data koleksi</h5>
+                  <p className="text-muted">Koleksi akan segera ditambahkan</p>
+                </div>
+              )
+            )}
+          </div>
+        )}
 
         {/* Pagination */}
-        {venues.length > itemsPerPage && (
+        {!isLoading && venues.length > itemsPerPage && (
           <div className="d-flex justify-content-center mt-5">
             <nav aria-label="Page navigation">
               <ul className="pagination">
