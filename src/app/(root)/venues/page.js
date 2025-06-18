@@ -33,7 +33,7 @@ export default function VenuesPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(page.baseUrl+"/api/venue/public");
+        const res = await fetch(page.baseUrl+"/api/venue");
         
         const result = await res.json();
         if (res.ok) {
