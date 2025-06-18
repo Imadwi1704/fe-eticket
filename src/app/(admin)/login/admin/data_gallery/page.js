@@ -96,13 +96,14 @@ export default function GalleryAdminPage() {
 
   const handleEditGallery = (item) => {
     setGallery({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      category: item.category,
-      image: null,
-      existingImageUrl: item.imageUrl,
+      id: data.id,
+      title: data.title,
+      category: data.category,
+      description: data.description,
+      existingImageUrl: data.image, // nama file gambar
+      image: null, // kosongkan input file
     });
+
     setModal({ show: true, type: "edit", title: "Edit Gallery" });
   };
 
@@ -491,14 +492,13 @@ export default function GalleryAdminPage() {
                         src={
                           gallery.image
                             ? URL.createObjectURL(gallery.image)
-                            : page.baseUrl +
-                              `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${gallery.existingImageUrl}`
+                            : `${page.baseUrl}/uploads/${gallery.existingImageUrl}`
                         }
                         alt="Preview"
-                        width={300} // atau sesuaikan dengan desain
+                        width={300}
                         height={200}
                         style={{
-                          objectFit: "contain", // biar gambar tidak kepotong
+                          objectFit: "contain",
                           border: "2px dashed rgba(13, 110, 253, 0.3)",
                           borderRadius: "8px",
                           padding: "4px",
