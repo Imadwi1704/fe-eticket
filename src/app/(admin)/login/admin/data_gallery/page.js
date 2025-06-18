@@ -198,10 +198,10 @@ export default function GalleryAdminPage() {
       let url, method;
 
       if (modal.type === "add") {
-        url = page.baseUrl + "/api/gallery";
+        url = `${page.baseUrl}/api/gallery`;
         method = "POST";
       } else {
-        url = page.baseUrl + "/api/gallery/${gallery.id}";
+        url = `${page.baseUrl}/api/gallery/${gallery.id}`;
         method = "PUT";
       }
 
@@ -356,12 +356,11 @@ export default function GalleryAdminPage() {
                                 <Image
                                   width={100}
                                   height={100}
-                                  src={
-                                  
-                                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${
-                                      item.imageUrl
-                                    }?t=${new Date().getTime()}`
-                                  }
+                                  src={`${
+                                    process.env.NEXT_PUBLIC_API_BASE_URL
+                                  }/uploads/${
+                                    item.imageUrl
+                                  }?t=${new Date().getTime()}`}
                                   alt={item.title}
                                   className="w-full h-full object-cover"
                                   crossOrigin="anonymous"
