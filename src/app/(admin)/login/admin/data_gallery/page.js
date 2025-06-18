@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
 import page from "@/config/page";
@@ -50,10 +50,10 @@ export default function GalleryAdminPage() {
     }
   }, [notification]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(page.baseUrl + "/api/gallery", {
+      const res = await fetch(`${page.baseUrl}/api/gallery`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -61,7 +61,7 @@ export default function GalleryAdminPage() {
 
       const result = await res.json();
       if (res.ok) {
-        setData(result.data || result); // Handle both formats
+        setData(result.data || result);
       } else {
         setNotification({
           message: "Gagal mengambil data gallery",
@@ -76,11 +76,11 @@ export default function GalleryAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (token) fetchData();
-  }, [token]);
+  }, [token, fetchData]);
 
   const handleAddGallery = () => {
     setGallery({
@@ -113,7 +113,7 @@ export default function GalleryAdminPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const res = await fetch(page.baseUrl + "/api/gallery/${gallery.id}", {
+      const res = await fetch(`${page.baseUrl}/api/gallery/${gallery.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -159,12 +159,28 @@ export default function GalleryAdminPage() {
   };
 
   const handleImageChange = (e) => {
-    setGallery((prev) => ({
-      ...prev,
-      image: e.target.files[0],
-      existingImageUrl: "",
-    }));
+    if (e.target.files && e.target.files[0]) {
+      // Clean up previous blob URL if exists
+      if (gallery.image) {
+        URL.revokeObjectURL(URL.createObjectURL(gallery.image));
+      }
+
+      setGallery((prev) => ({
+        ...prev,
+        image: e.target.files[0],
+        existingImageUrl: "",
+      }));
+    }
   };
+
+  // Clean up blob URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (gallery.image) {
+        URL.revokeObjectURL(URL.createObjectURL(gallery.image));
+      }
+    };
+  }, [gallery.image]);
 
   const handleSubmit = async () => {
     if (!gallery.title || !gallery.description || !gallery.category) {
@@ -189,21 +205,17 @@ export default function GalleryAdminPage() {
     formData.append("description", gallery.description);
     formData.append("category", gallery.category);
 
-    // Only append image if it's a new file
     if (gallery.image) {
       formData.append("image", gallery.image);
     }
 
     try {
-      let url, method;
+      const url =
+        modal.type === "add"
+          ? `${page.baseUrl}/api/gallery`
+          : `${page.baseUrl}/api/gallery/${gallery.id}`;
 
-      if (modal.type === "add") {
-        url = `${page.baseUrl}/api/gallery`;
-        method = "POST";
-      } else {
-        url = `${page.baseUrl}/api/gallery/${gallery.id}`;
-        method = "PUT";
-      }
+      const method = modal.type === "add" ? "POST" : "PUT";
 
       const res = await fetch(url, {
         method,
@@ -216,18 +228,16 @@ export default function GalleryAdminPage() {
       if (res.ok) {
         const result = await res.json();
         if (modal.type === "add") {
-          setData([...data, result.data]);
-          setNotification({
-            message: "Gallery berhasil ditambahkan",
-            type: "success",
-          });
+          setData([result.data, ...data]);
         } else {
           setData(data.map((i) => (i.id === gallery.id ? result.data : i)));
-          setNotification({
-            message: "Gallery berhasil diperbarui",
-            type: "success",
-          });
         }
+        setNotification({
+          message: `Gallery berhasil ${
+            modal.type === "add" ? "ditambahkan" : "diperbarui"
+          }`,
+          type: "success",
+        });
         setModal({ show: false, type: "", title: "" });
       } else {
         const result = await res.json();
@@ -249,20 +259,20 @@ export default function GalleryAdminPage() {
   const NotificationToast = ({ notification, setNotification }) => {
     if (!notification) return null;
 
-    const bgColor = {
-      success: "bg-green-100 border-l-4 border-green-500",
-      error: "bg-red-100 border-l-4 border-red-500",
-    }[notification.type];
+    const bgColor =
+      notification.type === "success"
+        ? "bg-green-100 border-l-4 border-green-500"
+        : "bg-red-100 border-l-4 border-red-500";
 
-    const textColor = {
-      success: "text-green-700",
-      error: "text-red-700",
-    }[notification.type];
+    const textColor =
+      notification.type === "success" ? "text-green-700" : "text-red-700";
 
-    const icon = {
-      success: <FiCheckCircle className="text-green-500 mr-3" size={20} />,
-      error: <FiAlertCircle className="text-red-500 mr-3" size={20} />,
-    }[notification.type];
+    const icon =
+      notification.type === "success" ? (
+        <FiCheckCircle className="text-green-500 mr-3" size={20} />
+      ) : (
+        <FiAlertCircle className="text-red-500 mr-3" size={20} />
+      );
 
     return (
       <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
@@ -433,7 +443,7 @@ export default function GalleryAdminPage() {
                   className="btn-close"
                   onClick={() => setModal({ show: false, type: "", title: "" })}
                   aria-label="Close"
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <div className="mb-3">
@@ -473,7 +483,7 @@ export default function GalleryAdminPage() {
                     value={gallery.description}
                     onChange={handleChange}
                     style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
-                  ></textarea>
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Gambar (jpg/png)</label>
@@ -485,24 +495,43 @@ export default function GalleryAdminPage() {
                     onChange={handleImageChange}
                     style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
                   />
-                  {(gallery.existingImageUrl || gallery.image) && (
-                    <div className="mt-3 text-center">
-                      <Image
-                        src={
-                          gallery.image
-                            ? URL.createObjectURL(gallery.image)
-                            : `${page.baseUrl}/uploads/${gallery.existingImageUrl}`
-                        }
-                        alt="Preview"
-                        width={300}
-                        height={200}
-                        style={{
-                          objectFit: "contain",
-                          border: "2px dashed rgba(13, 110, 253, 0.3)",
-                          borderRadius: "8px",
-                          padding: "4px",
-                        }}
-                      />
+                </div>
+                <div className="mt-3 text-center">
+                  {gallery.image ? (
+                    <Image
+                      src={URL.createObjectURL(gallery.image)}
+                      alt="Preview"
+                      width={300}
+                      height={200}
+                      style={{
+                        objectFit: "contain",
+                        border: "2px dashed rgba(13, 110, 253, 0.3)",
+                        borderRadius: "8px",
+                        padding: "4px",
+                      }}
+                      onLoad={() =>
+                        URL.revokeObjectURL(URL.createObjectURL(gallery.image))
+                      }
+                    />
+                  ) : gallery.existingImageUrl ? (
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${gallery.existingImageUrl}`}
+                      alt="Existing"
+                      width={300}
+                      height={200}
+                      style={{
+                        objectFit: "contain",
+                        border: "2px dashed rgba(13, 110, 253, 0.3)",
+                        borderRadius: "8px",
+                        padding: "4px",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="bg-gray-100 flex items-center justify-center"
+                      style={{ width: 300, height: 200 }}
+                    >
+                      <FiImage className="text-gray-400" size={48} />
                     </div>
                   )}
                 </div>
@@ -554,7 +583,7 @@ export default function GalleryAdminPage() {
                   className="btn-close"
                   onClick={() => setShowConfirmModal(false)}
                   aria-label="Close"
-                ></button>
+                />
               </div>
               <div className="modal-body">
                 <p>Apakah Anda yakin ingin menghapus data gallery ini?</p>
@@ -585,7 +614,10 @@ export default function GalleryAdminPage() {
         </div>
       )}
 
-      <NotificationToast notification={notification} />
+      <NotificationToast
+        notification={notification}
+        setNotification={setNotification}
+      />
     </>
   );
 }
