@@ -144,7 +144,7 @@ export default function VenuesPage() {
                 <div className="position-relative">
                   {handleSelectedVenue.photo ? (
                     <Image
-                      src={`uploads/${handleSelectedVenue.photo}`}
+                      src={`${page.baseUrl}/uploads/${handleSelectedVenue.photo}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
                       style={{objectFit: "cover"}}
@@ -252,7 +252,7 @@ export default function VenuesPage() {
                           style={{ objectFit: "cover" }}
                           width={200}
                           height={180}
-                          src={`uploads/${venue.photo}`}
+                          src={`${page.baseUrl}/uploads/${venue.photo}`}
                           alt={venue.name}
                           className="img-fluid"
                           onError={(e) => {

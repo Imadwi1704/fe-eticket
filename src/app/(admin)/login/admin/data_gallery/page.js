@@ -358,7 +358,7 @@ export default function GalleryAdminPage() {
                                   height={100}
                                   src={
                                   
-                                    `uploads/${
+                                    `${page.baseUrl}/uploads/${
                                       item.imageUrl
                                     }?t=${new Date().getTime()}`
                                   }
@@ -493,7 +493,7 @@ export default function GalleryAdminPage() {
                           gallery.image
                             ? URL.createObjectURL(gallery.image)
                             : page.baseUrl +
-                              "/uploads/${gallery.existingImageUrl}"
+                              "$page{page.baseUrl}/uploads/${gallery.existingImageUrl}"
                         }
                         alt="Preview"
                         width={300} // atau sesuaikan dengan desain

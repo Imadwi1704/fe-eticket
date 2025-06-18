@@ -671,7 +671,7 @@ export default function RootLayout() {
                                   <Image
                                     width={300}
                                     height={300}
-                                    src={`uploads/${
+                                    src={`${page.baseUrl}/uploads/${
                                       venue.photo
                                     }?t=${Date.now()}`}
                                     alt={venue.name}
