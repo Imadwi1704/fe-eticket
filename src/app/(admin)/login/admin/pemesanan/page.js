@@ -20,7 +20,7 @@ export default function OrderPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch(page.baseUr+"/api/orders", {
+        const res = await fetch(page.baseUrl+"/api/orders", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
