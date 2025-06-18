@@ -168,18 +168,21 @@ export default function AdminPage() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/reports`,
         {
-          method: "POST", // ✅ Ganti jadi POST
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(requestBody), // ✅ Body hanya diizinkan di POST/PUT
+          body: JSON.stringify(requestBody),
           credentials: "include",
         }
       );
 
-      if (!res.ok) throw new Error("Failed to generate PDF");
+      const result = await res.json(); // ⬅️ pindah ke sini dulu supaya bisa lihat isinya
 
-      const result = await res.json();
+      if (!res.ok) {
+        console.error("Server responded with:", result);
+        throw new Error(result.message || "Failed to generate PDF");
+      }
 
       if (result.status === "success") {
         window.open(
