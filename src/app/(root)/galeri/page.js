@@ -8,7 +8,6 @@ import Footer from "@/components/Footer";
 import { FiSearch, FiGrid, FiList } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getCookie } from "cookies-next";
 import page from "@/config/page";
 import Image from 'next/image';
 
@@ -19,7 +18,6 @@ export default function Gallery() {
   const [viewMode, setViewMode] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-  const token = getCookie("token");
 
   const categories = [
     { id: "all", name: "Semua Kategori" },
@@ -33,8 +31,8 @@ export default function Gallery() {
       selectedCategory === "all" || item.category === selectedCategory;
 
     const matchSearch =
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchCategory && matchSearch;
   });
@@ -42,13 +40,8 @@ export default function Gallery() {
   const fetchGalleries = async () => {
     try {
       setIsLoading(true);
-
-      const response = await fetch(page.baseUrl + "/api/gallery", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await fetch(page.baseUrl + "/api/gallery/public");
+      
       if (!response.ok) {
         throw new Error("Gagal memuat galeri");
       }
@@ -261,7 +254,21 @@ export default function Gallery() {
                         </div>
                       )}
                     </div>
-                  
+                    <div className="card-body">
+                      <span className="badge bg-primary mb-2">
+                        {categories.find((c) => c.id === item.category)?.name}
+                      </span>
+                      <h5 className="card-title">{item.title || 'Tanpa Judul'}</h5>
+                      <p className="card-text text-muted">{item.description || 'Tidak ada deskripsi'}</p>
+                    </div>
+                    <div className="card-footer bg-transparent border-top-0">
+                      <button
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => router.push(`/gallery/${item.id}`)}
+                      >
+                        Lihat Detail
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -321,12 +328,12 @@ export default function Gallery() {
                             <span className="badge bg-primary mb-1 align-self-start">
                               {
                                 categories.find((c) => c.id === item.category)
-                                  ?.name
+                                  ?.name || 'Tidak Berkategori'
                               }
                             </span>
-                            <h5 className="mb-1">{item.title}</h5>
+                            <h5 className="mb-1">{item.title || 'Tanpa Judul'}</h5>
                             <p className="mb-0 text-muted">
-                              {item.description}
+                              {item.description || 'Tidak ada deskripsi'}
                             </p>
                           </div>
                         </div>
