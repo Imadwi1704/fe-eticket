@@ -94,7 +94,7 @@ export default function VenuesPage() {
         className="hero-section position-relative d-flex align-items-center justify-content-center"
         id="aboutnext"
         style={{
-          height: "65vh",
+          height: "45vh",
           backgroundImage: "url('/assets/images/museum.jpg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -137,7 +137,7 @@ export default function VenuesPage() {
                 <div className="position-relative">
                   {handleSelectedVenue.photo ? (
                     <Image
-                      src={page.baseUrl+`/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
+                      src={`${page.baseUrl}/uploads/${handleSelectedVenue.photo}?t=${new Date().getTime()}`}
                       alt={handleSelectedVenue.name}
                       className="card-img-top object-cover"
                       style={{objectFit: "cover"}}
@@ -243,7 +243,7 @@ export default function VenuesPage() {
                         style={{ objectFit: "cover" }}
                         width={"200"}
                         height={"400"}
-                        src={page.baseUrl+`/uploads/${venue.photo}?t=${new Date().getTime()}`}
+                        src={`${page.baseUrl}/uploads/${venue.photo}?t=${new Date().getTime()}`}
                         alt={venue.name}
                         className="img-fluid"
                         crossOrigin="anonymous"

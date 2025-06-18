@@ -47,7 +47,7 @@ export default function Review() {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/reviews", {
+      const res = await fetch(page.baseUrl+"/api/reviews", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -86,7 +86,7 @@ export default function Review() {
     try {
       const payload = { ...review, score };
 
-      const res = await fetch("http://localhost:5001/api/reviews/create", {
+      const res = await fetch(page.baseUrl+"/api/reviews/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

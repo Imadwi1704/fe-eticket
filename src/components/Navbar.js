@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
+import page from "@/config/page";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,7 +69,7 @@ export default function Navbar() {
       if (token) {
         try {
           const response = await fetch(
-            "http://localhost:5001/api/users/profile",
+            page.baseUrl+"/api/users/profile",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -103,7 +104,7 @@ export default function Navbar() {
       const token = getCookie("token");
       if (token) {
         // Panggil API logout jika diperlukan
-        await fetch("http://localhost:5001/api/auth/logout", {
+        await fetch(page.baseUrl+"/api/auth/logout", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

@@ -9,13 +9,12 @@ import { FiSearch, FiGrid, FiList } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCookie } from "cookies-next";
-
-
+import page from "@/config/page";
+import Image from 'next/image';
 
 export default function Gallery() {
   const router = useRouter();
   const [items, setItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -29,57 +28,44 @@ export default function Gallery() {
     { id: "event", name: "Event" },
   ];
 
+  const filteredItems = items.filter((item) => {
+    const matchCategory =
+      selectedCategory === "all" || item.category === selectedCategory;
+
+    const matchSearch =
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchCategory && matchSearch;
+  });
+
+  const fetchGalleries = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(page.baseUrl + "/api/gallery", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal memuat galeri");
+      }
+
+      const data = await response.json();
+      setItems(data);
+    } catch (error) {
+      console.error("Error fetching galleries:", error);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchGalleries();
   }, []);
-
-  useEffect(() => {
-    filterItems();
-  }, [selectedCategory, searchTerm, items]);
-
-  const filterItems = () => {
-    let result = [...items];
-    
-    if (selectedCategory !== "all") {
-      result = result.filter(item => item.category === selectedCategory);
-    }
-    
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(item => 
-        item.title.toLowerCase().includes(term) ||
-        (item.description && item.description.toLowerCase().includes(term))
-      );
-    }
-    
-    setFilteredItems(result);
-  };
-
- const fetchGalleries = async () => {
-  try {
-    setIsLoading(true);
-
-    const token = getCookie("token"); // atau localStorage.getItem("token")
-    const response = await fetch("http://localhost:5001/api/gallery", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Gagal memuat galeri");
-    }
-
-    const data = await response.json();
-    setItems(data);
-  } catch (error) {
-    console.error("Error fetching galleries:", error);
-    toast.error(error.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -95,8 +81,8 @@ export default function Gallery() {
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center"
         style={{
-          height: "50vh",
-          backgroundImage: "url('/assets/images/museum-gallery.jpg')",
+          height: "35vh",
+          backgroundImage: "url('/assets/images/our2.jpeg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
           backgroundPosition: "center",
@@ -110,9 +96,15 @@ export default function Gallery() {
           }}
         ></div>
 
-        <div className="position-relative text-white text-center z-2 p-3" style={{ zIndex: 2 }}>
+        <div
+          className="position-relative text-white text-center z-2 p-3"
+          style={{ zIndex: 2 }}
+        >
           <h1 className="fw-bold display-4 mb-3">Galeri Museum Lampung</h1>
-          <p className="lead mb-4 mx-auto text-white" style={{maxWidth: "600px"}}>
+          <p
+            className="lead mb-4 mx-auto text-white"
+            style={{ maxWidth: "600px" }}
+          >
             Jelajahi koleksi, fasilitas, dan event Museum Negeri Lampung
           </p>
         </div>
@@ -141,15 +133,19 @@ export default function Gallery() {
               <div className="btn-group" role="group">
                 <button
                   type="button"
-                  className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'}`}
-                  onClick={() => setViewMode('grid')}
+                  className={`btn ${
+                    viewMode === "grid" ? "btn-primary" : "btn-outline-primary"
+                  }`}
+                  onClick={() => setViewMode("grid")}
                 >
                   <FiGrid className="me-1" /> Grid
                 </button>
                 <button
                   type="button"
-                  className={`btn ${viewMode === 'list' ? 'btn-primary' : 'btn-outline-primary'}`}
-                  onClick={() => setViewMode('list')}
+                  className={`btn ${
+                    viewMode === "list" ? "btn-primary" : "btn-outline-primary"
+                  }`}
+                  onClick={() => setViewMode("list")}
                 >
                   <FiList className="me-1" /> List
                 </button>
@@ -164,7 +160,11 @@ export default function Gallery() {
                 {categories.map((category) => (
                   <button
                     key={category.id}
-                    className={`btn btn-sm ${selectedCategory === category.id ? 'btn-primary' : 'btn-outline-primary'}`}
+                    className={`btn btn-sm ${
+                      selectedCategory === category.id
+                        ? "btn-primary"
+                        : "btn-outline-primary"
+                    }`}
                     onClick={() => handleCategoryChange(category.id)}
                   >
                     {category.name}
@@ -179,8 +179,12 @@ export default function Gallery() {
             <div className="col-12 mb-3">
               <p className="text-muted">
                 Menampilkan {filteredItems.length} dari {items.length} item
-                {selectedCategory !== 'all' ? ` dalam kategori "${categories.find(c => c.id === selectedCategory)?.name}"` : ''}
-                {searchTerm ? ` dengan kata kunci "${searchTerm}"` : ''}
+                {selectedCategory !== "all"
+                  ? ` dalam kategori "${
+                      categories.find((c) => c.id === selectedCategory)?.name
+                    }"`
+                  : ""}
+                {searchTerm ? ` dengan kata kunci "${searchTerm}"` : ""}
               </p>
             </div>
           </div>
@@ -208,10 +212,7 @@ export default function Gallery() {
                 <p className="text-muted mb-4">
                   Terjadi kesalahan saat memuat data galeri.
                 </p>
-                <button 
-                  className="btn btn-primary"
-                  onClick={fetchGalleries}
-                >
+                <button className="btn btn-primary" onClick={fetchGalleries}>
                   Coba Lagi
                 </button>
               </div>
@@ -219,27 +220,48 @@ export default function Gallery() {
           )}
 
           {/* Grid View */}
-          {!isLoading && items.length > 0 && viewMode === 'grid' && (
+          {!isLoading && items.length > 0 && viewMode === "grid" && (
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
               {filteredItems.map((item) => (
                 <div className="col" key={item.id}>
                   <div className="card h-100 border-0 shadow-sm overflow-hidden">
-                    <div 
-                      className="card-img-top" 
+                    <div
+                      className="card-img-top"
                       style={{
-                        height: '200px',
-                        backgroundImage: `url('${item.imageUrl}')`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
+                        height: "250px",
+                        width: "100%",
+                        position: "relative",
                       }}
-                    ></div>
-                    <div className="card-body">
-                      <span className="badge bg-primary mb-2">
-                        {categories.find(c => c.id === item.category)?.name}
-                      </span>
-                      <h5 className="card-title">{item.title}</h5>
-                      <p className="card-text text-muted">{item.description}</p>
+                    >
+                      {item.imageUrl ? (
+                        <Image
+                          src={`${page.baseUrl}/uploads/${item.imageUrl}`}
+                          alt={item.title || "Gambar"}
+                          fill
+                          style={{ objectFit: "cover" }}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            backgroundColor: "#e2e4e4",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#777",
+                          }}
+                        >
+                          Gambar tidak tersedia
+                        </div>
+                      )}
                     </div>
+                  
                   </div>
                 </div>
               ))}
@@ -247,36 +269,69 @@ export default function Gallery() {
           )}
 
           {/* List View */}
-          {!isLoading && items.length > 0 && viewMode === 'list' && (
+          {!isLoading && items.length > 0 && viewMode === "list" && (
             <div className="row">
               <div className="col-12">
                 <div className="list-group">
                   {filteredItems.map((item) => (
-                    <div className="list-group-item list-group-item-action p-3" key={item.id}>
+                    <div
+                      className="list-group-item list-group-item-action p-3"
+                      key={item.id}
+                    >
                       <div className="row align-items-center">
                         <div className="col-md-2">
-                          <div 
-                            className="rounded" 
+                          <div
                             style={{
-                              width: '100%',
-                              height: '120px',
-                              backgroundImage: `url('${item.imageUrl}')`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center'
+                              height: "120px",
+                              width: "100%",
+                              position: "relative",
                             }}
-                          ></div>
+                          >
+                            {item.imageUrl ? (
+                              <Image
+                                src={`${page.baseUrl}/uploads/${item.imageUrl}`}
+                                alt={item.title || "Gambar"}
+                                fill
+                                style={{ objectFit: "cover" }}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
+                                }}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  backgroundColor: "#e2e4e4",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  color: "#777",
+                                }}
+                              >
+                                Gambar tidak tersedia
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div className="col-md-8">
                           <div className="d-flex flex-column">
                             <span className="badge bg-primary mb-1 align-self-start">
-                              {categories.find(c => c.id === item.category)?.name}
+                              {
+                                categories.find((c) => c.id === item.category)
+                                  ?.name
+                              }
                             </span>
                             <h5 className="mb-1">{item.title}</h5>
-                            <p className="mb-0 text-muted">{item.description}</p>
+                            <p className="mb-0 text-muted">
+                              {item.description}
+                            </p>
                           </div>
                         </div>
                         <div className="col-md-2 text-md-end mt-3 mt-md-0">
-                          <button 
+                          <button
                             className="btn btn-outline-primary btn-sm"
                             onClick={() => router.push(`/gallery/${item.id}`)}
                           >
@@ -302,11 +357,11 @@ export default function Gallery() {
                 <p className="text-muted mb-4">
                   Tidak ditemukan item yang sesuai dengan pencarian Anda.
                 </p>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
+                    setSearchTerm("");
+                    setSelectedCategory("all");
                   }}
                 >
                   Tampilkan Semua Item
@@ -328,29 +383,29 @@ export default function Gallery() {
         .hero-section {
           overflow: hidden;
         }
-        
+
         .section-padding {
           padding: 5rem 0;
         }
-        
+
         .card {
           transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
         }
-        
+
         .list-group-item {
           transition: background-color 0.2s ease;
         }
-        
+
         @media (max-width: 768px) {
           .hero-section {
             height: 40vh;
           }
-          
+
           .section-padding {
             padding: 3rem 0;
           }

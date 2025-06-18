@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getCookie } from "cookies-next";
 import Image from "next/image";
+import page from "@/config/page";
 
 
 export default function AdminLayout({ children }) {
@@ -18,7 +19,7 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/ticket");
+        const res = await fetch(page.baseUrl+"/api/ticket");
         const data = await res.json();
         if (res.ok) {
           setTickets(data);
@@ -36,7 +37,7 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const reviewRes = await fetch("http://localhost:5001/api/reviews", {
+        const reviewRes = await fetch(page.baseUrl+"/api/reviews", {
           headers: {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),

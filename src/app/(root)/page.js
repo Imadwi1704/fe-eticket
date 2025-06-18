@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import { FiZoomIn } from "react-icons/fi";
 import Image from "next/image";
+import page from "@/config/page";
 
 export default function RootLayout() {
   const [venues, setVenues] = useState([]);
@@ -38,7 +39,7 @@ export default function RootLayout() {
     const fetchData = async () => {
       try {
         // Fetch venue data tanpa token
-        const venueRes = await fetch("http://localhost:5001/api/venue", {
+        const venueRes = await fetch(page.baseUrl+"/api/venue", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -50,7 +51,7 @@ export default function RootLayout() {
         }
 
         // Fetch review data tanpa token
-        const reviewRes = await fetch("http://localhost:5001/api/reviews", {
+        const reviewRes = await fetch(page.baseUrl+"/api/reviews", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -670,7 +671,7 @@ export default function RootLayout() {
                                   <Image
                                     width={300}
                                     height={300}
-                                    src={`http://localhost:5001/uploads/${
+                                    src={`${page.baseUrl}/uploads/${
                                       venue.photo
                                     }?t=${Date.now()}`}
                                     alt={venue.name}

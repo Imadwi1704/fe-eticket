@@ -256,8 +256,7 @@ export default function Register() {
   const formStyle = {
     background: "white",
     borderRadius: "16px",
-    boxShadow: "0 10px 30px rgba(13, 110, 253, 0.15)",
-    border: "1px solid rgba(13, 110, 253, 0.2)"
+    border: "1px solid rgba(0, 0, 0 0.2)"
   };
 
   const handleGoogleLogin = () => {
@@ -582,7 +581,7 @@ export default function Register() {
         
         .form-control:focus {
           border-color: #0d6efd;
-          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+          color: #000 !important;
         }
         
         .section-padding {
@@ -605,11 +604,6 @@ export default function Register() {
           background-color: #0d6efd;
           transition: all 0.3s ease;
         }
-        .form-control:focus {
-            border-color: #0d6efd !important;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-            background-color: #fff !important;
-          }
 
         
         .btn-primary:hover {
