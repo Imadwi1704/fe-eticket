@@ -228,7 +228,7 @@ export default function Gallery() {
                     >
                       {item.imageUrl ? (
                         <Image
-                          src={`${page.baseUrl}/uploads/${item.imageUrl}`}
+                          src={`uploads/${item.imageUrl}`}
                           alt={item.title || "Gambar"}
                           fill
                           style={{ objectFit: "cover" }}
@@ -296,7 +296,7 @@ export default function Gallery() {
                           >
                             {item.imageUrl ? (
                               <Image
-                                src={`${page.baseUrl}/uploads/${item.imageUrl}`}
+                                src={`uploads/${item.imageUrl}`}
                                 alt={item.title || "Gambar"}
                                 fill
                                 style={{ objectFit: "cover" }}

@@ -358,7 +358,7 @@ export default function GalleryAdminPage() {
                                   height={100}
                                   src={
                                   
-                                    `${page.baseUrl}/uploads/${
+                                    `uploads/${
                                       item.imageUrl
                                     }?t=${new Date().getTime()}`
                                   }

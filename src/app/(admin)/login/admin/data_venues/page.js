@@ -63,7 +63,7 @@ export default function VenueAdminPage() {
 
   const handleEditVenue = (item) => {
     setVenue(item);
-    setShowImage(`${page.baseUrl}/uploads/${item.photo}`);
+    setShowImage(`uploads/${item.photo}`);
     setShowEditModal(true);
   };
 
@@ -241,7 +241,7 @@ export default function VenueAdminPage() {
                                   style={{ objectFit: "cover" }}
                                   width={"200"}
                                   height={"100"}
-                                  src={`${page.baseUrl}/uploads/${
+                                  src={`uploads/${
                                     item.photo
                                   }?t=${new Date().getTime()}`}
                                   alt={item.name}
