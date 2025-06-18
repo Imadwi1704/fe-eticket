@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie, deleteCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
+import page from "@/config/page"
 
 export default function OrderPage() {
   const [orders, setOrders] = useState([]);
@@ -19,7 +20,7 @@ export default function OrderPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/orders", {
+        const res = await fetch(page.baseUr+"/api/orders", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -47,27 +48,6 @@ export default function OrderPage() {
     fetchData();
   }, [token, router]);
 
-  const handleDownloadPDF = async () => {
-    setLoadingPDF(true);
-    try {
-      const res = await fetch("/api/admin/cetak-pdf");
-      if (!res.ok) throw new Error("Gagal generate PDF");
-
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "laporan_pemesanan.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("Error saat download PDF:", error);
-      alert("Gagal mendownload PDF");
-    }
-    setLoadingPDF(false);
-  };
 
   const openDetailModal = (order) => setSelectedOrder(order);
   const closeDetailModal = () => setSelectedOrder(null);
@@ -80,14 +60,6 @@ export default function OrderPage() {
           <div className="card shadow-sm border-0 mt-5">
             <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
               <h2 className="card-title mb-0 fw-semibold text-white">Data Pemesanan Tiket</h2>
-              <button
-                onClick={handleDownloadPDF}
-                className="btn btn-success btn-sm"
-                disabled={loadingPDF}
-              >
-                <i className="bi bi-file-earmark-arrow-down me-2"></i>
-                {loadingPDF ? "Membuat PDF..." : "Cetak PDF"}
-              </button>
             </div>
             <div className="card-body p-4">
               <p className="text-muted mb-4">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
+import page from "@/config/page";
 
 export default function TicketAdminPage() {
   const [data, setData] = useState([]);
@@ -36,7 +37,7 @@ export default function TicketAdminPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5001/api/ticket", {
+        const res = await fetch(page.baseUrl+"/api/ticket", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -81,7 +82,7 @@ export default function TicketAdminPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5001/api/ticket/${ticket.id}`, {
+      const res = await fetch(`${page.baseUrl}/api/ticket/${ticket.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -116,8 +117,8 @@ export default function TicketAdminPage() {
 
       const method = showModal ? "POST" : "PUT";
       const url = showModal
-        ? "http://localhost:5001/api/ticket"
-        : `http://localhost:5001/api/ticket/${ticket.id}`;
+        ? page.baseUrl+"/api/ticket"
+        : `${page.baseUrl}/api/ticket/${ticket.id}`;
 
       const res = await fetch(url, {
         method,

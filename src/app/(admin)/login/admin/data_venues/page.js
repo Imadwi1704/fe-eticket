@@ -34,7 +34,7 @@ export default function VenueAdminPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/venue", {
+        const res = await fetch(page.baseUrl+"/api/venue", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ export default function VenueAdminPage() {
 
   const handleEditVenue = (item) => {
     setVenue(item);
-    setShowImage(`http://localhost:5001/uploads/${item.photo}`);
+    setShowImage(`${page.baseUrl}/uploads/${item.photo}`);
     setShowEditModal(true);
   };
 
@@ -74,7 +74,7 @@ export default function VenueAdminPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5001/api/venue/${venue.id}`, {
+      const res = await fetch(`${page.baseUrl}/api/venue/${venue.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -117,8 +117,8 @@ export default function VenueAdminPage() {
     try {
       const method = showModal ? "POST" : "PUT";
       const url = showModal
-        ? "http://localhost:5001/api/venue"
-        : `http://localhost:5001/api/venue/${venue.id}`;
+        ? page.baseUrl+"/api/venue"
+        : `${page.baseUrl}/api/venue/${venue.id}`;
 
       const formData = new FormData();
       formData.append("name", venue.name);
@@ -241,7 +241,7 @@ export default function VenueAdminPage() {
                                   style={{ objectFit: "cover" }}
                                   width={"200"}
                                   height={"100"}
-                                  src={`http://localhost:5001/uploads/${
+                                  src={`${page.baseUrl}/uploads/${
                                     item.photo
                                   }?t=${new Date().getTime()}`}
                                   alt={item.name}

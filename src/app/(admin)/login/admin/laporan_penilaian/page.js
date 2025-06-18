@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
+import page from "@/config/page";
 
 export default function AdminPage() {
   const [reviews, setReviews] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const reviewRes = await fetch("http://localhost:5001/api/reviews", {
+        const reviewRes = await fetch(page.baseUrl+"/api/reviews", {
           headers: {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` })

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
+import page  from "@/config/page";
 
 export default function PaymentPage() {
   const [payments, setPayments] = useState([]);
@@ -13,7 +14,7 @@ export default function PaymentPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/payments", {
+        const res = await fetch(page.baseUrl+"/api/payments", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

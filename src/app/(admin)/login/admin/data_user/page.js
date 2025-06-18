@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
+import page from "@/config/page";
 
 export default function UserPage() {
   const [users, setUsers] = useState([]);
@@ -13,7 +14,7 @@ export default function UserPage() {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/admin/users/buyers", {
+        const res = await fetch(page.baseUrl+"/api/admin/users/buyers", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
