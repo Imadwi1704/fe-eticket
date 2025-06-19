@@ -13,7 +13,7 @@ export default function IndexLayout({ children }) {
       <Navbar />
       
       {children}
-
+      {/* Conditionally render the Belitiket button based on the pathname */}
       {pathname !== "/register/ticket" && (
         <div style={{
           position: 'fixed',
