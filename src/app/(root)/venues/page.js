@@ -245,7 +245,7 @@ export default function VenuesPage() {
                     data-aos-delay={(index % 5) * 100}
                   >
                     <div
-                      className="card h-100 border-0 shadow rounded-4 bg-white"
+                      className="card h-100 border-0 shadow  bg-white"
                       onClick={() => setSelectedVenue(venue.id)}
                       style={{
                         cursor: "pointer",
