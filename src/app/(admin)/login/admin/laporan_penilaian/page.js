@@ -171,7 +171,7 @@ export default function AdminPage() {
       <div className="container-fluid py-4">
         <div className="card shadow-sm border-0 overflow-hidden">
           {/* Card Header */}
-          <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center mt-5">
             <h2 className="card-title fw-semibold text-white mb-0">
               <FiFileText className="me-2" /> Laporan Penilaian Museum Lampung
             </h2>
