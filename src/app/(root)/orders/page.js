@@ -114,7 +114,7 @@ export default function Ordersnext() {
         setIsLoading(false);
       }
     };
-
+    console.log("Token:", token);
     if (token) {
       fetchOrders();
     } else {
