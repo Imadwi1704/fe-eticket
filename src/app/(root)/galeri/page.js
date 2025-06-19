@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,7 +8,7 @@ import { FiSearch, FiGrid, FiList } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import page from "@/config/page";
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Gallery() {
   const router = useRouter();
@@ -21,10 +20,31 @@ export default function Gallery() {
 
   const categories = [
     { id: "all", name: "Semua Kategori" },
-    { id: "gallery", name: "Galeri" },
-    { id: "facility", name: "Fasilitas" },
-    { id: "event", name: "Event" },
+    { id: "GALLERY", name: "Galeri" },
+    { id: "FACILITY", name: "Fasilitas" },
+    { id: "EVENT", name: "Event" },
   ];
+
+  // Handle category change with URL update
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+    // Update URL without page reload
+    router.push(`/gallery/?category=${categoryId}`, undefined, {
+      shallow: true,
+    });
+  };
+
+  // Read URL params on initial load
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const queryParams = new URLSearchParams(window.location.search);
+      const categoryParam = queryParams.get("category");
+
+      if (categoryParam && categories.some((c) => c.id === categoryParam)) {
+        setSelectedCategory(categoryParam);
+      }
+    }
+  }, []);
 
   const filteredItems = items.filter((item) => {
     const matchCategory =
@@ -41,7 +61,7 @@ export default function Gallery() {
     try {
       setIsLoading(true);
       const response = await fetch(page.baseUrl + "/api/gallery");
-      
+
       if (!response.ok) {
         throw new Error("Gagal memuat galeri");
       }
@@ -62,10 +82,6 @@ export default function Gallery() {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-  };
-
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
   };
 
   return (
@@ -311,15 +327,9 @@ export default function Gallery() {
                         <div className="col-md-8">
                           <div className="d-flex flex-column">
                             <span className="badge bg-primary mb-1 align-self-start">
-                              {
-                                categories.find((c) => c.id === item.category)
-                                  ?.name || 'Tidak Berkategori'
-                              }
+                              {categories.find((c) => c.id === item.category)
+                                ?.name || "Tidak Berkategori"}
                             </span>
-                            <h5 className="mb-1">{item.title || 'Tanpa Judul'}</h5>
-                            <p className="mb-0 text-muted">
-                              {item.description || 'Tidak ada deskripsi'}
-                            </p>
                           </div>
                         </div>
                         <div className="col-md-2 text-md-end mt-3 mt-md-0">
