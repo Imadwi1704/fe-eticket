@@ -178,23 +178,24 @@ export default function AdminPage() {
     }
     setLoading(false);
   };
-  // Di komponen/admin/review.js
+
   const handleDownloadPDF = async () => {
     try {
       const token = getCookie("token"); // Ambil token dari cookies
 
-      const response = await fetch(`${page.baseUrl}/api/reviews/ReviewPDF`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${page.baseUrl}/api/reviews/ReviewPDF?token=${token}`, // Token di query parameter
+        {
+          method: "GET",
+          // Tidak perlu header Authorization
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Gagal mengunduh laporan");
       }
 
-      // Handle response sebagai blob (file PDF)
+      // Proses download PDF seperti sebelumnya
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
