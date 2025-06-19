@@ -205,9 +205,10 @@ export default function GalleryAdminPage() {
     formData.append("description", gallery.description);
     formData.append("category", gallery.category);
 
-    if (gallery.image) {
-      formData.append("image", gallery.image);
-    }
+    // if (gallery.image) {
+    //   formData.append("image", gallery.image);
+    // }
+    formData.append("image", gallery.image);
 
     try {
       const url =
