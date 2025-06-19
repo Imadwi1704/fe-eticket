@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import Footer from "@/components/Footer";
 import { getCookie } from "cookies-next";
+import page from "@/config/page";
 import {
   FiClock,
   FiMapPin,
@@ -86,7 +87,7 @@ export default function Review() {
     try {
       const payload = { ...review, score };
 
-      const res = await fetch(page.baseUrl + "/reviews/create", {
+      const res = await fetch(page.baseUrl + "/api/reviews/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
