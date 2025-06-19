@@ -86,7 +86,7 @@ export default function Review() {
     try {
       const payload = { ...review, score };
 
-      const res = await fetch(page.baseUrl + "/api/reviews/create", {
+      const res = await fetch(page.baseUrl + "/reviews/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
