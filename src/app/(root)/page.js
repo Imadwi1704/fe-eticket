@@ -925,7 +925,7 @@ export default function RootLayout() {
           id="ourgallery"
           style={{ padding: "40px 0" }}
         >
-          <div className="container-fluid px-4">
+          <div className="container-fluid ">
             <div className="row mb-4">
               <div className="col-12 text-center">
                 <h2 className="mb-2" style={{ color: "#333" }}>
@@ -936,7 +936,7 @@ export default function RootLayout() {
             <div className="row g-3">
               {gallery.length > 0 ? (
                 gallery.map((item, index) => (
-                  <div key={index} className="col-lg-3 col-md-6">
+                  <div key={index} className="col-lg-3 col-md-6 ps-3">
                     <motion.div
                       whileHover={{ scale: 1.03 }}
                       className="position-relative rounded overflow-hidden shadow-sm gallery-card"
