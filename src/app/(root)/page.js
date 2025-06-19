@@ -925,7 +925,7 @@ export default function RootLayout() {
           id="ourgallery"
           style={{ padding: "40px 0" }}
         >
-          <div className="container-fluid">
+          <div className="container-fluid px-4">
             <div className="row mb-4">
               <div className="col-12 text-center">
                 <h2 className="mb-2" style={{ color: "#333" }}>
