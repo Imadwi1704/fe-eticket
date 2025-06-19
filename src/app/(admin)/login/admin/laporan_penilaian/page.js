@@ -185,7 +185,7 @@ export default function AdminPage() {
                 {loading ? "Memuat..." : "Refresh"}
               </button>
               <a
-                href={`/login/admin/reviews/cetak_pdf`}
+                href={`${page.baseUrl}/api/reviews/ReviewPDF`}
                 className="btn btn-sm btn-success"
                 target="_blank"
                 rel="noopener noreferrer"
