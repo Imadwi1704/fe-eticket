@@ -936,7 +936,7 @@ export default function RootLayout() {
             <div className="row g-3">
               {gallery.length > 0 ? (
                 gallery.map((item, index) => (
-                  <div key={index} className="col-lg-3 col-md-6 ps-3">
+                  <div key={index} className="col-lg-3 col-md-6 ps-5">
                     <motion.div
                       whileHover={{ scale: 1.03 }}
                       className="position-relative rounded overflow-hidden shadow-sm gallery-card mx-2"
