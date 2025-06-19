@@ -16,6 +16,7 @@ import page from "@/config/page";
 export default function RootLayout() {
   const [venues, setVenues] = useState([]);
   const [review, setReview] = useState([]);
+  const [gallery, setGallery] = useState([]);
   const containerRef = useRef(null);
   const scrollLeft = () => {
     if (containerRef.current) {
@@ -39,7 +40,7 @@ export default function RootLayout() {
     const fetchData = async () => {
       try {
         // Fetch venue data tanpa token
-        const venueRes = await fetch(page.baseUrl+"/api/venue", {
+        const venueRes = await fetch(page.baseUrl + "/api/venue", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -51,7 +52,7 @@ export default function RootLayout() {
         }
 
         // Fetch review data tanpa token
-        const reviewRes = await fetch(page.baseUrl+"/api/reviews", {
+        const reviewRes = await fetch(page.baseUrl + "/api/reviews", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -68,6 +69,31 @@ export default function RootLayout() {
         }
       } catch (error) {
         console.error("Terjadi kesalahan saat fetch:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch gallery data
+        const galleryRes = await fetch(page.baseUrl + "/api/gallery", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (galleryRes.ok) {
+          const galleryData = await galleryRes.json();
+          // Urutkan berdasarkan tanggal terbaru dan ambil 4 gambar pertama
+          const sortedGallery = galleryData
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 4);
+          setGallery(sortedGallery);
+        }
+      } catch (error) {
+        console.error("Error fetching gallery data:", error);
       }
     };
 
@@ -671,7 +697,7 @@ export default function RootLayout() {
                                   <Image
                                     width={300}
                                     height={300}
-                                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${
+                                    src={`${page.baseUrl}/uploads/${
                                       venue.photo
                                     }?t=${Date.now()}`}
                                     alt={venue.name}
@@ -908,8 +934,8 @@ export default function RootLayout() {
               </div>
             </div>
             <div className="row g-3">
-              {["our1.jpg", "our2.jpeg", "our3.jpg", "our4.jpg"].map(
-                (image, index) => (
+              {gallery.length > 0 ? (
+                gallery.map((item, index) => (
                   <div key={index} className="col-lg-3 col-md-6">
                     <motion.div
                       whileHover={{ scale: 1.03 }}
@@ -919,15 +945,24 @@ export default function RootLayout() {
                       <Image
                         width={300}
                         height={300}
-                        src={`/assets/images/${image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.image}`}
                         alt={`Gallery ${index + 1}`}
-                        loading="lazy"
                         className="w-100 h-100 object-fit-cover"
                         style={{ height: "300px" }}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/assets/images/No-image.png";
+                        }}
                       />
                     </motion.div>
                   </div>
-                )
+                ))
+              ) : (
+                <div className="col-12 text-center">
+                  <p className="text-muted">
+                    Belum ada gambar gallery yang tersedia.
+                  </p>
+                </div>
               )}
             </div>
           </div>

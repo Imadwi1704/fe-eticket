@@ -48,11 +48,11 @@ export default function Aboutnext() {
         className="hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden"
         id="aboutnext"
         style={{
-          height: "80vh",
-          backgroundImage: "url('/assets/images/museum.jpg')",
+         height: "50vh",
+          backgroundImage: "url('/assets/images/our2.jpeg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
-          backgroundPosition: "center 30%",
+          backgroundPosition: "center",
         }}
       >
         <div className="overlay position-absolute top-0 start-0 w-100 h-100"></div>
@@ -66,19 +66,7 @@ export default function Aboutnext() {
           <h1 className="fw-bold display-4 mb-3">Destinasi Info </h1>
           <div className="divider mx-auto"></div>
         </motion.div>
-        {/* Gelombang Dekoratif */}
-        <div
-          className="position-absolute bottom-0 start-0 w-100"
-          style={{ zIndex: 3 }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
-            <path
-              fill="#f8f9fa"
-              fillOpacity="1"
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-            ></path>
-          </svg>
-        </div>
+       
       </section>
 
       {/* Tentang Museum */}

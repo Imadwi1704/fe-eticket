@@ -38,133 +38,92 @@ export default function Historynext() {
 
   return (
     <div className="bg-light">
-      {/* Hero Section */}
+      {/* Hero Section - Simplified */}
       <section
         ref={heroRef}
         className="hero-section position-relative d-flex align-items-center justify-content-center"
-        id="aboutnext"
         style={{
-          height: "65vh",
-          backgroundImage: "url('/assets/images/museum.jpg')",
+          height: "50vh",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
           backgroundPosition: "center",
-          transition: "background-position 0.3s ease-out",
+          background:
+            "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('/assets/images/museum.jpg') center/cover fixed",
         }}
       >
         <div
-          className="position-absolute top-0 start-0 w-100 h-100"
-          style={{
-            background: "linear-gradient(rgb(0 0 0 / 70%), rgb(0 0 0 / 40%))",
-            zIndex: 1,
-          }}
-        ></div>
-
-        <div
-          className="position-relative text-white text-center z-2 p-3"
+          className="container text-center text-white px-3"
           style={{ zIndex: 2 }}
         >
-          <h1 className="fw-bold display-4 mb-3" data-aos="fade-down">
+          <h1 className="display-4 fw-bold mb-3" data-aos="fade-down">
             Sejarah Museum Lampung
           </h1>
           <div
-            className="mb-4"
-            style={{
-              width: "100px",
-              height: "5px",
-              backgroundColor: "#FFFFFF",
-              borderRadius: "10px",
-              margin: "0 auto",
-            }}
+            className="mb-4 mx-auto bg-white"
+            style={{ width: "80px", height: "4px", borderRadius: "2px" }}
             data-aos="fade-down"
             data-aos-delay="200"
           ></div>
         </div>
-        {/* Gelombang Dekoratif */}
-        <div
-          className="position-absolute bottom-0 start-0 w-100"
-          style={{ zIndex: 3 }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
-            <path
-              fill="#f8f9fa"
-              fillOpacity="1"
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-            ></path>
-          </svg>
-        </div>
       </section>
 
-      {/* Sejarah */}
-      <section className="section-padding bg-light">
+      {/* History Section - Clean Layout */}
+      <section className="py-5 bg-light">
         <div className="container">
-          <div className="row g-5 justify-content-center">
-            <div className="col-lg-8" data-aos="fade-right">
-              <div className="card border-0 shadow-lg overflow-hidden">
+          <div className="row g-4 justify-content-center">
+            {/* Main Content */}
+            <div className="col-lg-8">
+              <div className="card border-0 shadow-sm overflow-hidden">
+                {/* Museum Image */}
                 <div className="position-relative">
                   <Image
                     src="/assets/images/history.jpg"
                     alt="Museum Lampung"
                     width={800}
                     height={450}
-                    className="img-fluid"
-                    style={{
-                      objectFit: "cover",
-                      height: "450px",
-                      width: "100%",
-                    }}
+                    className="img-fluid w-100"
+                    style={{ height: "400px", objectFit: "cover" }}
                   />
-                  <div
-                    className="position-absolute bottom-0 start-0 w-100 p-4"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(13, 110, 253, 0.8), transparent)",
-                    }}
-                  >
+                  <div className="position-absolute bottom-0 start-0 w-100 p-4 bg-dark bg-opacity-50">
                     <h3 className="text-white mb-0">
-                      Museum Negeri Provinsi Lampung &ldquo;Ruwa Jurai&ldquo;
+                      Museum Negeri Provinsi Lampung Ruwa Jurai
                     </h3>
                   </div>
                 </div>
 
-                <div className="card-body p-4 p-lg-5">
-                  <div className="lead text-muted mb-4">
-                    <p data-aos="fade-up">
-                      Museum Lampung atau Museum Negeri Provinsi Lampung
-                      &ldquo;Ruwa Jurai&ldquo; mulai dibangun pada tahun 1975,
-                      dan diresmikan pada tanggal 24 September 1988. Museum ini
-                      merupakan museum pertama dan terbesar di Provinsi Lampung,
-                      menyimpan warisan budaya dan sejarah yang tak ternilai
-                      harganya.
-                    </p>
+                {/* Content */}
+                <div className="card-body p-4 p-md-5">
+                  <p className="lead text-muted mb-4" data-aos="fade-up">
+                    Museum Lampung atau Museum Negeri Provinsi Lampung Ruwa
+                    Jurai mulai dibangun tahun 1975, diresmikan pada 24
+                    September 1988. Merupakan museum pertama dan terbesar di
+                    Provinsi Lampung yang menyimpan warisan budaya dan sejarah
+                    berharga.
+                  </p>
 
-                    <div
-                      className="bg-primary bg-opacity-10 p-4 rounded-3 my-5"
-                      data-aos="fade-up"
-                    >
-                      <h4 className="mb-3 fw-bold text-dark">
-                        Filosofi Nama &ldquo;Ruwa Jurai&ldquo;
-                      </h4>
-                      <p className="mb-0">
-                        &ldquo;Ruwa Jurai&ldquo; berasal dari bahasa Lampung
-                        yang berarti &ldquo;Dua Aliran&ldquo;. Nama ini
-                        mencerminkan dua kelompok masyarakat adat utama di
-                        Lampung, yaitu Saibatin (Peminggir) dan Pepadun (Adat
-                        Pedalaman), yang hidup rukun dalam keberagaman budaya.
-                      </p>
-                    </div>
-
-                    <h4
-                      className="mt-5 mb-3 fw-bold text-dark"
-                      data-aos="fade-up"
-                    >
-                      Koleksi Unggulan
+                  {/* Philosophy Highlight */}
+                  <div
+                    className="bg-primary bg-opacity-10 p-4 rounded-3 my-4"
+                    data-aos="fade-up"
+                  >
+                    <h4 className="h5 fw-bold mb-2">
+                      Filosofi Nama Ruwa Jurai
                     </h4>
-                    <p data-aos="fade-up">
-                      Museum ini menyimpan sekitar 4.735 koleksi yang terbagi
-                      dalam 10 kategori:
+                    <p className="mb-0">
+                      Ruwa Jurai berarti Dua Aliran dalam bahasa Lampung,
+                      mencerminkan dua kelompok masyarakat adat utama: Saibatin
+                      (Peminggir) dan Pepadun (Adat Pedalaman) yang hidup rukun
+                      dalam keberagaman budaya.
                     </p>
-                    <div className="row g-3 mt-2" data-aos="fade-up">
+                  </div>
+
+                  {/* Collections */}
+                  <div data-aos="fade-up">
+                    <h4 className="h5 fw-bold mt-4 mb-3">Koleksi Unggulan</h4>
+                    <p>
+                      Museum menyimpan sekitar 4.735 koleksi dalam 10 kategori:
+                    </p>
+                    <div className="row g-2 mt-2">
                       {[
                         "Geologika",
                         "Biologika",
@@ -177,104 +136,96 @@ export default function Historynext() {
                         "Teknologika",
                         "Arkeologika",
                       ].map((item, idx) => (
-                        <div className="col-md-4" key={idx}>
-                          <div className="bg-white p-3 rounded shadow-sm d-flex align-items-center border-start border-4 border-primary">
+                        <div className="col-6 col-md-4" key={idx}>
+                          <div className="d-flex align-items-center p-2 bg-white rounded shadow-sm">
                             <div
                               className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                              style={{ width: "28px", height: "28px" }}
+                              style={{
+                                width: "24px",
+                                height: "24px",
+                                fontSize: "0.7rem",
+                              }}
                             >
-                              <span className="small fw-bold">{idx + 1}</span>
+                              {idx + 1}
                             </div>
-                            <span className="ms-2">{item}</span>
+                            <span className="ms-2 small">{item}</span>
                           </div>
                         </div>
                       ))}
                     </div>
+                  </div>
 
-                    <h4
-                      className="mt-5 mb-3 fw-bold text-dark"
-                      data-aos="fade-up"
-                    >
-                      Budaya & Tradisi
-                    </h4>
-                    <p data-aos="fade-up">
-                      Museum menampilkan pernak-pernik aksesori dari dua
-                      kelompok adat dominan:
-                    </p>
-                    <div className="row g-4 mt-3">
-                      <div className="col-md-6" data-aos="zoom-in">
-                        <div className="h-100 bg-white p-4 rounded-4 shadow border-top border-4 border-primary">
-                          <h5 className="text-center fw-bold text-primary mb-3">
-                            Saibatin
-                          </h5>
-                          <p className="text-muted text-center">(Peminggir)</p>
-                          <ul className="list-unstyled">
-                            {[
-                              "Ritual kelahiran (Cakak Pepadun)",
-                              "Asah gigi (Ngerus Begu)",
-                              "Pernikahan (Ngejalang)",
-                              "Pakaian adat: Tapis, Siger, Bulu Serti",
-                            ].map((item, idx) => (
-                              <li key={idx} className="mb-2 d-flex">
-                                <FiChevronRight className="text-primary me-2 mt-1" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
+                  {/* Culture Comparison */}
+                  <div className="mt-5" data-aos="fade-up">
+                    <h4 className="h5 fw-bold mb-3">Budaya & Tradisi</h4>
+                    <div className="row g-3">
+                      {[
+                        {
+                          title: "Saibatin (Peminggir)",
+                          items: [
+                            "Ritual kelahiran (Cakak Pepadun)",
+                            "Asah gigi (Ngerus Begu)",
+                            "Pernikahan (Ngejalang)",
+                            "Pakaian adat: Tapis, Siger, Bulu Serti",
+                          ],
+                        },
+                        {
+                          title: "Pepadun (Adat Pedalaman)",
+                          items: [
+                            "Ritual kematian (Ngelamak)",
+                            "Pengangkatan adipati (Cakak Pepadun)",
+                            "Pesta adat (Begawi)",
+                            "Pakaian adat: Tapis, Siger, Gelang Kano",
+                          ],
+                        },
+                      ].map((group, idx) => (
+                        <div
+                          className="col-md-6"
+                          key={idx}
+                          data-aos="zoom-in"
+                          data-aos-delay={idx * 100}
+                        >
+                          <div className="h-100 bg-white p-3 rounded-3 shadow-sm border-start border-3 border-primary">
+                            <h5 className="h6 fw-bold text-primary text-center mb-2">
+                              {group.title}
+                            </h5>
+                            <ul className="list-unstyled small">
+                              {group.items.map((item, i) => (
+                                <li key={i} className="mb-2 d-flex">
+                                  <FiChevronRight
+                                    className="text-primary me-2 mt-1"
+                                    size={14}
+                                  />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
-                      </div>
-                      <div
-                        className="col-md-6"
-                        data-aos="zoom-in"
-                        data-aos-delay="200"
-                      >
-                        <div className="h-100 bg-white p-4 rounded-4 shadow border-top border-4 border-primary">
-                          <h5 className="text-center fw-bold text-primary mb-3">
-                            Pepadun
-                          </h5>
-                          <p className="text-muted text-center">
-                            (Adat Pedalaman)
-                          </p>
-                          <ul className="list-unstyled">
-                            {[
-                              "Ritual kematian (Ngelamak)",
-                              "Pengangkatan adipati (Cakak Pepadun)",
-                              "Pesta adat (Begawi)",
-                              "Pakaian adat: Tapis, Siger, Gelang Kano",
-                            ].map((item, idx) => (
-                              <li key={idx} className="mb-2 d-flex">
-                                <FiChevronRight className="text-primary me-2 mt-1" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
+                      ))}
                     </div>
+                  </div>
 
-                    <div
-                      className="mt-5 p-4 rounded-3"
-                      style={{
-                        background: "linear-gradient(135deg, #0D6EFD, #0dcaf0)",
-                      }}
-                      data-aos="fade-up"
-                    >
-                      <div className="row align-items-center">
-                        <div className="col-md-8 text-white">
-                          <h4 className="fw-bold mb-3 text-white">
-                            Kunjungi Museum Lampung
-                          </h4>
-                          <p className="mb-0 text-white">
-                            Jelajahi kekayaan budaya dan sejarah Lampung dengan
-                            mengunjungi Museum Negeri &ldquo;Ruwa Jurai&ldquo;.
-                            Dapatkan pengalaman edukatif yang tak terlupakan.
-                          </p>
-                        </div>
-                        <div className="col-md-4 text-md-end mt-3 mt-md-0">
-                          <button className="btn btn-light rounded-pill px-4 py-2 fw-bold">
-                            Pesan Tiket <FiChevronRight className="ms-1" />
-                          </button>
-                        </div>
+                  {/* CTA */}
+                  <div
+                    className="mt-5 p-3 rounded-3 bg-primary text-white"
+                    data-aos="fade-up"
+                  >
+                    <div className="row align-items-center">
+                      <div className="col-md-8">
+                        <h4 className="h5 fw-bold mb-2 text-white">
+                          Kunjungi Museum Lampung
+                        </h4>
+                        <p className="small mb-0 text-white">
+                          Jelajahi kekayaan budaya dan sejarah Lampung dengan
+                          pengalaman edukatif yang tak terlupakan.
+                        </p>
+                      </div>
+                      <div className="col-md-4 text-md-end mt-3 mt-md-0">
+                        <button className="btn btn-light btn-sm rounded-pill px-3 fw-bold">
+                          Pesan Tiket{" "}
+                          <FiChevronRight className="ms-1" size={14} />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -282,22 +233,21 @@ export default function Historynext() {
               </div>
             </div>
 
+            {/* Sidebar */}
             <div className="col-lg-4">
-              <div
-                className="sticky-top"
-                style={{
-                  top: "100px",
-                  zIndex: 990,
-                }}
-              >
-                <div className="card border-0 shadow-lg" data-aos="fade-left">
-                  <div className="card-header bg-primary text-white fw-bold py-3">
-                    <div className="d-flex align-items-center">
-                      <span>Timeline Sejarah</span>
-                    </div>
+              <div className="sticky-top sticky-sidebar">
+                {/* Timeline */}
+                <div
+                  className="card border-0 shadow-sm mb-4"
+                  data-aos="fade-left"
+                >
+                  <div className="card-header bg-primary text-white py-2">
+                    <h5 className="h6 mb-0 fw-bold text-white">
+                      Timeline Sejarah
+                    </h5>
                   </div>
-                  <div className="card-body p-0">
-                    <div className="timeline-container p-3">
+                  <div className="card-body p-3">
+                    <div className="timeline">
                       {[
                         {
                           year: "1975",
@@ -335,32 +285,34 @@ export default function Historynext() {
                       ].map((item, idx, array) => (
                         <div
                           key={idx}
-                          className="timeline-item"
+                          className="timeline-item mb-3"
                           data-aos="fade-up"
-                          data-aos-delay={idx * 100}
+                          data-aos-delay={idx * 50}
                         >
-                          {/* Timeline dot */}
-                          <div className="timeline-dot">
-                            <div className="dot-circle bg-primary"></div>
-                            {idx < array.length - 1 && (
-                              <div className="dot-line bg-primary"></div>
-                            )}
-                          </div>
-
-                          {/* Timeline content */}
-                          <div className="timeline-content shadow-sm rounded-3">
-                            <div className="d-flex justify-content-between align-items-center mb-2">
-                              <h6 className="fw-bold mb-0 text-primary">
+                          <div className="d-flex">
+                            <div className="me-3 text-center">
+                              <div className="bg-primary text-white rounded-3 py-1 px-2 small fw-bold">
                                 {item.year}
-                              </h6>
-                              <span className="badge bg-primary bg-opacity-10 text-primary">
-                                Sejarah
-                              </span>
+                              </div>
+                              {idx < array.length - 1 && (
+                                <div
+                                  className="bg-primary bg-opacity-25 mx-auto"
+                                  style={{
+                                    width: "2px",
+                                    height: "100%",
+                                    minHeight: "20px",
+                                  }}
+                                ></div>
+                              )}
                             </div>
-                            <h6 className="fw-bold mb-1">{item.event}</h6>
-                            <p className="text-muted small mb-0">
-                              {item.detail}
-                            </p>
+                            <div className="bg-white p-2 rounded-2 shadow-sm flex-grow-1">
+                              <h6 className="small fw-bold mb-1">
+                                {item.event}
+                              </h6>
+                              <p className="small text-muted mb-0">
+                                {item.detail}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -368,15 +320,14 @@ export default function Historynext() {
                   </div>
                 </div>
 
+                {/* Map */}
                 <div
-                  className="card border-0 shadow-lg mt-4"
+                  className="card border-0 shadow-sm"
                   data-aos="fade-left"
-                  data-aos-delay="300"
+                  data-aos-delay="100"
                 >
-                  <div className="card-header bg-primary text-white fw-bold py-3">
-                    <div className="d-flex align-items-center">
-                      <span>Peta Lokasi</span>
-                    </div>
+                  <div className="card-header bg-primary text-white py-2">
+                    <h5 className="h6 mb-0 fw-bold text-white">Peta Lokasi</h5>
                   </div>
                   <div className="card-body p-0">
                     <div className="ratio ratio-16x9">
@@ -388,9 +339,9 @@ export default function Historynext() {
                         title="Peta Lokasi Museum Lampung"
                       ></iframe>
                     </div>
-                    <div className="p-3">
-                      <button className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
-                        <FiMapPin className="me-2" /> Dapatkan Petunjuk Arah
+                    <div className="p-2 text-center">
+                      <button className="btn btn-outline-primary btn-sm w-100">
+                        <FiMapPin className="me-1" size={14} /> Petunjuk Arah
                       </button>
                     </div>
                   </div>
@@ -403,67 +354,43 @@ export default function Historynext() {
 
       <Footer />
 
+      {/* Global Styles */}
       <style jsx global>{`
-        .navbar {
-          z-index: 1000 !important;
-        }
-
-        .timeline {
-          list-style: none;
-          padding: 0;
-        }
-        .timeline-item {
-          position: relative;
-          padding-left: 40px;
-        }
-        .timeline-badge {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: #0d6efd;
-          z-index: 1;
-        }
-        .timeline-content {
-          background: white;
-          border-radius: 8px;
-          position: relative;
-          margin-left: 30px;
-          transition: transform 0.3s ease;
-        }
-        .timeline-content:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-        }
-        .timeline-content::before {
-          content: "";
-          position: absolute;
-          left: -15px;
-          top: 15px;
-          width: 0;
-          height: 0;
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
-          border-right: 15px solid white;
-        }
-
         .hero-section {
+          position: relative;
           overflow: hidden;
         }
 
-        .section-padding {
-          padding: 5rem 0;
+        .card {
+          transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+        }
+
+        .btn-primary {
+          transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+        }
+
+        .timeline-item {
+          transition: transform 0.2s ease;
+        }
+
+        .timeline-item:hover {
+          transform: translateX(3px);
         }
 
         @media (max-width: 768px) {
           .hero-section {
             height: 50vh;
           }
-
-          .section-padding {
-            padding: 3rem 0;
+          .sticky-sidebar {
+            top: 70px; /* atau setara tinggi navbar */
           }
         }
       `}</style>

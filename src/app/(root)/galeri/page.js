@@ -74,7 +74,7 @@ export default function Gallery() {
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center"
         style={{
-          height: "35vh",
+          height: "50vh",
           backgroundImage: "url('/assets/images/our2.jpeg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
@@ -253,21 +253,6 @@ export default function Gallery() {
                           Gambar tidak tersedia
                         </div>
                       )}
-                    </div>
-                    <div className="card-body">
-                      <span className="badge bg-primary mb-2">
-                        {categories.find((c) => c.id === item.category)?.name}
-                      </span>
-                      <h5 className="card-title">{item.title || 'Tanpa Judul'}</h5>
-                      <p className="card-text text-muted">{item.description || 'Tidak ada deskripsi'}</p>
-                    </div>
-                    <div className="card-footer bg-transparent border-top-0">
-                      <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => router.push(`/gallery/${item.id}`)}
-                      >
-                        Lihat Detail
-                      </button>
                     </div>
                   </div>
                 </div>
