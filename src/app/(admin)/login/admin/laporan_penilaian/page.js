@@ -15,7 +15,7 @@ import {
   FiFilter,
   FiChevronDown,
   FiChevronUp,
-  FiAlertCircle
+  FiAlertCircle,
 } from "react-icons/fi";
 
 export default function AdminPage() {
@@ -24,7 +24,10 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
+  const [sortConfig, setSortConfig] = useState({
+    key: "date",
+    direction: "desc",
+  });
   const [showFilters, setShowFilters] = useState(false);
   const [scoreFilter, setScoreFilter] = useState("all");
   const token = getCookie("token");
@@ -35,11 +38,11 @@ export default function AdminPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const reviewRes = await fetch(page.baseUrl + "/api/reviews", {
           headers: {
             "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` })
+            ...(token && { Authorization: `Bearer ${token}` }),
           },
         });
 
@@ -48,17 +51,21 @@ export default function AdminPage() {
         }
 
         const reviewData = await reviewRes.json();
-        
-        const enrichedReviews = reviewData.data?.reviews?.map((review) => ({
-          ...review,
-          userName: review.user?.fullName || "Anonymous",
-          date: new Date(review.createdAt),
-          formattedDate: new Date(review.createdAt).toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-          })
-        })) || [];
+
+        const enrichedReviews =
+          reviewData.data?.reviews?.map((review) => ({
+            ...review,
+            userName: review.user?.fullName || "Anonymous",
+            date: new Date(review.createdAt),
+            formattedDate: new Date(review.createdAt).toLocaleDateString(
+              "id-ID",
+              {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              }
+            ),
+          })) || [];
 
         setReviews(enrichedReviews);
         setFilteredReviews(enrichedReviews);
@@ -82,16 +89,19 @@ export default function AdminPage() {
     // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(review => 
-        review.userName.toLowerCase().includes(term) ||
-        review.comment?.toLowerCase().includes(term) ||
-        review.id?.toString().includes(term)
+      result = result.filter(
+        (review) =>
+          review.userName.toLowerCase().includes(term) ||
+          review.comment?.toLowerCase().includes(term) ||
+          review.id?.toString().includes(term)
       );
     }
 
     // Apply score filter
     if (scoreFilter !== "all") {
-      result = result.filter(review => review.score.toString() === scoreFilter);
+      result = result.filter(
+        (review) => review.score.toString() === scoreFilter
+      );
     }
 
     // Apply sorting
@@ -124,9 +134,9 @@ export default function AdminPage() {
     return (
       <div className="d-flex">
         {[...Array(5)].map((_, i) => (
-          <FiStar 
-            key={i} 
-            className={i < score ? "text-warning" : "text-muted"} 
+          <FiStar
+            key={i}
+            className={i < score ? "text-warning" : "text-muted"}
             fill={i < score ? "currentColor" : "none"}
           />
         ))}
@@ -141,28 +151,62 @@ export default function AdminPage() {
     const reviewRes = fetch(page.baseUrl + "/api/reviews", {
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` })
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
     });
 
     if (reviewRes.ok) {
       const reviewData = reviewRes.json();
-      const enrichedReviews = reviewData.data?.reviews?.map((review) => ({
-        ...review,
-        userName: review.user?.fullName || "Anonymous",
-        date: new Date(review.createdAt),
-        formattedDate: new Date(review.createdAt).toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        })
-      })) || [];
+      const enrichedReviews =
+        reviewData.data?.reviews?.map((review) => ({
+          ...review,
+          userName: review.user?.fullName || "Anonymous",
+          date: new Date(review.createdAt),
+          formattedDate: new Date(review.createdAt).toLocaleDateString(
+            "id-ID",
+            {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            }
+          ),
+        })) || [];
 
       setReviews(enrichedReviews);
     } else {
       setError("Gagal memuat ulang data");
     }
     setLoading(false);
+  };
+  // Di komponen/admin/review.js
+  const handleDownloadPDF = async () => {
+    try {
+      const token = getCookie("token"); // Ambil token dari cookies
+
+      const response = await fetch(`${page.baseUrl}/api/reviews/ReviewPDF`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengunduh laporan");
+      }
+
+      // Handle response sebagai blob (file PDF)
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "laporan-review-museum.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Gagal mengunduh laporan: " + error.message);
+    }
   };
 
   return (
@@ -176,22 +220,17 @@ export default function AdminPage() {
               <FiFileText className="me-2" /> Laporan Penilaian Museum Lampung
             </h2>
             <div>
-              <button 
+              <button
                 onClick={handleRefresh}
                 className="btn btn-sm btn-outline-light me-2"
                 disabled={loading}
               >
-                <FiRefreshCw className={loading ? "spin" : ""} /> 
+                <FiRefreshCw className={loading ? "spin" : ""} />
                 {loading ? "Memuat..." : "Refresh"}
               </button>
-              <a
-                href={`${page.baseUrl}/api/reviews/ReviewPDF`}
-                className="btn btn-sm btn-success"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <button onClick={handleDownloadPDF} className="btn btn-success">
                 <FiDownload className="me-1" /> Cetak PDF
-              </a>
+              </button>
             </div>
           </div>
 
@@ -214,7 +253,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="col-md-4">
-                <button 
+                <button
                   className="btn btn-outline-secondary w-100"
                   onClick={() => setShowFilters(!showFilters)}
                 >
@@ -232,7 +271,7 @@ export default function AdminPage() {
                       <div className="row g-3">
                         <div className="col-md-4">
                           <label className="form-label">Filter Nilai</label>
-                          <select 
+                          <select
                             className="form-select"
                             value={scoreFilter}
                             onChange={(e) => setScoreFilter(e.target.value)}
@@ -246,11 +285,18 @@ export default function AdminPage() {
                           </select>
                         </div>
                         <div className="col-md-4">
-                          <label className="form-label">Urutkan Berdasarkan</label>
-                          <select 
+                          <label className="form-label">
+                            Urutkan Berdasarkan
+                          </label>
+                          <select
                             className="form-select"
                             value={sortConfig.key}
-                            onChange={(e) => setSortConfig({...sortConfig, key: e.target.value})}
+                            onChange={(e) =>
+                              setSortConfig({
+                                ...sortConfig,
+                                key: e.target.value,
+                              })
+                            }
                           >
                             <option value="date">Tanggal</option>
                             <option value="score">Nilai</option>
@@ -259,10 +305,15 @@ export default function AdminPage() {
                         </div>
                         <div className="col-md-4">
                           <label className="form-label">Arah Urutan</label>
-                          <select 
+                          <select
                             className="form-select"
                             value={sortConfig.direction}
-                            onChange={(e) => setSortConfig({...sortConfig, direction: e.target.value})}
+                            onChange={(e) =>
+                              setSortConfig({
+                                ...sortConfig,
+                                direction: e.target.value,
+                              })
+                            }
                           >
                             <option value="desc">Terbaru/Tertinggi</option>
                             <option value="asc">Terlama/Terendah</option>
@@ -300,7 +351,10 @@ export default function AdminPage() {
                   <thead className="table-light">
                     <tr>
                       <th>No</th>
-                      <th onClick={() => requestSort("id")} style={{ cursor: "pointer" }}>
+                      <th
+                        onClick={() => requestSort("id")}
+                        style={{ cursor: "pointer" }}
+                      >
                         Kode Review
                         {sortConfig.key === "id" && (
                           <span className="ms-1">
@@ -308,7 +362,10 @@ export default function AdminPage() {
                           </span>
                         )}
                       </th>
-                      <th onClick={() => requestSort("userName")} style={{ cursor: "pointer" }}>
+                      <th
+                        onClick={() => requestSort("userName")}
+                        style={{ cursor: "pointer" }}
+                      >
                         Nama Pengunjung
                         {sortConfig.key === "userName" && (
                           <span className="ms-1">
@@ -316,7 +373,10 @@ export default function AdminPage() {
                           </span>
                         )}
                       </th>
-                      <th onClick={() => requestSort("date")} style={{ cursor: "pointer" }}>
+                      <th
+                        onClick={() => requestSort("date")}
+                        style={{ cursor: "pointer" }}
+                      >
                         Tanggal
                         {sortConfig.key === "date" && (
                           <span className="ms-1">
@@ -324,7 +384,10 @@ export default function AdminPage() {
                           </span>
                         )}
                       </th>
-                      <th onClick={() => requestSort("score")} style={{ cursor: "pointer" }}>
+                      <th
+                        onClick={() => requestSort("score")}
+                        style={{ cursor: "pointer" }}
+                      >
                         Nilai
                         {sortConfig.key === "score" && (
                           <span className="ms-1">
@@ -360,10 +423,15 @@ export default function AdminPage() {
                           <td>
                             <div className="d-flex align-items-center">
                               {renderStars(review.score)}
-                              <span className="ms-2 fw-bold">{review.score}</span>
+                              <span className="ms-2 fw-bold">
+                                {review.score}
+                              </span>
                             </div>
                           </td>
-                          <td className="text-wrap" style={{ maxWidth: "300px" }}>
+                          <td
+                            className="text-wrap"
+                            style={{ maxWidth: "300px" }}
+                          >
                             {review.comment || "-"}
                           </td>
                         </tr>
@@ -385,7 +453,8 @@ export default function AdminPage() {
             {/* Pagination and Summary */}
             <div className="d-flex justify-content-between align-items-center mt-4">
               <div className="text-muted">
-                Menampilkan {filteredReviews.length} dari {reviews.length} penilaian
+                Menampilkan {filteredReviews.length} dari {reviews.length}{" "}
+                penilaian
               </div>
               <div className="d-flex gap-2">
                 <button className="btn btn-outline-primary" disabled>
@@ -406,8 +475,12 @@ export default function AdminPage() {
           animation: spin 1s linear infinite;
         }
         @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
         .table-hover tbody tr:hover {
           background-color: rgba(13, 110, 253, 0.05);
