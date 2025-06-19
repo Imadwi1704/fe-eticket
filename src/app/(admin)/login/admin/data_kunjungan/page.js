@@ -5,7 +5,6 @@ import Template from "@/components/admin/Template";
 import { useParams } from "next/navigation";
 import { getCookie } from "cookies-next";
 import page from '@/config/page';
-
 import {
   FiCheckCircle,
   FiAlertCircle,
@@ -35,8 +34,6 @@ export default function DataKunjungan() {
   const id = params.id;
   const token = getCookie("token");
 
-
-
   // Auto-dismiss notifications after 5 seconds
   useEffect(() => {
     if (notification) {
@@ -47,14 +44,31 @@ export default function DataKunjungan() {
     }
   }, [notification]);
 
-  
+  // Filter data based on search term
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = data.filter(item => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          (item.orderItem?.order?.orderCode?.toLowerCase().includes(searchLower)) ||
+          (item.orderItem?.order?.user?.fullName?.toLowerCase().includes(searchLower)) ||
+          (item.orderItem?.order?.user?.email?.toLowerCase().includes(searchLower))
+        );
+      });
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchTerm, data]);
 
   // Fetch data from API
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const response = await fetch(
-        page.baseUrl+"/api/orders/ticket-instances/admin",
+        `${page.baseUrl}/api/orders/ticket-instances/admin`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,18 +77,32 @@ export default function DataKunjungan() {
       );
 
       if (!response.ok) {
-        throw new Error("Gagal memuat data tiket");
+        throw new Error(`Gagal memuat data tiket: ${response.status}`);
       }
 
       const result = await response.json();
+      
+      // Debug: Log the response data structure
+      console.log("API Response:", result);
+      
+      if (!result.data || !Array.isArray(result.data)) {
+        throw new Error("Format data tidak valid dari API");
+      }
+
       setData(result.data);
       setFilteredData(result.data);
     } catch (err) {
-      setError(err.message);
+      console.error("Error fetching data:", err);
+      setError(err.message || "Terjadi kesalahan saat memuat data");
     } finally {
       setLoading(false);
     }
   };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Open validation modal
   const openValidationModal = (item, status) => {
@@ -86,8 +114,12 @@ export default function DataKunjungan() {
   // Validate ticket attendance
   const validateTicket = async () => {
     try {
+      if (!selectedItem || !selectedItem.qrCode) {
+        throw new Error("Data tiket tidak valid");
+      }
+
       const response = await fetch(
-        page.baseUrl+"/api/orders/validate-attendance",
+        `${page.baseUrl}/api/orders/validate-attendance`,
         {
           method: "POST",
           headers: {
@@ -111,7 +143,16 @@ export default function DataKunjungan() {
         message: result.message || "Validasi berhasil",
         type: "success",
       });
-      fetchData();
+      
+      // Update local data instead of refetching all
+      setData(prevData => 
+        prevData.map(item => 
+          item._id === selectedItem._id 
+            ? { ...item, attendanceStatus: validationStatus } 
+            : item
+        )
+      );
+      
       setShowValidationModal(false);
     } catch (error) {
       console.error("Error validasi:", error);
@@ -130,15 +171,20 @@ export default function DataKunjungan() {
   // Format date to Indonesian locale
   const formatDate = (dateString) => {
     if (!dateString) return "-";
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return new Date(dateString).toLocaleDateString("id-ID", options);
+    try {
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      return new Date(dateString).toLocaleDateString("id-ID", options);
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return dateString;
+    }
   };
 
   // Get status badge with appropriate styling
@@ -180,7 +226,7 @@ export default function DataKunjungan() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Cari berdasarkan kode order atau nama pengunjung..."
+                  placeholder="Cari berdasarkan kode order, nama pengunjung, atau email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -199,8 +245,9 @@ export default function DataKunjungan() {
 
             {/* Error State */}
             {error && (
-              <div className="alert alert-danger">
-                <FiAlertCircle className="me-2" /> {error}
+              <div className="alert alert-danger d-flex align-items-center">
+                <FiAlertCircle className="me-2 flex-shrink-0" />
+                <div>{error}</div>
               </div>
             )}
 
@@ -222,7 +269,7 @@ export default function DataKunjungan() {
                   <tbody>
                     {filteredData.length > 0 ? (
                       filteredData.map((item, index) => (
-                        <tr key={`${item._id}-${index}`}>
+                        <tr key={item._id || index}>
                           <td>{index + 1}</td>
                           <td>
                             <span className="badge bg-light text-dark">
@@ -264,7 +311,7 @@ export default function DataKunjungan() {
                                 className="btn btn-sm btn-warning"
                                 disabled={item.attendanceStatus === "NOT_ARRIVED"}
                               >
-                                <FiXCircle className="me-1 btn-danger" /> Batal
+                                <FiXCircle className="me-1" /> Batal
                               </button>
                             </div>
                           </td>
@@ -273,8 +320,13 @@ export default function DataKunjungan() {
                     ) : (
                       <tr>
                         <td colSpan="7" className="text-center py-4">
-                          <div className="alert alert-warning mb-0">
-                            <FiAlertCircle className="me-2" /> Tidak ada data yang ditemukan
+                          <div className="alert alert-warning mb-0 d-flex align-items-center">
+                            <FiAlertCircle className="me-2 flex-shrink-0" />
+                            <div>
+                              {searchTerm 
+                                ? "Tidak ada data yang cocok dengan pencarian" 
+                                : "Tidak ada data kunjungan yang tersedia"}
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -311,21 +363,21 @@ export default function DataKunjungan() {
                         <strong>Kode Order:</strong> {selectedItem.orderItem?.order?.orderCode || "-"}
                       </li>
                       <li className="list-group-item">
-                        <strong>Nama Pengunjung:</strong> {selectedItem.orderItem?.user?.fullName || "-"}
+                        <strong>Nama Pengunjung:</strong> {selectedItem.orderItem?.order?.user?.fullName || "-"}
                       </li>
                       <li className="list-group-item">
-                        <strong>Email:</strong> {selectedItem.user?.email || "-"}
+                        <strong>Email:</strong> {selectedItem.orderItem?.order?.user?.email || "-"}
                       </li>
                       <li className="list-group-item">
                         <strong>Tanggal Kunjungan:</strong> {formatDate(selectedItem.orderItem?.order?.visitDate)}
                       </li>
                       <li className="list-group-item">
-                        <strong>Status Saat Ini:</strong> {getStatusBadge(selectedItem.orderItem?.order?.attendanceStatus)}
+                        <strong>Status Saat Ini:</strong> {getStatusBadge(selectedItem.attendanceStatus)}
                       </li>
                     </ul>
                   </div>
                   <div className="col-md-6">
-                    <h6>Rincian Pemesanan</h6>
+                    <h6>Rincian Tiket</h6>
                     <div className="table-responsive">
                       <table className="table table-sm">
                         <thead>
@@ -333,30 +385,15 @@ export default function DataKunjungan() {
                             <th>Jenis Tiket</th>
                             <th>Harga</th>
                             <th>Jumlah</th>
-                            <th>Subtotal</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {selectedItem.orderItems?.map((item, index) => (
-                            <tr key={`order-item-${item._id || index}`}>
-                              <td>{item.orderItem?.ticket?.type || "Tiket Museum"}</td>
-                              <td>Rp{item.orderItem?.ticketPrice?.toLocaleString("id-ID") || "0"}</td>
-                              <td>{item.orderItem?.quantity || "0"}</td>
-                              <td>Rp{((item.orderItem?.ticketPrice || 0) * (item.quantity || 0)).toLocaleString("id-ID")}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                        <tfoot>
                           <tr>
-                            <td colSpan="3" className="text-end fw-bold">Total</td>
-                            <td className="fw-bold">
-                              Rp{selectedItem.orderItems?.reduce(
-                                (sum, item) => sum + ((item.orderItem?.ticketPrice || 0) * (item.orderItem?.quantity || 0)), 
-                                0
-                              ).toLocaleString("id-ID")}
-                            </td>
+                            <td>{selectedItem.orderItem?.ticket?.type || "Tiket Museum"}</td>
+                            <td>Rp{selectedItem.orderItem?.ticketPrice?.toLocaleString("id-ID") || "0"}</td>
+                            <td>{selectedItem.orderItem?.quantity || "1"}</td>
                           </tr>
-                        </tfoot>
+                        </tbody>
                       </table>
                     </div>
                     <div className="alert alert-info mt-3">
@@ -368,10 +405,10 @@ export default function DataKunjungan() {
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="btn btn-secondary"
                   onClick={() => setShowValidationModal(false)}
                 >
-                  Batal
+                  Tutup
                 </button>
                 <button
                   type="button"
@@ -388,19 +425,23 @@ export default function DataKunjungan() {
 
       {/* Notification Toast */}
       {notification && (
-        <div className={`toast show position-fixed bottom-0 end-0 m-3 ${notification.type === "success" ? "bg-success" : "bg-danger"}`}>
-          <div className="toast-header">
-            <strong className="me-auto text-white">
-              {notification.type === "success" ? "Sukses" : "Error"}
-            </strong>
+        <div 
+          className={`toast show position-fixed bottom-0 end-0 m-3 ${notification.type === "success" ? "bg-success" : "bg-danger"}`}
+          style={{ zIndex: 1100 }}
+        >
+          <div className="d-flex align-items-center p-2">
+            {notification.type === "success" 
+              ? <FiCheckCircle className="me-2 flex-shrink-0" size={20} />
+              : <FiAlertCircle className="me-2 flex-shrink-0" size={20} />
+            }
+            <div className="toast-body text-white">
+              {notification.message}
+            </div>
             <button
               type="button"
-              className="btn-close btn-close-white"
+              className="btn-close btn-close-white ms-auto"
               onClick={() => setNotification(null)}
             ></button>
-          </div>
-          <div className="toast-body text-white">
-            {notification.message}
           </div>
         </div>
       )}
