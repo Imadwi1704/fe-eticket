@@ -945,7 +945,7 @@ export default function RootLayout() {
                       <Image
                         width={300}
                         height={300}
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.image}`}
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.imageUrl}`}
                         alt={`Gallery ${index + 1}`}
                         className="w-100 h-100 object-fit-cover"
                         style={{ height: "300px" }}
