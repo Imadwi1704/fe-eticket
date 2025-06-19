@@ -29,7 +29,7 @@ export default function Gallery() {
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
     // Update URL without page reload
-    router.push(`/gallery/?category=${categoryId}`, undefined, {
+    router.push(`/galeri/?category=${categoryId}`, undefined, {
       shallow: true,
     });
   };

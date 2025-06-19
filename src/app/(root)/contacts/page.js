@@ -313,7 +313,7 @@ export default function Review() {
       <section className="py-5 bg-light">
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-lg-10">
+            <div className="col-lg-0">
               <div className="card border-0 shadow-sm overflow-hidden">
                 <div className="card-header bg-primary text-white py-3">
                   <h3 className="h5 mb-0 text-center text white">
