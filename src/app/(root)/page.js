@@ -939,7 +939,7 @@ export default function RootLayout() {
                   <div key={index} className="col-lg-3 col-md-6 ps-3">
                     <motion.div
                       whileHover={{ scale: 1.03 }}
-                      className="position-relative rounded overflow-hidden shadow-sm gallery-card"
+                      className="position-relative rounded overflow-hidden shadow-sm gallery-card mx-2"
                       style={{ cursor: "pointer" }}
                     >
                       <Image
