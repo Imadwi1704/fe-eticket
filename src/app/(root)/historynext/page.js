@@ -24,7 +24,6 @@ export default function Historynext() {
       offset: 100,
     });
 
-    // Efek paralaks untuk hero section
     const handleScroll = () => {
       if (heroRef.current) {
         const scrollPosition = window.pageYOffset;
@@ -35,6 +34,7 @@ export default function Historynext() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  
 
   return (
     <div className="bg-light">
@@ -235,7 +235,7 @@ export default function Historynext() {
 
             {/* Sidebar */}
             <div className="col-lg-4">
-              <div className="sticky-top sticky-sidebar">
+              <div className="sticky-top" style={{ top: "20px" }}>
                 {/* Timeline */}
                 <div
                   className="card border-0 shadow-sm mb-4"
@@ -390,7 +390,7 @@ export default function Historynext() {
             height: 50vh;
           }
           .sticky-sidebar {
-            top: 70px; /* atau setara tinggi navbar */
+            top: 20px; /* atau setara tinggi navbar */
           }
         }
       `}</style>

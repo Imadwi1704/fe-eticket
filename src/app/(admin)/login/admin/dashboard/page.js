@@ -134,9 +134,7 @@ export default function Dashboard() {
     setSelectedYear(year);
   };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [token, selectedYear]);
+ 
 
   // Chart data generators
   const generateMonthlySalesChart = () => {

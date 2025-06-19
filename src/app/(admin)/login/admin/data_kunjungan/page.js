@@ -35,10 +35,7 @@ export default function DataKunjungan() {
   const id = params.id;
   const token = getCookie("token");
 
-  // Fetch data on component mount
-  useEffect(() => {
-    if (token) fetchData();
-  }, [token]);
+
 
   // Auto-dismiss notifications after 5 seconds
   useEffect(() => {

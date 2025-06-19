@@ -108,7 +108,7 @@ const CompactFooter = () => {
           <div className="col-12">
             <div className="text-center text-white-60 pt-3" style={copyrightStyle}>
               <p className="mb-0 text-white">
-                © {currentYear} Museum Negeri Propinsi Lampung Ruwa Jura".{" "}
+                © {currentYear} Museum Negeri Propinsi Lampung Ruwa Jura.{" "}
                 <span className="d-block d-sm-inline">All Rights Reserved.</span>
               </p>
               <p className="mt-1 mb-0 text-white">
