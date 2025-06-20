@@ -138,7 +138,7 @@ export default function Review() {
           backgroundPosition: "center",
         }}
       >
-         <div
+        <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{
             background: "linear-gradient(rgb(0 0 0 / 70%), rgb(0 0 0 / 40%))",
@@ -149,7 +149,10 @@ export default function Review() {
           <h1 className="display-5 fw-bold mb-3">
             Kontak & Ulasan Museum Lampung
           </h1>
-          <p className="lead mb-0 mx-auto text-white" style={{ maxWidth: "600px" }}>
+          <p
+            className="lead mb-0 mx-auto text-white"
+            style={{ maxWidth: "600px" }}
+          >
             Berikan ulasan Anda dan temukan informasi kontak untuk Museum Negeri
             Ruwa Jurai
           </p>
@@ -162,7 +165,7 @@ export default function Review() {
           <div className="row g-4">
             {/* Museum Info Card */}
             <div className="col-lg-4">
-              <div className="card h-100 border-0 shadow-sm">
+              <div className="bg-light">
                 <div className="card-body p-4">
                   <h5 className="text-primary mb-4 fw-semibold text-center">
                     Informasi Museum
@@ -205,15 +208,23 @@ export default function Review() {
 
             {/* Review Form */}
             <div className="col-lg-8">
-              <div className="bg-white p-4 rounded shadow-sm h-100">
-                <h5 className="text-primary fw-semibold mb-3 text-center">
+              <div
+                className="p-4 rounded-3 border bg-white shadow-sm h-100"
+                style={{
+                  borderColor: "#000", // Warna border Bootstrap abu muda
+                  borderWidth: "5px",
+                  borderStyle: "solid",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)", // Lembut
+                }}
+              >
+                {" "}
+                <h5 className="text-primary fw-semibold mb-4">
                   Beri Ulasan Anda
                 </h5>
                 <p className="text-center text-muted mb-4">
                   Kirimkan saran dan masukan Anda setelah berkunjung ke Museum
                   Lampung.
                 </p>
-
                 <form
                   onSubmit={handleSubmit}
                   className="mx-auto"
@@ -251,7 +262,7 @@ export default function Review() {
                   </div>
 
                   <div className="text-center">
-                    <button type="submit" className="btn btn-primary px-4">
+                    <button type="submit" className="btn btn-primary px-4 rounded-5">
                       Kirim Ulasan <FiSend className="ms-2" />
                     </button>
                   </div>
@@ -315,11 +326,6 @@ export default function Review() {
           <div className="row justify-content-center">
             <div className="col-lg-0">
               <div className="card border-0 shadow-sm overflow-hidden">
-                <div className="card-header bg-primary text-white py-3">
-                  <h3 className="h5 mb-0 text-center text white">
-                    Lokasi Museum Lampung
-                  </h3>
-                </div>
                 <div className="ratio ratio-16x9">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.292852728222!2d105.23834287498384!3d-5.372234694606639!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e40dab5d8b8ddfb%3A0xb2235987d49dad2f!2sMuseum%20Lampung!5e0!3m2!1sid!2sid!4v1742337921781!5m2!1sid!2sid"
@@ -328,26 +334,6 @@ export default function Review() {
                     referrerPolicy="no-referrer-when-downgrade"
                     title="Peta Lokasi Museum Lampung"
                   />
-                </div>
-                <div className="p-3 bg-white border-top">
-                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-                    <div className="text-center text-md-start">
-                      <h5 className="h6 fw-bold mb-1">
-                        Museum Negeri Provinsi Lampung Ruwa Jurai
-                      </h5>
-                      <p className="text-muted mb-0">
-                        Jl. Z.A. Pagar Alam No.64, Bandar Lampung
-                      </p>
-                    </div>
-                    <a
-                      href="https://goo.gl/maps/2XqJv9QcXyQ2"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary btn-sm"
-                    >
-                      <FiMapPin className="me-1" /> Petunjuk Arah
-                    </a>
-                  </div>
                 </div>
               </div>
             </div>

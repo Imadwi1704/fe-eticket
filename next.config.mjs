@@ -19,6 +19,16 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
       {
+        protocol: 'http',
+        hostname: '192.168.1.37',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'museumlampung.store',
+        pathname: '/uploads/**',
+      },
+      {
         protocol: 'https',
         hostname: 'via.placeholder.com',
         pathname: '/**', // tambahkan pathname default

@@ -8,9 +8,9 @@ import { getCookie } from "cookies-next";
 import page from "@/config/page";
 import { Spinner, Alert } from "react-bootstrap";
 import { format, parseISO } from "date-fns";
-import { id } from "date-fns/locale";
 import { useParams } from "next/navigation";
-// import Cookies from "js-cookie";
+import Link from "next/link";
+import Modal from "react-bootstrap/Modal";
 
 export default function DetailPage() {
   const params = useParams();
@@ -19,6 +19,8 @@ export default function DetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const token = getCookie("token");
+  const [showQRModal, setShowQRModal] = useState(false);
+
 
   useEffect(() => {
     if (!token) {
@@ -56,14 +58,17 @@ export default function DetailPage() {
   }, [token, id]);
 
   const formatDate = (dateString) => {
-    try {
-      return format(parseISO(dateString), "dd MMMM yyyy", { locale: id });
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return dateString;
-    }
-  };
+  try {
+    if (!dateString) return "-"; // Kembalikan placeholder kalau tidak ada tanggal
+    return format(parseISO(dateString), "dd MMMM yyyy", { locale: id });
+  } catch (error) {
+    console.error("Format date error:", error);
+    return dateString || "-";
+  }
+};
 
+
+  
   const calculateTotal = (items) => {
     return (
       items?.reduce(
@@ -74,7 +79,10 @@ export default function DetailPage() {
   };
 
   const handleDownload = () => {
-    window.open(`${page.baseUrl}/api/orders/${id}/download?token=${token}`, "_blank");
+    window.open(
+      `${page.baseUrl}/api/orders/${id}/download?token=${token}`,
+      "_blank"
+    );
   };
 
   if (!token) {
@@ -88,120 +96,152 @@ export default function DetailPage() {
   return (
     <>
       <Navbar />
+      {/* Hero Section */}
+      <section className="bg-primary bg-gradient text-white py-5">
+        <div className="container py-4">
+          <div className="row align-items-center">
+            <div className="col-lg-8">
+              <h1 className="display-5 fw-bold mb-3 text-white">
+                Detail Pemesanan Tiket
+              </h1>
+              <p className="lead mb-4 text-white">
+                Terima kasih telah melakukan pemesanan tiket. Di halaman ini,
+                Anda dapat melihat detail pemesanan, mengunduh tiket digital,
+                dan melanjutkan pembayaran jika diperlukan.
+              </p>
+              <div className="d-flex gap-3">
+                <Link href="/orders" className="btn btn-light px-2">
+                  <i className="bi bi-arrow-left me-3"></i>
+                  Kembali ke Daftar Pemesanan
+                </Link>
+              </div>
+            </div>
+            <div className="col-lg-4 d-none d-lg-block">
+              <Image
+                src="/assets/images/detail_tiket.png"
+                alt="Payment Illustration"
+                className="img-fluid"
+                width={600}
+                height={400}
+                style={{ maxHeight: "250px", objectFit: "contain" }}
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section
-        className="section-padding py-5"
         id="detail-order"
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #e4f0ff 100%)",
+          background: "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)",
         }}
+        className="py-5"
       >
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8 col-md-10">
-              <div className="text-center mb-5">
-                <h2 className="fw-bold text-primary">Detail Pemesanan</h2>
-                <p className="text-muted">
-                  Berikut detail tiket kunjungan Anda
-                </p>
-              </div>
-
               {isLoading ? (
                 <div className="text-center py-5">
-                  <Spinner animation="border" variant="primary" />
+                  <div className="spinner-border text-primary" role="status" />
                   <p className="mt-3 text-muted">Memuat data pemesanan...</p>
                 </div>
               ) : error ? (
-                <Alert variant="danger" className="text-center">
-                  {error}
-                </Alert>
+                <div className="alert alert-danger text-center">{error}</div>
               ) : order ? (
-                <div className="card border-0 shadow-lg overflow-hidden">
-                  {/* Header with decorative element */}
+                <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+                  {/* Header Tiket */}
                   <div
-                    className="bg-primary py-3 px-4 text-white position-relative"
+                    className="bg-primary text-white px-4 py-3 position-relative"
                     style={{
                       background:
                         "linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%)",
                     }}
                   >
-                    <h3 className="fw-bold text-white">E-RUWAJURAI</h3>
+                    <h3 className="fw-bold mb-0 text-white">
+                      E-RUWAJURAI TICKET
+                    </h3>
                     <div
-                      className="position-absolute top-0 end-0 bg-white text-primary fw-bold px-3 py-1 rounded-start-pill m-0 shadow-sm"
-                      style={{ fontSize: "0.9rem" }}
+                      className="position-absolute top-0 end-0 bg-white text-primary fw-semibold px-3 py-1 rounded-start-pill shadow-sm"
+                      style={{ fontSize: "0.85rem" }}
                     >
-                      TIKET DIGITAL
+                      DIGITAL
                     </div>
                   </div>
 
-                  <div className="card-body p-4 p-md-5 position-relative">
-                    {/* Order details */}
+                  {/* Body Tiket */}
+                  <div className="card-body p-4 p-md-5 bg-white position-relative">
+                    {/* Informasi Utama */}
                     <div className="row mb-4">
                       <div className="col-md-6 mb-3 mb-md-0">
-                        <div className="d-flex align-items-center mb-3">
-                          <i className="bi bi-receipt-cutoff fs-4 text-primary me-3"></i>
+                        <div className="d-flex align-items-start mb-3">
+                          <i className="bi bi-receipt-cutoff fs-3 text-primary me-3" />
                           <div>
-                            <h6 className="mb-0 fw-bold">Kode Pemesanan</h6>
-                            <p className="fw-bold text-primary small mb-1">
+                            <p className="mb-1 text-primary">
+                              Kode Pemesanan
+                            </p>
+                            <p className="fw-bold text-dark mb-0">
                               {order.orderCode}
                             </p>
                           </div>
                         </div>
 
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-calendar-check fs-4 text-primary me-3"></i>
+                        <div className="d-flex align-items-start">
+                          <i className="bi bi-calendar-event fs-3 text-primary me-3" />
                           <div>
-                            <h6 className="mb-0 fw-bold">Tanggal Berkunjung</h6>
-                            <p className="fw-bold text-primary small mb-1">
-                              {formatDate(order.visitDate)}
+                            <p className="mb-1 text-primary">
+                              Tanggal Berkunjung
+                            </p>
+                            <p className="fw-bold text-dark mb-0">
+                              {formatDate(order?.visitDate)}
                             </p>
                           </div>
                         </div>
                       </div>
 
                       <div className="col-md-6">
-                        <div className="d-flex align-items-center mb-3">
-                          <i className="bi bi-credit-card fs-4 text-primary me-3"></i>
+                        <div className="d-flex align-items-start mb-3">
+                          <i className="bi bi-credit-card fs-3 text-primary me-3" />
                           <div>
-                            <p className="text-muted small mb-1">
+                            <p className="mb-1 text-primary">
                               Status Pembayaran
                             </p>
-                            <h5 className="mb-0">
-                              <span
-                                className={`badge ${
-                                  order.payment?.paymentStatus === "success"
-                                    ? "bg-success"
-                                    : "bg-warning"
-                                } text-white`}
-                              >
-                                {order.payment?.paymentStatus?.toUpperCase() ||
-                                  "PENDING"}
-                              </span>
-                            </h5>
+                            <span
+                              className={`badge rounded-pill px-3 py-1 fs-6 ${
+                                order.payment?.paymentStatus === "success"
+                                  ? "bg-success"
+                                  : "bg-warning text-dark"
+                              }`}
+                            >
+                              {order.payment?.paymentStatus?.toUpperCase() ||
+                                "PENDING"}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-cash-coin fs-4 text-primary me-3"></i>
+                        <div className="d-flex align-items-start">
+                          <i className="bi bi-wallet2 fs-3 text-primary me-3" />
                           <div>
-                            <h6 className="mb-0 fw-bold">Metode Pembayaran</h6>
-                            <p className="fw-bold text-primary small mb-1">
-                              {formatDate(order.payment?.paymentMethod)}
+                            <p className="mb-1 text-primary">
+                              Metode Pembayaran
+                            </p>
+                            <p className="fw-bold text-dark mb-0">
+                              {order.payment?.paymentMethod || "-"}
                             </p>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Ticket items */}
+                    {/* Tabel Tiket */}
                     <div className="mb-4">
                       <h5 className="fw-bold mb-3 border-bottom pb-2">
                         Rincian Tiket
                       </h5>
                       <div className="table-responsive">
-                        <table className="table table-hover">
-                          <thead className="bg-light">
+                        <table className="table table-bordered align-middle">
+                          <thead className="table-light ">
                             <tr>
                               <th>Jenis Tiket</th>
                               <th className="text-end">Harga</th>
@@ -226,7 +266,7 @@ export default function DetailPage() {
                               </tr>
                             ))}
                           </tbody>
-                          <tfoot className="bg-light">
+                          <tfoot>
                             <tr>
                               <td colSpan="3" className="fw-bold text-end">
                                 Total Pembayaran
@@ -243,46 +283,77 @@ export default function DetailPage() {
                       </div>
                     </div>
 
-                    {/* Action buttons */}
-                    <div className="d-flex flex-column flex-md-row gap-3">
-                      <button
-                        onClick={handleDownload}
-                        className="btn btn-primary d-flex align-items-center justify-content-center gap-2 py-3 px-4 flex-grow-1"
-                      >
-                        <i className="bi bi-download fs-5"></i>
-                        Download Tiket
-                      </button>
-
-                      {order.payment?.paymentStatus !== "success" && (
-                        <button
-                          onClick={() =>
-                            window.open(order.payment?.paymentUrl, "_blank")
-                          }
-                          className="btn btn-warning text-white d-flex align-items-center justify-content-center gap-2 py-3 px-4 flex-grow-1"
+                    {/* Tombol Aksi with QR Button */}
+                    <div className="d-flex flex-column flex-md-row gap-2 align-items-center">
+                      <div className="d-flex gap-2">
+                        <Link
+                          href="#"
+                          onClick={handleDownload}
+                          className="btn btn-sm btn-primary d-inline-flex align-items-center justify-content-center gap-1 py-1 px-3 rounded-pill"
                         >
-                          <i className="bi bi-credit-card fs-3"></i>
-                          Lanjutkan Pembayaran
+                          <i className="bi bi-download fs-6" />
+                          <span className="small">Download Tiket</span>
+                        </Link>
+
+                        <button
+                          onClick={() => setShowQRModal(true)}
+                          className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center gap-1 py-1 px-3 rounded-pill"
+                        >
+                          <i className="bi bi-qr-code fs-6" />
+                          <span className="small">Scan QR</span>
                         </button>
-                      )}
+                      </div>
+
+                      {/* Logo Dekoratif */}
+                      <div
+                        className="position-absolute bottom-0 end-0 opacity-10 me-3 mb-2"
+                        style={{ width: "120px", zIndex: 0 }}
+                      >
+                        <Image
+                          src={lampungLogo}
+                          alt="Logo Lampung"
+                          className="img-fluid"
+                        />
+                      </div>
                     </div>
 
-                    {/* Decorative elements */}
-                    <div
-                      className="position-absolute bottom-0 end-0 me-3 mb-2 opacity-10"
-                      style={{ width: "150px", zIndex: 0 }}
+                    {/* QR Code Modal */}
+                    <Modal
+                      show={showQRModal}
+                      onHide={() => setShowQRModal(false)}
+                      centered
                     >
-                      <Image
-                        src={lampungLogo}
-                        alt="Logo Lampung"
-                        className="img-fluid"
-                      />
-                    </div>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Kode QR Tiket</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body className="text-center">
+                        <div className="p-4">
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${order.orderCode}`}
+                            alt="QR Code"
+                            className="img-fluid mb-3"
+                          />
+                          <p className="text-muted">
+                            Scan QR code untuk validasi tiket
+                          </p>
+                          <p className="fw-bold">{order.orderCode}</p>
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => setShowQRModal(false)}
+                        >
+                          Tutup
+                        </button>
+                      </Modal.Footer>
+                    </Modal>
                   </div>
                 </div>
               ) : (
-                <Alert variant="info" className="text-center">
-                  Data pemesanan tidak ditemukan
-                </Alert>
+                <div className="alert alert-info text-center">
+                  Data pemesanan tidak ditemukan.
+                </div>
               )}
             </div>
           </div>

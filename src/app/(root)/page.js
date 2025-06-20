@@ -18,10 +18,36 @@ export default function RootLayout() {
   const [review, setReview] = useState([]);
   const [gallery, setGallery] = useState([]);
   const containerRef = useRef(null);
+
+  // Fungsi untuk mengecek status buka/tutup museum
+  const isMuseumOpen = () => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentDay = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+
+    // Museum tutup di hari Senin (1) dan buka Selasa-Minggu
+    if (currentDay === 1) return false;
+
+    // Jam operasional: 08:00 - 14:00
+    const openingHour = 8;
+    const closingHour = 14;
+
+    // Konversi waktu ke menit untuk perbandingan lebih mudah
+    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+    const openingTimeInMinutes = openingHour * 60;
+    const closingTimeInMinutes = closingHour * 60;
+
+    return (
+      currentTimeInMinutes >= openingTimeInMinutes &&
+      currentTimeInMinutes < closingTimeInMinutes
+    );
+  };
+
   const scrollLeft = () => {
     if (containerRef.current) {
       containerRef.current.scrollBy({
-        left: -300, // scroll ke kiri 300px
+        left: -300,
         behavior: "smooth",
       });
     }
@@ -30,7 +56,7 @@ export default function RootLayout() {
   const scrollRight = () => {
     if (containerRef.current) {
       containerRef.current.scrollBy({
-        left: 300, // scroll ke kanan 300px
+        left: 300,
         behavior: "smooth",
       });
     }
@@ -39,7 +65,7 @@ export default function RootLayout() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch venue data tanpa token
+        // Fetch venue data
         const venueRes = await fetch(page.baseUrl + "/api/venue", {
           headers: {
             "Content-Type": "application/json",
@@ -51,7 +77,7 @@ export default function RootLayout() {
           setVenues(venueData);
         }
 
-        // Fetch review data tanpa token
+        // Fetch review data
         const reviewRes = await fetch(page.baseUrl + "/api/reviews", {
           headers: {
             "Content-Type": "application/json",
@@ -68,16 +94,16 @@ export default function RootLayout() {
           setReview(enrichedReviews);
         }
       } catch (error) {
-        console.error("Terjadi kesalahan saat fetch:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
   }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchGalleryData = async () => {
       try {
-        // Fetch gallery data
         const galleryRes = await fetch(page.baseUrl + "/api/gallery", {
           headers: {
             "Content-Type": "application/json",
@@ -86,7 +112,6 @@ export default function RootLayout() {
 
         if (galleryRes.ok) {
           const galleryData = await galleryRes.json();
-          // Urutkan berdasarkan tanggal terbaru dan ambil 4 gambar pertama
           const sortedGallery = galleryData
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .slice(0, 4);
@@ -97,8 +122,9 @@ export default function RootLayout() {
       }
     };
 
-    fetchData();
+    fetchGalleryData();
   }, []);
+
   return (
     <>
       <div className="overflow-hidden">
@@ -106,14 +132,14 @@ export default function RootLayout() {
         <section
           className="hero-section"
           style={{
-            height: "100vh",
+            height: "90vh",
             position: "relative",
             overflow: "hidden",
             display: "flex",
             alignItems: "center",
           }}
         >
-          {/* Video Background - Now only covering right half */}
+          {/* Video Background */}
           <div
             style={{
               position: "absolute",
@@ -126,7 +152,7 @@ export default function RootLayout() {
             }}
           >
             <iframe
-              src="https://www.youtube.com/embed/gR8kj6ti-s4?start=180&autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4&controls=0&modestbranding=1&rel=0"
+              src="https://www.youtube.com/embed/gR8kj6ti-s4?start=25&end=40&autoplay=1&mute=1&loop=1&playlist=gR8kj6ti-s4&controls=0&modestbranding=1&rel=0"
               title="YouTube video player"
               allow="autoplay; encrypted-media"
               allowFullScreen
@@ -135,8 +161,8 @@ export default function RootLayout() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: "100%",
-                height: "100%",
+                width: "150%",
+                height: "132%",
                 objectFit: "cover",
                 filter: "brightness(0.7)",
               }}
@@ -154,7 +180,7 @@ export default function RootLayout() {
             ></div>
           </div>
 
-          {/* Content Container - Left Side */}
+          {/* Content Container */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -169,121 +195,138 @@ export default function RootLayout() {
               maxWidth: "1000px",
             }}
           >
-            <h1
-              className="fw-bold text-white"
-              style={{
-                fontSize: "50px",
-                lineHeight: "1.1",
-                textShadow: "2px 2px 8px rgba(0,0,0,0.5)",
-                marginBottom: "1.5rem",
-              }}
-            >
-              Museum Lampung Ruwa Jurai
-            </h1>
-
             <div
               style={{
-                marginBottom: "2.5rem",
-                maxWidth: "1000px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                width: "100%",
               }}
             >
-              <p
-                className="lead text-white"
-                style={{
-                  fontSize: "1.25rem",
-                  textShadow: "1px 1px 4px rgba(0,0,0,0.3)",
-                  lineHeight: "1.6",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                Melestarikan Warisan Sejarah dan Budaya Lampung sebagai Cerminan
-                Jati Diri, Demi Mewariskannya kepada Generasi Mendatang dengan
-                Penuh Kebanggaan.
-              </p>
-            </div>
-
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <Link href="/aboutnext">
-                <button
-                  className="btn"
+              <div style={{ flex: 1 }}>
+                <h1
+                  className="fw-bold text-white"
                   style={{
-                    background: "#FFFFFF",
-                    color: "#000",
-                    borderRadius: "50px",
-                    fontSize: "1rem",
-                    padding: "0.75rem 2rem",
-                    transition: "0.3s",
-                    fontWeight: "600",
-                    border: "none",
-                    boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.transform = "translateY(-2px)")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.transform = "translateY(0)")
-                  }
-                >
-                  Jelajahi Museum
-                </button>
-              </Link>
-
-              <Link href="/venues">
-                <button
-                  className="btn"
-                  style={{
-                    background: "transparent",
-                    color: "#FFF",
-                    borderRadius: "50px",
-                    fontSize: "1rem",
-                    padding: "0.75rem 2rem",
-                    transition: "0.3s",
-                    fontWeight: "600",
-                    border: "2px solid #FFF",
-                    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.transform = "translateY(0)";
+                    fontSize: "50px",
+                    lineHeight: "1.1",
+                    textShadow: "2px 2px 8px rgba(0,0,0,0.5)",
+                    marginBottom: "1.5rem",
                   }}
                 >
-                  Koleksi Kami
-                </button>
-              </Link>
+                  Museum Lampung Ruwa Jurai
+                </h1>
+
+                <div style={{ marginBottom: "2.5rem", maxWidth: "1000px" }}>
+                  <p
+                    className="lead text-white"
+                    style={{
+                      fontSize: "1.25rem",
+                      textShadow: "1px 1px 4px rgba(0,0,0,0.3)",
+                      lineHeight: "1.6",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    Melestarikan Warisan Sejarah dan Budaya Lampung sebagai
+                    Cerminan Jati Diri, Demi Mewariskannya kepada Generasi
+                    Mendatang dengan Penuh Kebanggaan.
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  <Link href="/aboutnext">
+                    <button
+                      className="btn"
+                      style={{
+                        background: "#FFFFFF",
+                        color: "#000",
+                        borderRadius: "50px",
+                        fontSize: "1rem",
+                        padding: "5px 15px",
+                        transition: "0.3s",
+                        fontWeight: "600",
+                        border: "none",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                      }}
+                      onMouseOver={(e) =>
+                        (e.currentTarget.style.transform = "translateY(-2px)")
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget.style.transform = "translateY(0)")
+                      }
+                    >
+                      Jelajahi Museum
+                    </button>
+                  </Link>
+
+                  <Link href="/venues">
+                    <button
+                      className="btn"
+                      style={{
+                        background: "transparent",
+                        color: "#FFF",
+                        borderRadius: "50px",
+                        fontSize: "1rem",
+                        padding: "5px 15px",
+                        transition: "0.3s",
+                        fontWeight: "600",
+                        border: "2px solid #FFF",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255,255,255,0.1)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      Koleksi Kami
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </motion.div>
-
-          {/* Decorative Elements */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "5%",
-              left: "5%",
-              zIndex: 4,
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
+        </section>
+        <section
+          style={{
+            width: "100%",
+            height: "10vh",
+            background: "rgba(13, 110, 253, 1)",
+            position: "relative",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <div className="container">
             <div
               style={{
-                width: "50px",
-                height: "2px",
-                background: "rgba(255,255,255,0.5)",
-              }}
-            ></div>
-            <span
-              style={{
-                color: "rgba(255,255,255,0.8)",
-                fontSize: "0.9rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.75rem 1.25rem",
+                fontSize: "18px",
+                fontWeight: 500,
+                color: "#fff",
               }}
             >
-              Scroll untuk menjelajahi
-            </span>
+              <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  background: isMuseumOpen() ? "#4ade80" : "#f87171",
+                  animation: isMuseumOpen() ? "pulse 1.5s infinite" : "none",
+                }}
+              ></div>
+              <span>
+                {isMuseumOpen() ? "Museum Sedang Buka" : "Museum Sedang Tutup"}{" "}
+                — Jam Operasional: 08:00 - 14:00
+              </span>
+            </div>
           </div>
         </section>
 
@@ -295,7 +338,6 @@ export default function RootLayout() {
         >
           <div className="container">
             <div className="row justify-content-center align-items-center">
-              {/* Kolom Teks */}
               <div className="col-lg-10 mb-2">
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
@@ -306,7 +348,6 @@ export default function RootLayout() {
                   <h2 className="text-black">
                     Selamat Datang di Museum Ruwa Jurai
                   </h2>
-
                   <p className="lead text-black" style={{ lineHeight: 1.7 }}>
                     Sebagai pusat preservasi budaya Lampung, kami menyimpan
                     lebih dari 15.000 artefak bersejarah yang menceritakan
@@ -315,7 +356,6 @@ export default function RootLayout() {
                 </motion.div>
               </div>
 
-              {/* Info Cards */}
               <div className="col-12">
                 <motion.div
                   className="d-flex justify-content-center flex-wrap gap-4"
@@ -323,98 +363,59 @@ export default function RootLayout() {
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                 >
-                  {/* Card 1 */}
-                  <div
-                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
-                    style={{
-                      backgroundColor: "#FFFFFF",
-                      minWidth: "220px",
-                      flex: "1 1 250px",
-                      border: "2px solid #0D6EFD",
-                      color: "#000000",
-                    }}
-                  >
+                  {/* Info Cards */}
+                  {[
+                    {
+                      icon: "bi-collection",
+                      value: "15.000",
+                      label: "Koleksi bersejarah",
+                    },
+                    {
+                      icon: "bi-people-fill",
+                      value: "120.000",
+                      label: "Pengunjung/tahun",
+                    },
+                    {
+                      icon: "bi-award",
+                      value: "10",
+                      label: "Penghargaan nasional",
+                    },
+                  ].map((card, index) => (
                     <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
+                      key={index}
+                      className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
                       style={{
-                        width: "60px",
-                        height: "60px",
-                        backgroundColor: "#0D6EFD",
+                        backgroundColor: "#FFFFFF",
+                        minWidth: "220px",
+                        flex: "1 1 250px",
+                        border: "2px solid #0D6EFD",
+                        color: "#000000",
                       }}
                     >
-                      <i className="bi bi-collection fs-2 text-white"></i>
+                      <div
+                        className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          backgroundColor: "#0D6EFD",
+                        }}
+                      >
+                        <i className={`bi ${card.icon} fs-2 text-white`}></i>
+                      </div>
+                      <h3 className="text-3xl fw-bold mt-3">
+                        {card.value}
+                        <span>+</span>
+                      </h3>
+                      <p className="mt-2 mb-0 text-dark">{card.label}</p>
                     </div>
-                    <h3 className="text-3xl fw-bold mt-3">
-                      15.000<span>+</span>
-                    </h3>
-                    <p className="mt-2 mb-0 text-dark">
-                      Koleksi bersejarah yang tersimpan di museum
-                    </p>
-                  </div>
-
-                  {/* Card 2 */}
-                  <div
-                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
-                    style={{
-                      backgroundColor: "#FFFFFF",
-                      minWidth: "220px",
-                      flex: "1 1 250px",
-                      border: "2px solid #0D6EFD",
-                      color: "#000000",
-                    }}
-                  >
-                    <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        backgroundColor: "#0D6EFD",
-                      }}
-                    >
-                      <i className="bi bi-people-fill fs-2 text-white"></i>
-                    </div>
-                    <h3 className="text-3xl fw-bold mt-3">
-                      120.000<span>+</span>
-                    </h3>
-                    <p className="mt-2 mb-0 text-dark">
-                      Pengunjung setiap tahunnya dari seluruh Indonesia
-                    </p>
-                  </div>
-
-                  {/* Card 3 */}
-                  <div
-                    className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
-                    style={{
-                      backgroundColor: "#FFFFFF",
-                      minWidth: "220px",
-                      flex: "1 1 250px",
-                      border: "2px solid #0D6EFD",
-                      color: "#000000",
-                    }}
-                  >
-                    <div
-                      className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        backgroundColor: "#0D6EFD",
-                      }}
-                    >
-                      <i className="bi bi-award fs-2 text-white"></i>
-                    </div>
-                    <h3 className="text-3xl fw-bold mt-3">
-                      10<span>+</span>
-                    </h3>
-                    <p className="mt-2 mb-0 text-dark">
-                      Penghargaan nasional atas pelestarian budaya
-                    </p>
-                  </div>
+                  ))}
                 </motion.div>
               </div>
             </div>
           </div>
         </section>
 
+        {/* History Section */}
         <section
           className="section-padding"
           id="history"
@@ -422,12 +423,10 @@ export default function RootLayout() {
         >
           <div className="container">
             <div className="row justify-content-center align-items-center">
-              {/* Kolom Gambar Vertikal dengan efek menumpuk */}
               <div
                 className="col-lg-4 col-md-5 col-12 position-relative d-flex justify-content-center mb-4 mb-lg-0"
                 style={{ minHeight: "500px" }}
               >
-                {/* Gambar Pertama (bawah) */}
                 <div
                   className="position-absolute"
                   style={{
@@ -452,7 +451,6 @@ export default function RootLayout() {
                   />
                 </div>
 
-                {/* Gambar Kedua (atas) */}
                 <div
                   className="position-absolute"
                   style={{
@@ -478,11 +476,10 @@ export default function RootLayout() {
                 </div>
               </div>
 
-              {/* Kolom Teks */}
               <div className="col-lg-6 col-md-7 col-12">
                 <h2 className="text-black mb-4">
                   Sejarah Museum
-                  <span className="text-primary"> Ruwai Jurai</span>{" "}
+                  <span className="text-primary"> Ruwai Jurai</span>
                 </h2>
                 <p className="text-black mb-5 text-justify">
                   Lampung memiliki museum yang mengabadikan perjalanan sejarah
@@ -511,12 +508,11 @@ export default function RootLayout() {
                       e.currentTarget.style.color = "white";
                     }}
                     onMouseOut={(e) => {
-                      const button = e.currentTarget;
-                      button.style.backgroundColor = "white";
-                      button.style.color = "#0D6EFD";
-                      button.style.outlineColor = "#0D6EFD";
-                      button.style.outlineStyle = "solid";
-                      button.style.outlineWidth = "1px";
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#0D6EFD";
+                      e.currentTarget.style.outlineColor = "#0D6EFD";
+                      e.currentTarget.style.outlineStyle = "solid";
+                      e.currentTarget.style.outlineWidth = "1px";
                     }}
                   >
                     Pelajari Selengkapnya
@@ -526,6 +522,8 @@ export default function RootLayout() {
             </div>
           </div>
         </section>
+
+        {/* Venues Section */}
         <section
           className="artists-section section-padding"
           id="venues"
@@ -533,7 +531,6 @@ export default function RootLayout() {
         >
           <div className="container">
             <div className="row">
-              {/* Header Koleksi di sebelah kiri */}
               <div className="col-md-3 mb-4">
                 <h2 className="mb-1">Koleksi Museum Lampung</h2>
                 <p className="text-black mb-0">
@@ -541,9 +538,7 @@ export default function RootLayout() {
                   &rdquo;Ruwa Jurai&ldquo;
                 </p>
 
-                {/* Explore Button and Navigation Controls */}
                 <div className="d-flex justify-content-between align-items-center mt-4">
-                  {/* Explore Button */}
                   <Link
                     href="/venues"
                     style={{
@@ -561,12 +556,11 @@ export default function RootLayout() {
                       e.currentTarget.style.color = "white";
                     }}
                     onMouseOut={(e) => {
-                      const button = e.currentTarget;
-                      button.style.backgroundColor = "white";
-                      button.style.color = "#0D6EFD";
-                      button.style.outlineColor = "#0D6EFD";
-                      button.style.outlineStyle = "solid";
-                      button.style.outlineWidth = "1px";
+                      e.currentTarget.style.backgroundColor = "white";
+                      e.currentTarget.style.color = "#0D6EFD";
+                      e.currentTarget.style.outlineColor = "#0D6EFD";
+                      e.currentTarget.style.outlineStyle = "solid";
+                      e.currentTarget.style.outlineWidth = "1px";
                     }}
                   >
                     <span>Koleksi Lainnya</span>
@@ -584,13 +578,11 @@ export default function RootLayout() {
                 </div>
               </div>
 
-              {/* Konten Card dengan navigasi */}
               <div className="col-md-9 position-relative">
                 <div
                   className="position-relative"
                   style={{ padding: "10px 0" }}
                 >
-                  {/* Navigation buttons - Positioned absolutely below the first card */}
                   <div
                     className="d-flex gap-2 mb-3"
                     style={{
@@ -607,11 +599,7 @@ export default function RootLayout() {
                         height: "40px",
                         transition: "all 0.3s ease",
                       }}
-                      onClick={() => {
-                        const container =
-                          document.querySelector(".scroll-container");
-                        container.scrollBy({ left: -300, behavior: "smooth" });
-                      }}
+                      onClick={scrollLeft}
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.transform = "scale(1.1)")
                       }
@@ -619,16 +607,7 @@ export default function RootLayout() {
                         (e.currentTarget.style.transform = "scale(1)")
                       }
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M15 18l-6-6 6-6" />
-                      </svg>
+                      <FiChevronLeft />
                     </button>
                     <button
                       className="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
@@ -637,11 +616,7 @@ export default function RootLayout() {
                         height: "40px",
                         transition: "all 0.3s ease",
                       }}
-                      onClick={() => {
-                        const container =
-                          document.querySelector(".scroll-container");
-                        container.scrollBy({ left: 300, behavior: "smooth" });
-                      }}
+                      onClick={scrollRight}
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.transform = "scale(1.1)")
                       }
@@ -649,20 +624,10 @@ export default function RootLayout() {
                         (e.currentTarget.style.transform = "scale(1)")
                       }
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M9 18l6-6-6-6" />
-                      </svg>
+                      <FiChevronRight />
                     </button>
                   </div>
 
-                  {/* Scrollable Container */}
                   <div
                     className="scroll-container d-flex hide-scrollbar"
                     style={{
@@ -691,7 +656,6 @@ export default function RootLayout() {
                             }}
                           >
                             <div className="artists-thumb custom-card h-100 shadow-sm rounded-1 overflow-hidden position-relative">
-                              {/* Gambar dan Nama */}
                               <div className="image-container position-relative">
                                 {venue.photo ? (
                                   <Image
@@ -729,10 +693,9 @@ export default function RootLayout() {
                                 <div className="venue-name">{venue.name}</div>
                               </div>
 
-                              {/* Hover Content */}
                               <div className="hover-content">
                                 <h3>{venue.name}</h3>
-                                <p className=" text-dark">
+                                <p className="text-dark">
                                   {venue.description.length > 500
                                     ? `${venue.description.slice(0, 500)}...`
                                     : venue.description}
@@ -767,7 +730,6 @@ export default function RootLayout() {
           style={{ padding: "40px 0" }}
         >
           <div className="container">
-            {/* Title + Arrow Buttons */}
             <div className="row mb-4">
               <div className="col-12 text-center">
                 <h2 className="mb-2" style={{ color: "#333" }}>
@@ -779,9 +741,7 @@ export default function RootLayout() {
               </div>
             </div>
 
-            {/* Review Content with Navigation */}
             <div className="position-relative">
-              {/* Reviews Container */}
               <div
                 ref={containerRef}
                 className="d-flex overflow-auto hide-scrollbar"
@@ -803,7 +763,7 @@ export default function RootLayout() {
                         flex: "0 0 auto",
                         scrollSnapAlign: "start",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        transition: "transform 0.3s ease, 0.3s ease",
+                        transition: "transform 0.3s ease",
                         cursor: "default",
                       }}
                       onMouseEnter={(e) => {
@@ -813,9 +773,7 @@ export default function RootLayout() {
                         e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
-                      {/* User Profile Section */}
                       <div className="d-flex align-items-center mb-3">
-                        {/* Profile Picture with Fallback */}
                         <div
                           className="rounded-circle overflow-hidden me-3"
                           style={{
@@ -855,7 +813,6 @@ export default function RootLayout() {
                           )}
                         </div>
 
-                        {/* User Info */}
                         <div>
                           <h4
                             className="fw-bold mb-0"
@@ -879,7 +836,6 @@ export default function RootLayout() {
                         </div>
                       </div>
 
-                      {/* Rating Stars */}
                       <div
                         className="mb-3"
                         style={{ fontSize: "1.25rem", color: "#ffc107" }}
@@ -895,7 +851,6 @@ export default function RootLayout() {
                         ))}
                       </div>
 
-                      {/* Review Comment */}
                       <p
                         className="mb-0 flex-grow-1"
                         style={{
@@ -920,23 +875,24 @@ export default function RootLayout() {
           </div>
         </section>
 
+        {/* Gallery Section */}
         <section
           className="section-padding"
           id="ourgallery"
           style={{ padding: "40px 0" }}
         >
-          <div className="container-fluid ">
+          <div className="container">
             <div className="row mb-4">
               <div className="col-12 text-center">
                 <h2 className="mb-2" style={{ color: "#333" }}>
-                  Our Gallery
+                  Galeri Kami
                 </h2>
               </div>
             </div>
             <div className="row g-3">
               {gallery.length > 0 ? (
                 gallery.map((item, index) => (
-                  <div key={index} className="col-lg-3 col-md-6 ps-5">
+                  <div key={index} className="col-lg-3 col-md-6">
                     <motion.div
                       whileHover={{ scale: 1.03 }}
                       className="position-relative rounded overflow-hidden shadow-sm gallery-card mx-2"
@@ -948,7 +904,7 @@ export default function RootLayout() {
                         src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.imageUrl}`}
                         alt={`Gallery ${index + 1}`}
                         className="w-100 h-100 object-fit-cover"
-                        style={{ height: "300px" }}
+                        style={{ height: "100px" }}
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = "/assets/images/No-image.png";
@@ -969,206 +925,179 @@ export default function RootLayout() {
         </section>
 
         <Footer />
+
+        <style jsx global>{`
+          @keyframes pulse {
+            0% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+            100% {
+              opacity: 1;
+            }
+          }
+          @keyframes marquee {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-33.33%);
+            }
+          }
+          @keyframes bounce {
+            0%,
+            100% {
+              transform: translateY(0);
+            }
+            50% {
+              transform: translateY(-5px);
+            }
+          }
+          @keyframes pulse {
+            0% {
+              opacity: 0.6;
+              transform: scale(0.9);
+            }
+            50% {
+              opacity: 1;
+              transform: scale(1.1);
+            }
+            100% {
+              opacity: 0.6;
+              transform: scale(0.9);
+            }
+          }
+          @keyframes borderFlow {
+            0% {
+              transform: translateX(-100%);
+            }
+            100% {
+              transform: translateX(100%);
+            }
+          }
+
+          .hide-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+
+          .hover-card:hover {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+            cursor: pointer;
+          }
+
+          .hover-card:hover h3,
+          .hover-card:hover p {
+            color: #ffffff !important;
+          }
+
+          .hover-card:hover .hover-icon {
+            background-color: #ffffff !important;
+          }
+
+          .hover-card:hover .hover-icon i {
+            color: #0d6efd !important;
+          }
+
+          .text-justify {
+            text-align: justify;
+          }
+
+          .custom-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            transition: all 0.3s ease;
+            height: 100%;
+          }
+
+          .image-container {
+            position: relative;
+            transition: transform 0.4s ease;
+          }
+
+          .main-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+          }
+
+          .venue-name {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.4s ease;
+          }
+
+          .hover-content {
+            padding: 16px;
+            position: absolute;
+            bottom: -100%;
+            width: 100%;
+            height: 100%;
+            background: white;
+            transition: bottom 0.4s ease;
+            z-index: 2;
+          }
+
+          .custom-card:hover .image-container {
+            transform: translateY(-40%);
+          }
+
+          .custom-card:hover .hover-content {
+            bottom: 0;
+          }
+
+          .read-more-btn {
+            background: #0d6efd;
+            color: white;
+            padding: 3px 6px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            cursor: pointer;
+          }
+
+          @media (max-width: 768px) {
+            .overflow-hidden,
+            .container-fluid {
+              padding: 0 25px !important;
+            }
+            .hero-section {
+              margin: 0 -25px !important;
+            }
+          }
+
+          @media (max-width: 576px) {
+            .overflow-hidden,
+            .container-fluid {
+              padding: 0 15px !important;
+            }
+            .hero-section {
+              margin: 0 -15px !important;
+            }
+          }
+        `}</style>
       </div>
-
-      <style jsx global>{`
-        :root {
-          --primary-color: #714d29;
-          --secondary-color: #f8f9fa;
-        }
-
-        .hero-section {
-          position: relative;
-          height: 100vh;
-          overflow: hidden;
-        }
-        .hide-scrollbar {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE/Edge */
-        }
-
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari */
-        }
-
-        .venue-card {
-          background: white;
-          border-radius: 15px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          transition: transform 0.3s ease;
-        }
-
-        .hover-card:hover {
-          background-color: #0d6efd !important;
-          color: #ffffff !important;
-          cursor: pointer;
-        }
-        .hover-card:hover h3,
-        .hover-card:hover p {
-          color: #ffffff !important;
-        }
-        .hover-card:hover .hover-icon {
-          background-color: #ffffff !important;
-        }
-        .hover-card:hover .hover-icon i {
-          color: #0d6efd !important;
-        }
-
-        .review-card {
-          background: white;
-          padding: 2rem;
-          border-radius: 15px;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .gallery-item {
-          position: relative;
-          overflow: hidden;
-          cursor: pointer;
-        }
-
-        .gallery-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(113, 77, 41, 0.8);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .gallery-item:hover .gallery-overlay {
-          opacity: 1;
-        }
-        .text-justify {
-          text-align: justify;
-        }
-        .scroll-container {
-          display: flex;
-          gap: 2rem;
-          padding: 2rem 0;
-          overflow-x: auto;
-          scroll-behavior: smooth;
-        }
-
-        .scroll-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background: white;
-          border: none;
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .scroll-arrow:hover {
-          background: var(--primary-color);
-          color: white;
-          transform: translateY(-50%) scale(1.1);
-        }
-        .text-brown {
-        }
-        .custom-card {
-          position: relative;
-          overflow: hidden;
-          border-radius: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          background: #fff;
-          transition: all 0.3s ease;
-          height: 100%;
-        }
-
-        .image-container {
-          position: relative;
-          transition: transform 0.4s ease;
-        }
-
-        .main-image {
-          width: 100%;
-          height: 250px;
-          object-fit: cover;
-          display: block;
-          transition: transform 0.4s ease;
-        }
-
-        .venue-name {
-          background: rgba(0, 0, 0, 0.6);
-          color: white;
-          padding: 8px 12px;
-          font-weight: bold;
-          font-size: 1rem;
-          position: absolute;
-          bottom: 0;
-          width: 100%;
-          text-align: center;
-          transition: transform 0.4s ease;
-        }
-
-        .hover-content {
-          padding: 16px;
-          position: absolute;
-          bottom: -100%;
-          width: 100%;
-          height: 100%;
-          background: white;
-          transition: bottom 0.4s ease;
-          z-index: 2;
-        }
-
-        .custom-card:hover .image-container {
-          transform: translateY(-40%);
-        }
-
-        .custom-card:hover .hover-content {
-          bottom: 0;
-        }
-
-        .read-more-btn {
-          background: #0d6efd;
-          color: white;
-          padding: 3px 6px;
-          border: none;
-          border-radius: 50px;
-          font-weight: 500;
-          font-size: 0.85rem;
-          margin-top: 10px;
-          cursor: pointer;
-        }
-        @media (max-width: 768px) {
-          .overflow-hidden {
-            padding: 0 25px !important;
-          }
-          .container-fluid {
-            padding: 0 25px !important;
-          }
-          .hero-section {
-            margin: 0 -25px !important;
-          }
-        }
-        .text-white {
-          color: rgba(255, 255, 255, 255);
-        }
-
-        @media (max-width: 576px) {
-          .overflow-hidden {
-            padding: 0 15px !important;
-          }
-          .container-fluid {
-            padding: 0 15px !important;
-          }
-          .hero-section {
-            margin: 0 -15px !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

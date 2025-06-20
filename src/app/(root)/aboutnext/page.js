@@ -64,7 +64,6 @@ export default function Aboutnext() {
           transition={{ duration: 0.8 }}
         >
           <h1 className="fw-bold display-4 mb-3">Destinasi Info </h1>
-          <div className="divider mx-auto"></div>
         </motion.div>
        
       </section>

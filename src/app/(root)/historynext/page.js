@@ -37,7 +37,7 @@ export default function Historynext() {
   
 
   return (
-    <div className="bg-light">
+    <div className="bg-white">
       {/* Hero Section - Simplified */}
       <section
         ref={heroRef}
@@ -55,25 +55,19 @@ export default function Historynext() {
           className="container text-center text-white px-3"
           style={{ zIndex: 2 }}
         >
-          <h1 className="display-4 fw-bold mb-3" data-aos="fade-down">
+          <h1 className="display-4 fw-bold mb-3">
             Sejarah Museum Lampung
           </h1>
-          <div
-            className="mb-4 mx-auto bg-white"
-            style={{ width: "80px", height: "4px", borderRadius: "2px" }}
-            data-aos="fade-down"
-            data-aos-delay="200"
-          ></div>
         </div>
       </section>
 
       {/* History Section - Clean Layout */}
-      <section className="py-5 bg-light">
+      <section className="py-5 bg-white">
         <div className="container">
           <div className="row g-4 justify-content-center">
             {/* Main Content */}
             <div className="col-lg-8">
-              <div className="card border-0 shadow-sm overflow-hidden">
+              <div className=" overflow-hidden">
                 {/* Museum Image */}
                 <div className="position-relative">
                   <Image
@@ -84,16 +78,11 @@ export default function Historynext() {
                     className="img-fluid w-100"
                     style={{ height: "400px", objectFit: "cover" }}
                   />
-                  <div className="position-absolute bottom-0 start-0 w-100 p-4 bg-dark bg-opacity-50">
-                    <h3 className="text-white mb-0">
-                      Museum Negeri Provinsi Lampung Ruwa Jurai
-                    </h3>
-                  </div>
                 </div>
 
                 {/* Content */}
-                <div className="card-body p-4 p-md-5">
-                  <p className="lead text-muted mb-4" data-aos="fade-up">
+                <div className="p-4">
+                  <p className="lead text-muted mb-4 text-justify" >
                     Museum Lampung atau Museum Negeri Provinsi Lampung Ruwa
                     Jurai mulai dibangun tahun 1975, diresmikan pada 24
                     September 1988. Merupakan museum pertama dan terbesar di
@@ -104,7 +93,7 @@ export default function Historynext() {
                   {/* Philosophy Highlight */}
                   <div
                     className="bg-primary bg-opacity-10 p-4 rounded-3 my-4"
-                    data-aos="fade-up"
+                    
                   >
                     <h4 className="h5 fw-bold mb-2">
                       Filosofi Nama Ruwa Jurai
@@ -118,7 +107,7 @@ export default function Historynext() {
                   </div>
 
                   {/* Collections */}
-                  <div data-aos="fade-up">
+                  <div >
                     <h4 className="h5 fw-bold mt-4 mb-3">Koleksi Unggulan</h4>
                     <p>
                       Museum menyimpan sekitar 4.735 koleksi dalam 10 kategori:
@@ -156,9 +145,9 @@ export default function Historynext() {
                   </div>
 
                   {/* Culture Comparison */}
-                  <div className="mt-5" data-aos="fade-up">
-                    <h4 className="h5 fw-bold mb-3">Budaya & Tradisi</h4>
-                    <div className="row g-3">
+                  <div className="mt-5" >
+                    <h4 className="h5 fw-bold mb-3 ">Budaya & Tradisi</h4>
+                    <div className="row g-3 bordeer-2">
                       {[
                         {
                           title: "Saibatin (Peminggir)",
@@ -209,7 +198,7 @@ export default function Historynext() {
                   {/* CTA */}
                   <div
                     className="mt-5 p-3 rounded-3 bg-primary text-white"
-                    data-aos="fade-up"
+                    
                   >
                     <div className="row align-items-center">
                       <div className="col-md-8">
@@ -235,10 +224,10 @@ export default function Historynext() {
 
             {/* Sidebar */}
             <div className="col-lg-4">
-              <div className="sticky-top" style={{ top: "20px" }}>
+              <div className="sticky" style={{ top: "5px" }}>
                 {/* Timeline */}
                 <div
-                  className="card border-0 shadow-sm mb-4"
+                  className="card border-2 shadow-sm mb-4"
                   data-aos="fade-left"
                 >
                   <div className="card-header bg-primary text-white py-2">
@@ -286,7 +275,7 @@ export default function Historynext() {
                         <div
                           key={idx}
                           className="timeline-item mb-3"
-                          data-aos="fade-up"
+                          
                           data-aos-delay={idx * 50}
                         >
                           <div className="d-flex">
@@ -322,7 +311,7 @@ export default function Historynext() {
 
                 {/* Map */}
                 <div
-                  className="card border-0 shadow-sm"
+                  className="card border-2 "
                   data-aos="fade-left"
                   data-aos-delay="100"
                 >
