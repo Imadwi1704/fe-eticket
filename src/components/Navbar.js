@@ -8,24 +8,17 @@ import page from "@/config/page";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [fullName, setFullName] = useState("");
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const navRef = useRef(null);
+  const profileMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null);
   const pathname = usePathname();
   const [isSticky, setIsSticky] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 0);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+  // Navigation items
   const navItems = [
     { name: "Beranda", path: "/" },
     { name: "Destination Info", path: "/aboutnext" },
@@ -35,41 +28,63 @@ export default function Navbar() {
     { name: "Review & Contact", path: "/contacts" },
   ];
 
+  // Sticky header effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Click outside handler for profile menu and mobile menu
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (navRef.current && !navRef.current.contains(e.target)) {
+      // Close profile menu if clicked outside
+      if (
+        profileMenuRef.current && 
+        !profileMenuRef.current.contains(e.target) &&
+        navRef.current && 
+        !navRef.current.contains(e.target)
+      ) {
         setShowProfileMenu(false);
       }
+      
+      // Close mobile menu if clicked outside
+      if (
+        isOpen && 
+        mobileMenuRef.current && 
+        !mobileMenuRef.current.contains(e.target) &&
+        !navRef.current?.contains(e.target)
+      ) {
+        setIsOpen(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  const getFirstName = (fullName) => {
-    if (!fullName) return "";
-    return fullName.split(" ")[0];
+    document.addEventListener("touchstart", handleClickOutside);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Get first name from profile
+  const getFirstName = () => {
+    if (!profile?.fullName) return "Profile";
+    return profile.fullName.split(" ")[0];
   };
 
+  // Fetch user profile
   useEffect(() => {
-    const shouldOpenLogin = localStorage.getItem("openLoginModal");
-    if (shouldOpenLogin === "true") {
-      window.dispatchEvent(new CustomEvent("openLoginModal"));
-      localStorage.removeItem("openLoginModal");
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleOpenLogin = () => setShowLogin(true);
-    window.addEventListener("openLoginModal", handleOpenLogin);
-    return () => window.removeEventListener("openLoginModal", handleOpenLogin);
-  }, []);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchProfile = async () => {
       const token = getCookie("token");
       if (token) {
         try {
           const response = await fetch(
-            page.baseUrl+"/api/users/profile",
+            `${page.baseUrl}/api/users/profile`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -80,13 +95,10 @@ export default function Navbar() {
           if (response.ok) {
             const userData = await response.json();
             setIsLoggedIn(true);
-            // Safely handle fullName with fallback
-            const userName = userData.fullName || userData.name;
-            setFullName(userName);
-            setCookie("fullName", userName, { path: "/" });
+            setProfile(userData);
+            setCookie("fullName", userData.fullName, { path: "/" });
           } else {
             console.error("Failed to fetch user data");
-            // Clear invalid token
             deleteCookie("token");
           }
         } catch (error) {
@@ -95,16 +107,16 @@ export default function Navbar() {
       }
     };
 
-    fetchUserData();
+    fetchProfile();
   }, []);
 
+  // Handle logout
   const handleLogout = async () => {
     setLoading(true);
     try {
       const token = getCookie("token");
       if (token) {
-        // Panggil API logout jika diperlukan
-        await fetch(page.baseUrl+"/api/auth/logout", {
+        await fetch(`${page.baseUrl}/api/auth/logout`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -112,14 +124,13 @@ export default function Navbar() {
         });
       }
 
-      // Hapus semua cookies dan state
       deleteCookie("token");
       deleteCookie("fullName");
       setIsLoggedIn(false);
-      setFullName("");
+      setProfile(null);
       setShowProfileMenu(false);
+      setIsOpen(false);
 
-      // Redirect ke halaman home setelah logout
       window.location.href = "/";
     } catch (error) {
       console.error("Logout error:", error);
@@ -128,47 +139,53 @@ export default function Navbar() {
     }
   };
 
+  // Render profile dropdown menu
   const renderProfileMenu = () => {
     if (!showProfileMenu) return null;
+    
     return (
-      <ul
-        className="dropdown-menu dropdown-menu-end show position-absolute bg-white shadow rounded"
-        style={{ right: 0, top: "100%" }}
-        aria-labelledby="profileDropdown"
+      <div
+        ref={profileMenuRef}
+        className={`dropdown-menu ${isOpen ? 'position-static d-block' : 'position-absolute'} bg-white shadow rounded mt-2`}
+        style={{
+          right: 0,
+          minWidth: '200px',
+          zIndex: 1000,
+        }}
       >
-        <li>
-          <Link
-            href="/profile"
-            className="dropdown-item"
-            onClick={() => setShowProfileMenu(false)}
-          >
-            Profile Saya
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/orders"
-            className="dropdown-item"
-            onClick={() => setShowProfileMenu(false)}
-          >
-            History Pemesanan
-          </Link>
-        </li>
-        <li>
-          <hr className="dropdown-divider" />
-        </li>
-        <li>
-          <button
-            className="dropdown-item text-danger"
-            onClick={() => {
-              handleLogout();
-              setShowProfileMenu(false);
-            }}
-          >
-            Logout
-          </button>
-        </li>
-      </ul>
+        <Link
+          href="/profile"
+          className="dropdown-item py-2 px-3"
+          onClick={() => {
+            setShowProfileMenu(false);
+            setIsOpen(false);
+          }}
+        >
+          Profile Saya
+        </Link>
+        <Link
+          href="/orders"
+          className="dropdown-item py-2 px-3"
+          onClick={() => {
+            setShowProfileMenu(false);
+            setIsOpen(false);
+          }}
+        >
+          History Pemesanan
+        </Link>
+        <div className="dropdown-divider"></div>
+        <button
+          className="dropdown-item py-2 px-3 text-danger"
+          onClick={() => {
+            handleLogout();
+            setShowProfileMenu(false);
+            setIsOpen(false);
+          }}
+          disabled={loading}
+        >
+          {loading ? "Logging out..." : "Logout"}
+        </button>
+      </div>
     );
   };
 
@@ -179,38 +196,47 @@ export default function Navbar() {
       }`}
       style={{ transition: "all 0.3s ease" }}
     >
-      <div className="container d-flex justify-content-between align-items-center px-1">
+      <div className="container d-flex justify-content-between align-items-center px-3 px-lg-1">
+        {/* Brand logo */}
         <Link href="/" className="navbar-brand fw-bold fs-5">
           <span className={isSticky ? "text-dark" : "text-white"}>
-            Ruwa Jurai
+            RuwaJurai
           </span>
         </Link>
 
-        {/* Mobile */}
+        {/* Mobile controls */}
         <div className="d-lg-none d-flex align-items-center gap-2">
           {!isLoggedIn ? (
             <>
-              <Link href="/register" className="btn btn-light btn-sm">
+              <Link 
+                href="/register" 
+                className={`btn btn-sm ${isSticky ? 'btn-outline-dark' : 'btn-outline-light'}`}
+              >
                 Daftar
               </Link>
-              <Link href="/login" className="btn btn-light btn-sm">
+              <Link 
+                href="/login" 
+                className={`btn btn-sm ${isSticky ? 'btn-dark' : 'btn-light'}`}
+              >
                 Login
               </Link>
             </>
           ) : (
             <div className="position-relative" ref={navRef}>
               <button
-                className="btn btn-light btn-sm"
+                className={`btn btn-sm d-flex align-items-center ${isSticky ? 'btn-outline-dark' : 'btn-outline-light'}`}
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
-                <i className="bi bi-person-circle me-2"></i>
-                {getFirstName()} {/* Use safe function here */}
+                <i className="bi bi-person-circle me-1"></i>
+                <span className="d-none d-sm-inline">
+                  {getFirstName()}
+                </span>
               </button>
               {renderProfileMenu()}
             </div>
           )}
           <button
-            className="btn btn-sm"
+            className="btn btn-sm border-0"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation"
             style={{ fontSize: "1.3rem", color: isSticky ? "#000" : "#fff" }}
@@ -219,8 +245,8 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Desktop */}
-        <nav className="d-none d-lg-flex align-items-center gap-1 py-1 px-1 small">
+        {/* Desktop navigation */}
+        <nav className="d-none d-lg-flex align-items-center gap-3 py-1 px-1 small">
           <ul className="navbar-nav d-flex flex-row gap-3 mb-0 small">
             {navItems.map((item, idx) => (
               <li className="nav-item position-relative" key={idx}>
@@ -228,7 +254,7 @@ export default function Navbar() {
                   href={item.path}
                   className={`nav-link px-1 py-2 ${
                     isSticky ? "text-dark" : "text-white"
-                  }`}
+                  } ${pathname === item.path ? 'active' : ''}`}
                 >
                   {item.name}
                   {pathname === item.path && (
@@ -237,8 +263,6 @@ export default function Navbar() {
                       style={{
                         height: "3px",
                         borderRadius: "3px 3px 0 0",
-                        transform: "scaleX(1)",
-                        transition: "transform 0.3s ease",
                       }}
                     />
                   )}
@@ -251,7 +275,7 @@ export default function Navbar() {
               <Link
                 href="/register"
                 className={`btn btn-sm rounded-pill ${
-                  isSticky ? "btn-outline-dark" : "btn-light"
+                  isSticky ? "btn-outline-dark" : "btn-outline-light"
                 }`}
               >
                 Daftar
@@ -268,7 +292,7 @@ export default function Navbar() {
           ) : (
             <div className="position-relative" ref={navRef}>
               <button
-                className="btn d-flex align-items-center gap-2"
+                className="btn d-flex align-items-center gap-2 border-0 bg-transparent p-0"
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
               >
                 <span className={isSticky ? "text-dark" : "text-white"}>
@@ -278,10 +302,6 @@ export default function Navbar() {
                   className={`bi bi-person-circle fs-4 ${
                     isSticky ? "text-dark" : "text-white"
                   }`}
-                  style={{
-                    borderRadius: "50%",
-                    padding: "8px",
-                  }}
                 ></i>
               </button>
               {renderProfileMenu()}
@@ -292,19 +312,78 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="bg-primary d-lg-none py-3 px-4">
-          <ul className="navbar-nav d-flex flex-column gap-1 small">
+        <div 
+          ref={mobileMenuRef}
+          className={`d-lg-none py-3 px-4 ${isSticky ? 'bg-white' : 'bg-primary'}`}
+          style={{ 
+            zIndex: 999,
+            position: 'absolute',
+            width: '100%',
+            top: '100%',
+            left: 0
+          }}
+        >
+          <ul className="navbar-nav d-flex flex-column gap-2 small">
             {navItems.map((item, idx) => (
               <li key={idx} className="nav-item">
                 <Link
                   href={item.path}
-                  className="nav-link text-white px-2"
+                  className={`nav-link px-2 py-1 ${isSticky ? 'text-dark' : 'text-white'} ${
+                    pathname === item.path ? 'fw-bold' : ''
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
                 </Link>
               </li>
             ))}
+            {isLoggedIn && (
+              <>
+                <li className="nav-item">
+                  <Link
+                    href="/profile"
+                    className={`nav-link px-2 py-1 ${isSticky ? 'text-dark' : 'text-white'} ${
+                      pathname === '/profile' ? 'fw-bold' : ''
+                    }`}
+                    onClick={() => {
+                      setIsOpen(false);
+                      setShowProfileMenu(false);
+                    }}
+                  >
+                    Profile Saya
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    href="/orders"
+                    className={`nav-link px-2 py-1 ${isSticky ? 'text-dark' : 'text-white'} ${
+                      pathname === '/orders' ? 'fw-bold' : ''
+                    }`}
+                    onClick={() => {
+                      setIsOpen(false);
+                      setShowProfileMenu(false);
+                    }}
+                  >
+                    History Pemesanan
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className={`nav-link px-2 py-1 w-100 text-start bg-transparent border-0 ${
+                      isSticky ? 'text-dark' : 'text-white'
+                    }`}
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                      setShowProfileMenu(false);
+                    }}
+                    disabled={loading}
+                  >
+                    {loading ? "Logging out..." : "Logout"}
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       )}

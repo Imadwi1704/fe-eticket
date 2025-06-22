@@ -125,7 +125,7 @@ export default function CollectionDetail() {
       {/* Hero Section */}
       <div
         className="position-relative w-100 overflow-hidden"
-        style={{ height: "300px" }}
+        style={{ height: "200px" }}
       >
         <Image
           src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${venue.photo}`}

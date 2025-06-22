@@ -20,14 +20,14 @@ export default function RootLayout() {
   const containerRef = useRef(null);
   const getRandomColor = () => {
     const colors = [
-      "#3498db", 
-      "#e74c3c", 
-      "#2ecc71", 
-      "#f39c12", 
-      "#9b59b6", 
-      "#1abc9c", 
-      "#d35400", 
-      "#27ae60", 
+      "#3498db",
+      "#e74c3c",
+      "#2ecc71",
+      "#f39c12",
+      "#9b59b6",
+      "#1abc9c",
+      "#d35400",
+      "#27ae60",
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
@@ -369,9 +369,9 @@ export default function RootLayout() {
                 </motion.div>
               </div>
 
-              <div className="col-10">
+              <div className="col-lg-10">
                 <motion.div
-                  className="d-flex justify-content-center flex-wrap gap-4"
+                  className="d-flex justify-content-center flex-wrap gap-5"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
@@ -381,45 +381,46 @@ export default function RootLayout() {
                     {
                       icon: "bi-collection",
                       value: "15Rb",
-                      label: "Koleksi bersejarah",
+                      label: "Koleksi bersejarah yang tersimpan di Museum Lampung",
                     },
                     {
                       icon: "bi-people-fill",
                       value: "120Rb",
-                      label: "Pengunjung/tahun",
+                      label: "Banyak pengunjung/tahun yang mengunjungi Museum Lampung",
                     },
                     {
                       icon: "bi-award",
                       value: "10",
-                      label: "Penghargaan nasional",
+                      label: "Penghargaan nasional yang diraih Museum Lampung",
                     },
                   ].map((card, index) => (
                     <div
                       key={index}
-                      className="rounded-4 p-3 text-center shadow-sm transition-all duration-300 hover-card"
+                      className="rounded-4 p-2 p-md-3 text-center shadow-sm transition-all duration-300 hover-card"
                       style={{
                         backgroundColor: "#FFFFFF",
-                        minWidth: "50px",
-                        flex: "1 1 50px",
                         border: "2px solid #0D6EFD",
                         color: "#000000",
+                        width: "100%", // Make it responsive
+                        maxWidth: "200px", // Limit maximum size
+                        margin: "1", // Center the card
                       }}
                     >
                       <div
                         className="d-flex align-items-center justify-content-center mx-auto rounded-circle transition-all duration-300 hover-icon"
                         style={{
-                          width: "60px",
-                          height: "60px",
+                          width: "50px",
+                          height: "50px",
                           backgroundColor: "#0D6EFD",
                         }}
                       >
-                        <i className={`bi ${card.icon} fs-2 text-white`}></i>
+                        <i className={`bi ${card.icon} fs-4 text-white`}></i>
                       </div>
-                      <h2 className="text-3xl fw-bold mt-3">
+                      <h2 className="fs-5 fs-md-4 fw-bold mt-2 mt-md-3 mb-1">
                         {card.value}
                         <span className="text-primary">+</span>
                       </h2>
-                      <p className="mt-2 mb-0 text-dark">{card.label}</p>
+                      <p className=" text-dark mb-0">{card.label}</p>
                     </div>
                   ))}
                 </motion.div>
@@ -432,7 +433,7 @@ export default function RootLayout() {
         <section
           className="section-padding"
           id="history"
-          style={{ padding: "40px 0" }}
+          style={{ padding: "20px 0" }}
         >
           <div className="container">
             <div className="row justify-content-center align-items-center">
@@ -668,7 +669,7 @@ export default function RootLayout() {
                               minWidth: "250px",
                             }}
                           >
-                            <div className="artists-thumb custom-card h-100 shadow-sm rounded-1 overflow-hidden position-relative">
+                            <div className="artists-thumb custom-card h-100 shadow-sm rounded-2">
                               <div className="image-container position-relative">
                                 {venue.photo ? (
                                   <Image
@@ -709,8 +710,8 @@ export default function RootLayout() {
                               <div className="hover-content">
                                 <h3>{venue.name}</h3>
                                 <p className="text-dark">
-                                  {venue.description.length > 500
-                                    ? `${venue.description.slice(0, 500)}...`
+                                  {venue.description.length > 100
+                                    ? `${venue.description.slice(0, 100)}...`
                                     : venue.description}
                                 </p>
                                 <Link href={`/venues/detail?id=${venue.id}`}>
@@ -1087,8 +1088,9 @@ export default function RootLayout() {
             cursor: pointer;
           }
 
-          .hover-card:hover h3,
-          .hover-card:hover p {
+          .hover-card:hover h2,
+          .hover-card:hover p,
+          .hard-card:hover span {
             color: #ffffff !important;
           }
 
@@ -1139,6 +1141,9 @@ export default function RootLayout() {
             text-align: center;
             transition: transform 0.4s ease;
           }
+            .text-white {
+            color: white !important;
+            }
 
           .hover-content {
             padding: 16px;
