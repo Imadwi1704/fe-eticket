@@ -380,12 +380,12 @@ export default function RootLayout() {
                   {[
                     {
                       icon: "bi-collection",
-                      value: "15.000",
+                      value: "15Rb",
                       label: "Koleksi bersejarah",
                     },
                     {
                       icon: "bi-people-fill",
-                      value: "120.000",
+                      value: "120Rb",
                       label: "Pengunjung/tahun",
                     },
                     {
@@ -415,10 +415,10 @@ export default function RootLayout() {
                       >
                         <i className={`bi ${card.icon} fs-2 text-white`}></i>
                       </div>
-                      <h3 className="text-3xl fw-bold mt-3">
+                      <h2 className="text-3xl fw-bold mt-3">
                         {card.value}
-                        <span>+</span>
-                      </h3>
+                        <span className="text-primary">+</span>
+                      </h2>
                       <p className="mt-2 mb-0 text-dark">{card.label}</p>
                     </div>
                   ))}
