@@ -1,9 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import { useState, useEffect } from "react";
-import Script from "next/script";
-import Footer from "@/components/Footer";
 import { getCookie } from "cookies-next";
 import page from "@/config/page";
 import {
@@ -13,7 +9,10 @@ import {
   FiCalendar,
   FiStar,
   FiSend,
+  FiUser,
+  FiChevronRight,
 } from "react-icons/fi";
+import Footer from "@/components/Footer";
 
 export default function Review() {
   const [review, setReview] = useState({
@@ -21,12 +20,18 @@ export default function Review() {
     comment: "",
     userId: "",
   });
-  const [list, setList] = useState([]);
+  const [reviewsData, setReviewsData] = useState({
+    reviews: [],
+    averageRating: 0,
+    totalReviews: 0
+  });
   const [message, setMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("review"); // "review" or "contact"
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const token = getCookie("token");
 
+  // Get user ID from token if exists
   useEffect(() => {
     if (token) {
       try {
@@ -40,39 +45,62 @@ export default function Review() {
     }
   }, [token]);
 
+  // Fetch reviews on component mount
   useEffect(() => {
-    if (token) {
-      fetchReviews();
-    }
-  }, [token]);
+    fetchReviews();
+  }, []);
 
+  // Fetch reviews from API
   const fetchReviews = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(page.baseUrl + "/api/reviews", {
+      const res = await fetch(`${page.baseUrl}/api/reviews`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
+        cache: "no-store",
       });
 
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const result = await res.json();
-      if (res.ok) {
-        const reviews = Array.isArray(result.data) ? result.data : [];
-        setList(reviews);
+      
+      if (result.success && result.data) {
+        setReviewsData({
+          reviews: result.data.reviews || [],
+          averageRating: result.data.averageRating || 0,
+          totalReviews: result.data.totalReviews || 0
+        });
       } else {
-        console.error("Gagal fetch review:", result.message);
+        throw new Error(result.message || "Invalid data format received");
       }
     } catch (err) {
-      console.error("Error fetchReviews:", err);
+      console.error("Error fetching reviews:", err);
+      setError("Gagal memuat ulasan. Silakan coba lagi nanti.");
+      setReviewsData({
+        reviews: [],
+        averageRating: 0,
+        totalReviews: 0
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Handle form input changes
   const handleChange = (e) => {
     setReview((old) => ({ ...old, [e.target.name]: e.target.value }));
   };
 
+  // Submit review to server
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!token) {
       alert("Anda harus login terlebih dahulu.");
       return;
@@ -87,7 +115,7 @@ export default function Review() {
     try {
       const payload = { ...review, score };
 
-      const res = await fetch(page.baseUrl + "/api/reviews/create", {
+      const res = await fetch(`${page.baseUrl}/api/reviews/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,28 +124,29 @@ export default function Review() {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
-      if (res.ok) {
-        setMessage("Terima kasih telah memberikan penilaian!");
-        setReview({ score: "", comment: "", userId: review.userId });
-        setShowModal(true);
-        fetchReviews();
-      } else {
-        alert(result.message || "Gagal menyimpan review");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Gagal menyimpan review");
       }
+
+      setMessage("Terima kasih telah memberikan penilaian!");
+      setReview({ score: "", comment: "", userId: review.userId });
+      setShowModal(true);
+      fetchReviews(); // Refresh reviews after submission
     } catch (error) {
-      console.error("Error saat menyimpan review:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      console.error("Error submitting review:", error);
+      alert(error.message || "Terjadi kesalahan saat menyimpan data.");
     }
   };
 
+  // Render star rating component
   const renderStars = (score) => {
     return (
-      <div className="d-flex">
+      <div className="d-flex gap-1">
         {[...Array(5)].map((_, i) => (
           <FiStar
             key={i}
-            className={i < score ? "text-warning" : "text-muted"}
+            className={i < score ? "text-warning" : "text-secondary"}
             fill={i < score ? "#ffc107" : "transparent"}
           />
         ))}
@@ -125,215 +154,250 @@ export default function Review() {
     );
   };
 
+  // Museum information data
+  const museumInfo = [
+    {
+      icon: <FiClock className="text-primary" />,
+      label: "Jam Operasional",
+      value: "Selasa-Minggu: 08.00-16.00",
+    },
+    {
+      icon: <FiMapPin className="text-primary" />,
+      label: "Lokasi",
+      value: "Jl. Z.A. Pagar Alam No.64, Bandar Lampung",
+    },
+    {
+      icon: <FiPhone className="text-primary" />,
+      label: "Kontak",
+      value: "(0721) 703 621",
+    },
+    {
+      icon: <FiCalendar className="text-primary" />,
+      label: "Didirikan",
+      value: "24 September 1988",
+    },
+  ];
+
   return (
-    <div className="bg-light">
-      {/* Hero Section - Simplified */}
+    <div className="bg-white">
+      {/* Hero Section */}
       <section
-        className="hero-section d-flex align-items-center justify-content-center"
+        className="position-relative d-flex align-items-center justify-content-center"
         style={{
           height: "50vh",
           backgroundImage: "url('/assets/images/our2.jpeg')",
           backgroundSize: "cover",
-          backgroundAttachment: "fixed",
           backgroundPosition: "center",
         }}
       >
-        <div
-          className="position-absolute top-0 start-0 w-100 h-100"
-          style={{
-            background: "linear-gradient(rgb(0 0 0 / 70%), rgb(0 0 0 / 40%))",
-            zIndex: 1,
-          }}
-        ></div>
-        <div className="container text-center text-white px-3">
-          <h1 className="display-5 fw-bold mb-3">
-            Kontak & Ulasan Museum Lampung
-          </h1>
-          <p
-            className="lead mb-0 mx-auto text-white"
-            style={{ maxWidth: "600px" }}
-          >
-            Berikan ulasan Anda dan temukan informasi kontak untuk Museum Negeri
-            Ruwa Jurai
+        <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+        <div className="container position-relative text-center text-white px-4">
+          <h1 className="display-4 fw-bold mb-3">Kontak & Ulasan Museum</h1>
+          <p className="lead mb-0 mx-auto text-white" style={{ maxWidth: "600px" }}>
+            Berikan ulasan Anda dan temukan informasi kontak Museum Negeri Ruwa Jurai
           </p>
         </div>
       </section>
 
-      {/* Review Section - More Compact */}
-      <section className="py-5 bg-light" id="review">
+      {/* Main Content */}
+      <section className="py-5">
         <div className="container">
           <div className="row g-4">
             {/* Museum Info Card */}
-            <div className="col-lg-4">
-              <div className="bg-light">
+            <div className="col-lg-5">
+              <div className=" h-100">
                 <div className="card-body p-4">
-                  <h5 className="text-primary mb-4 fw-semibold text-center">
-                    Informasi Museum
-                  </h5>
-                  {[
-                    {
-                      icon: <FiClock />,
-                      label: "Jam Operasional",
-                      value: "Selasa-Minggu: 08.00-16.00",
-                    },
-                    {
-                      icon: <FiMapPin />,
-                      label: "Lokasi",
-                      value: "Jl. Z.A. Pagar Alam No.64, Bandar Lampung",
-                    },
-                    {
-                      icon: <FiPhone />,
-                      label: "Kontak",
-                      value: "(0721) 703 621",
-                    },
-                    {
-                      icon: <FiCalendar />,
-                      label: "Didirikan",
-                      value: "24 September 1988",
-                    },
-                  ].map((item, i) => (
-                    <div key={i} className="d-flex mb-3">
-                      <div className="me-3 text-primary">{item.icon}</div>
-                      <div>
-                        <div className="text-muted small mb-1">
-                          {item.label}
+                  <h5 className="text-primary mb-4 fw-bold">Informasi Museum</h5>
+                  <div className="list-group list-group">
+                    {museumInfo.map((item, i) => (
+                      <div key={i} className="list-group-item border-0 px-0 py-3">
+                        <div className="d-flex">
+                          <div className="me-3">{item.icon}</div>
+                          <div>
+                            <small className="text-muted">{item.label}</small>
+                            <p className="mb-0 fw-medium">{item.value}</p>
+                          </div>
                         </div>
-                        <div className="fw-normal">{item.value}</div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Review Form */}
-            <div className="col-lg-8">
-              <div
-                className="p-4 rounded-3 border bg-white shadow-sm h-100"
-                style={{
-                  borderColor: "#000", // Warna border Bootstrap abu muda
-                  borderWidth: "5px",
-                  borderStyle: "solid",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)", // Lembut
-                }}
-              >
-                {" "}
-                <h5 className="text-primary fw-semibold mb-4">
-                  Beri Ulasan Anda
-                </h5>
-                <p className="text-center text-muted mb-4">
-                  Kirimkan saran dan masukan Anda setelah berkunjung ke Museum
-                  Lampung.
-                </p>
-                <form
-                  onSubmit={handleSubmit}
-                  className="mx-auto"
-                  style={{ maxWidth: "600px" }}
-                >
-                  <div className="mb-3">
-                    <label className="form-label">Rating (1-5)</label>
-                    <div className="d-flex align-items-center gap-3">
-                      <input
-                        type="number"
-                        name="score"
-                        value={review.score}
-                        onChange={handleChange}
-                        className="form-control w-auto"
-                        min="1"
-                        max="5"
-                        required
-                        style={{ width: "70px" }}
-                      />
-                      <div>{renderStars(parseInt(review.score || 0))}</div>
+            <div className="col-lg-7 ">
+              <div className="card border-0 shadow-sm h-100 ">
+                <div className="card-body p-4 p-md-5">
+                  <div className="text-center mb-4">
+                    <div className="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                      <FiStar size={28} className="text-primary" />
                     </div>
+                    <h3 className="h4 fw-bold">Beri Ulasan Anda</h3>
+                    <p className="text-dark mb-0">
+                      Bagikan pengalaman Anda mengunjungi Museum Lampung
+                    </p>
                   </div>
 
-                  <div className="mb-4">
-                    <label className="form-label">Saran dan Masukan</label>
-                    <textarea
-                      name="comment"
-                      value={review.comment}
-                      onChange={handleChange}
-                      className="form-control"
-                      rows={3}
-                      placeholder="Tulis komentar Anda..."
-                      required
-                    />
-                  </div>
+                  <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: "600px" }}>
+                    <div className="mb-4">
+                      <label className="form-label fw-medium">Rating</label>
+                      <div className="d-flex align-items-center gap-3">
+                        <div className="d-flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              className="btn p-0 me-1"
+                              onClick={() => setReview({ ...review, score: star.toString() })}
+                              aria-label={`Rate ${star} star`}
+                            >
+                              <FiStar
+                                size={28}
+                                className={star <= (review.score || 0) ? "text-warning" : "text-secondary"}
+                                fill={star <= (review.score || 0) ? "#ffc107" : "transparent"}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <span className="text-primary fw-medium">
+                          {review.score ? `${review.score} bintang` : "Pilih rating"}
+                        </span>
+                      </div>
+                    </div>
 
-                  <div className="text-center">
-                    <button type="submit" className="btn btn-primary px-4 rounded-5">
-                      Kirim Ulasan <FiSend className="ms-2" />
-                    </button>
-                  </div>
-                </form>
+                    <div className="mb-4">
+                      <label className="form-label fw-medium">Ulasan Anda</label>
+                      <textarea
+                        name="comment"
+                        value={review.comment}
+                        onChange={handleChange}
+                        className="form-control"
+                        rows={5}
+                        placeholder="Ceritakan pengalaman Anda mengunjungi museum..."
+                        required
+                        style={{ resize: "none" }}
+                      />
+                    </div>
+
+                    <div className="text-center mt-4">
+                      <button
+                        type="submit"
+                        className="btn btn-primary px-4 py-2 fw-medium"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Mengirim...
+                          </>
+                        ) : (
+                          <>
+                            <FiSend className="me-2" />
+                            Kirim Ulasan
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Reviews List */}
-      {activeTab !== "review" && (
-        <section className="py-5 bg-white">
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-lg-10">
-                <div className="p-4">
-                  <h5 className="text-primary fw-bold text-center mb-4">
-                    Ulasan Pengunjung
-                  </h5>
-                  {list.length > 0 ? (
-                    <div className="row g-3">
-                      {list.map((item, i) => (
-                        <div className="col-md-6" key={i}>
-                          <div className="p-3 border-start border-3 border-primary bg-light rounded h-100">
-                            <div className="d-flex justify-content-between">
-                              <h6 className="text-primary mb-1">
-                                {item.user?.name || "Pengunjung"}
-                              </h6>
-                              <small className="text-muted">
-                                {new Date(item.createdAt).toLocaleDateString()}
-                              </small>
-                            </div>
-                            <div className="mb-2">
-                              {renderStars(item.score)}
-                            </div>
-                            <p className="mb-0 text-muted">{item.comment}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4">
-                      <FiStar size={36} className="text-primary mb-3" />
-                      <h6 className="fw-bold mb-2">Belum Ada Ulasan</h6>
-                      <p className="text-muted">
-                        Jadilah yang pertama memberikan ulasan!
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Google Maps - Simplified */}
-      <section className="py-5 bg-light">
+      {/* Reviews List Section */}
+      <section className="py-5 bg-white">
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-lg-0">
-              <div className="card border-0 shadow-sm overflow-hidden">
-                <div className="ratio ratio-16x9">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.292852728222!2d105.23834287498384!3d-5.372234694606639!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e40dab5d8b8ddfb%3A0xb2235987d49dad2f!2sMuseum%20Lampung!5e0!3m2!1sid!2sid!4v1742337921781!5m2!1sid!2sid"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Peta Lokasi Museum Lampung"
-                  />
+            <div className="col-lg-10">
+              <div className="text-center mb-5">
+                <h2 className="fw-bold">Ulasan Pengunjung</h2>
+                <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
+                  <div className="d-flex align-items-center">
+                    {renderStars(reviewsData.averageRating)}
+                    <span className="ms-2 fw-medium">
+                      {reviewsData.averageRating.toFixed(1)} ({reviewsData.totalReviews} ulasan)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="alert alert-danger text-center">
+                  {error}
+                  <button className="btn btn-sm btn-outline-danger ms-3" onClick={fetchReviews}>
+                    Coba Lagi
+                  </button>
+                </div>
+              )}
+
+              {loading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Memuat...</span>
+                  </div>
+                  <p className="mt-2">Memuat ulasan...</p>
+                </div>
+              ) : reviewsData.reviews.length > 0 ? (
+                <div className="row g-4">
+                  {reviewsData.reviews.map((item, i) => (
+                    <div className="col-md-5" key={i}>
+                      <div className="card border-0 shadow-sm h-100">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between mb-3">
+                            <div className="d-flex align-items-center">
+                              <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <FiUser className="text-primary" />
+                              </div>
+                              <h6 className="mb-0 fw-medium">
+                                {item.user?.fullName || "Pengunjung"}
+                              </h6>
+                            </div>
+                            <small className="text-muted">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </small>
+                          </div>
+                          <div className="mb-3">{renderStars(item.score)}</div>
+                          <p className="mb-0" style={{ whiteSpace: "pre-line" }}>{item.comment}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-5">
+                  <div className="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                    <FiStar size={28} className="text-primary" />
+                  </div>
+                  <h4 className="fw-bold mb-2">Belum Ada Ulasan</h4>
+                  <p className="text-muted">
+                    Jadilah yang pertama memberikan ulasan!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-3">
+        <div className="">
+          <div className="row justify-content-center">
+            <div className="col-lg-15">
+              <div className="card ">
+                <div className="card-body p-0">
+                  <div className="ratio ratio-16x9">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.292852728222!2d105.23834287498384!3d-5.372234694606639!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e40dab5d8b8ddfb%3A0xb2235987d49dad2f!2sMuseum%20Lampung!5e0!3m2!1sid!2sid!4v1742337921781!5m2!1sid!2sid"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Peta Lokasi Museum Lampung"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -341,7 +405,7 @@ export default function Review() {
         </div>
       </section>
 
-      {/* Success Modal - Simplified */}
+      {/* Success Modal */}
       {showModal && (
         <div
           className="modal show d-block"
@@ -378,47 +442,26 @@ export default function Review() {
 
       <Footer />
 
-      {/* Global Styles */}
+      {/* Custom Styles */}
       <style jsx global>{`
         .hero-section {
           position: relative;
           overflow: hidden;
         }
-
         .card {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: all 0.3s ease;
+          border-radius: 0.5rem;
         }
-        .form-control:focus {
-          background-color: #fff !important;
-          color: #000 !important;
-          border-color: #86b7fe !important;
-          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-        }
-
         .card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
         }
-
-        .btn-primary {
-          background-color: #0d6efd;
-          border-color: #0d6efd;
-          transition: all 0.2s ease;
-        }
-
-        .btn-primary:hover {
-          background-color: #0b5ed7;
-          transform: translateY(-2px);
-        }
-
         textarea.form-control {
           min-height: 120px;
         }
-
-        @media (max-width: 768px) {
-          .hero-section {
-            height: 50vh;
-          }
+        .modal-content {
+          border-radius: 0.5rem;
+          overflow: hidden;
         }
       `}</style>
     </div>

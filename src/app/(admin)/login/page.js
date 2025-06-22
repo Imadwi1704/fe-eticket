@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { getCookie, setCookie } from "cookies-next";
 import Image from "next/image";
 import AOS from "aos";
@@ -13,6 +14,7 @@ import {
   FiLock,
   FiArrowRight,
   FiChevronLeft,
+  FiHome,
 } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { toast, ToastContainer } from "react-toastify";
@@ -405,6 +407,19 @@ const LoginPage = () => {
           <FcGoogle className="me-2" size={20} />
           Google
         </button>
+
+        {/* Register link */}
+        <div className="text-center mt-4">
+          <p className="text-muted">
+            Belum punya akun?{" "}
+            <Link
+              href="/register"
+              className="text-primary fw-medium text-decoration-none"
+            >
+              Daftar disini
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
@@ -635,6 +650,17 @@ const LoginPage = () => {
           {/* Form Section */}
           <div className="col-lg-6 d-flex align-items-center justify-content-center">
             <div className="p-4 p-md-5 w-100" style={{ maxWidth: "500px" }}>
+              {/* Back to Home Button */}
+              <div className="mb-4">
+                <Link
+                  href="/"
+                  className="btn btn-outline-secondary"
+                >
+                  <FiHome className="me-1" />
+                  Kembali ke Beranda
+                </Link>
+              </div>
+
               {activeTab === "login" && renderLoginForm()}
               {activeTab === "forgot" && renderForgotPasswordForm()}
               {activeTab === "verify" && renderVerifyCodeForm()}

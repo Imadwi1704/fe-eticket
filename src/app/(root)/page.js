@@ -18,6 +18,19 @@ export default function RootLayout() {
   const [review, setReview] = useState([]);
   const [gallery, setGallery] = useState([]);
   const containerRef = useRef(null);
+  const getRandomColor = () => {
+    const colors = [
+      "#3498db", 
+      "#e74c3c", 
+      "#2ecc71", 
+      "#f39c12", 
+      "#9b59b6", 
+      "#1abc9c", 
+      "#d35400", 
+      "#27ae60", 
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
 
   // Fungsi untuk mengecek status buka/tutup museum
   const isMuseumOpen = () => {
@@ -161,8 +174,8 @@ export default function RootLayout() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: "150%",
-                height: "132%",
+                width: "100%",
+                height: "150%",
                 objectFit: "cover",
                 filter: "brightness(0.7)",
               }}
@@ -356,7 +369,7 @@ export default function RootLayout() {
                 </motion.div>
               </div>
 
-              <div className="col-12">
+              <div className="col-10">
                 <motion.div
                   className="d-flex justify-content-center flex-wrap gap-4"
                   initial={{ opacity: 0 }}
@@ -383,11 +396,11 @@ export default function RootLayout() {
                   ].map((card, index) => (
                     <div
                       key={index}
-                      className="rounded-4 p-4 text-center shadow-sm transition-all duration-300 hover-card"
+                      className="rounded-4 p-3 text-center shadow-sm transition-all duration-300 hover-card"
                       style={{
                         backgroundColor: "#FFFFFF",
-                        minWidth: "220px",
-                        flex: "1 1 250px",
+                        minWidth: "50px",
+                        flex: "1 1 50px",
                         border: "2px solid #0D6EFD",
                         color: "#000000",
                       }}
@@ -700,7 +713,7 @@ export default function RootLayout() {
                                     ? `${venue.description.slice(0, 500)}...`
                                     : venue.description}
                                 </p>
-                                <Link href={`/venues?id=${venue.id}`}>
+                                <Link href={`/venues/detail?id=${venue.id}`}>
                                   <button className="read-more-btn">
                                     Baca Selengkapnya
                                   </button>
@@ -722,21 +735,27 @@ export default function RootLayout() {
             </div>
           </div>
         </section>
-
         {/* Review Section */}
         <section
           className="section-padding bg-white"
           id="review"
-          style={{ padding: "40px 0" }}
+          style={{ padding: "60px 0" }}
         >
           <div className="container">
-            <div className="row mb-4">
+            <div className="row mb-2">
               <div className="col-12 text-center">
-                <h2 className="mb-2" style={{ color: "#333" }}>
+                <h2
+                  className="mb-3"
+                  style={{
+                    color: "#2c3e50",
+                    fontSize: "2rem",
+                    fontWeight: "700",
+                  }}
+                >
                   Ulasan Pengunjung
                 </h2>
-                <p className="text-muted mb-4">
-                  Bagaimana Kata Mereka setelah berkunjung di Museum Lampung
+                <p className="text-muted mb-4" style={{ fontSize: "1.1rem" }}>
+                  Bagaimana Kata Mereka Tentang Pengalaman di Museum Lampung
                 </p>
               </div>
             </div>
@@ -746,9 +765,9 @@ export default function RootLayout() {
                 ref={containerRef}
                 className="d-flex overflow-auto hide-scrollbar"
                 style={{
-                  gap: "1.5rem",
+                  gap: "2rem",
                   scrollSnapType: "x mandatory",
-                  padding: "1rem 0.5rem",
+                  padding: "1.5rem 0.5rem",
                   scrollBehavior: "smooth",
                 }}
               >
@@ -756,41 +775,51 @@ export default function RootLayout() {
                   review.map((item, index) => (
                     <div
                       key={index}
-                      className="bg-white rounded-2 p-4 d-flex flex-column"
+                      className="bg-white rounded-3 p-4 d-flex flex-column position-relative"
                       style={{
-                        minWidth: "360px",
-                        maxWidth: "360px",
+                        minWidth: "340px",
+                        maxWidth: "340px",
                         flex: "0 0 auto",
                         scrollSnapAlign: "start",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        transition: "transform 0.3s ease",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                        transition: "all 0.3s ease",
                         cursor: "default",
+                        border: "1px solid rgba(0,0,0,0.05)",
+                        height: "220px",
+                        overflow: "hidden",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = "translateY(-8px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 12px 24px rgba(0,0,0,0.12)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow =
+                          "0 6px 20px rgba(0,0,0,0.08)";
                       }}
                     >
-                      <div className="d-flex align-items-center mb-3">
+                      {/* Profile Avatar with Cartoon Style */}
+                      <div className="d-flex align-items-center mb-4">
                         <div
-                          className="rounded-circle overflow-hidden me-3"
+                          className="rounded-circle overflow-hidden me-3 d-flex align-items-center justify-content-center"
                           style={{
-                            width: "50px",
-                            height: "50px",
-                            backgroundColor: "#e9ecef",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
+                            width: "60px",
+                            height: "60px",
+                            backgroundColor: getRandomColor(),
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "1.5rem",
+                            border: "3px solid white",
+                            boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
                           }}
                         >
                           {item.user?.profilePicture ? (
                             <Image
                               src={item.user.profilePicture}
                               alt={item.user.fullName || "Pengunjung"}
-                              width={50}
-                              height={50}
+                              width={60}
+                              height={60}
                               className="img-fluid"
                               style={{ objectFit: "cover" }}
                               onError={(e) => {
@@ -799,24 +828,17 @@ export default function RootLayout() {
                               }}
                             />
                           ) : (
-                            <div
-                              className="d-flex align-items-center justify-content-center w-100 h-100"
-                              style={{
-                                backgroundColor: "#0d6efd",
-                                color: "white",
-                              }}
-                            >
-                              <span style={{ fontSize: "1.25rem" }}>
-                                {item.user?.fullName?.charAt(0) || "P"}
-                              </span>
-                            </div>
+                            <span>
+                              {item.user?.fullName?.charAt(0)?.toUpperCase() ||
+                                "P"}
+                            </span>
                           )}
                         </div>
 
                         <div>
                           <h4
-                            className="fw-bold mb-0"
-                            style={{ fontSize: "1.1rem", color: "#333" }}
+                            className="fw-bold mb-1"
+                            style={{ fontSize: "1.2rem", color: "#2c3e50" }}
                           >
                             {item.user?.fullName || "Pengunjung"}
                           </h4>
@@ -836,38 +858,110 @@ export default function RootLayout() {
                         </div>
                       </div>
 
+                      {/* Rating Stars */}
                       <div
                         className="mb-3"
-                        style={{ fontSize: "1.25rem", color: "#ffc107" }}
+                        style={{ fontSize: "1.4rem", color: "#FFD700" }}
                         aria-label={`Rating: ${item.score} dari 5`}
                       >
                         {Array.from({ length: 5 }, (_, i) => (
                           <span
                             key={i}
-                            style={{ opacity: i < item.score ? 1 : 0.3 }}
+                            style={{
+                              opacity: i < item.score ? 1 : 0.3,
+                              textShadow:
+                                i < item.score
+                                  ? "0 1px 2px rgba(0,0,0,0.2)"
+                                  : "none",
+                            }}
                           >
                             {i < item.score ? "★" : "☆"}
                           </span>
                         ))}
+                        <span
+                          className="ms-2"
+                          style={{ fontSize: "0.9rem", color: "#7f8c8d" }}
+                        >
+                          {item.score}.0/5.0
+                        </span>
                       </div>
 
-                      <p
-                        className="mb-0 flex-grow-1"
+                      {/* Review Text */}
+                      <div style={{ flex: 1, overflow: "hidden" }}>
+                        <p
+                          className="mb-0"
+                          style={{
+                            fontSize: "0.95rem",
+                            color: "#555",
+                            lineHeight: "1.6",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 6,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {item.comment}
+                        </p>
+                      </div>
+
+                      {/* Decorative Corner */}
+                      <div
                         style={{
-                          fontSize: "0.95rem",
-                          color: "#555",
-                          lineHeight: "1.5",
+                          position: "absolute",
+                          bottom: "0",
+                          right: "0",
+                          width: "60px",
+                          height: "60px",
+                          background:
+                            "linear-gradient(135deg, transparent 50%, rgba(52, 152, 219, 0.1) 50%)",
+                          borderTopLeftRadius: "100%",
                         }}
-                      >
-                        {item.comment}
-                      </p>
+                      ></div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center w-100 py-4">
-                    <p className="text-muted">
-                      Belum ada review yang tersedia.
-                    </p>
+                  <div
+                    className="text-center w-100 py-5"
+                    style={{ minWidth: "100%" }}
+                  >
+                    <div className="d-flex flex-column align-items-center justify-content-center">
+                      <div
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: "1.5rem",
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="48"
+                          height="48"
+                          fill="#adb5bd"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zM4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683zM10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8z" />
+                        </svg>
+                      </div>
+                      <p
+                        className="text-muted mb-2"
+                        style={{ fontSize: "1.1rem" }}
+                      >
+                        Belum ada ulasan yang tersedia
+                      </p>
+                      <p
+                        className="text-muted"
+                        style={{ fontSize: "0.9rem", maxWidth: "400px" }}
+                      >
+                        Jadilah yang pertama memberikan ulasan tentang
+                        pengalaman Anda di Museum Lampung
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>

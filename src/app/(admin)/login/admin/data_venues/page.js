@@ -9,6 +9,7 @@ import {
   FiTrash2,
   FiPlus,
   FiCheckCircle,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import Image from "next/image";
 import page from "@/config/page";
@@ -64,7 +65,9 @@ export default function VenueAdminPage() {
 
   const handleEditVenue = (item) => {
     setVenue(item);
-    setShowImage(`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.photo}`);
+    setShowImage(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.photo}`
+    );
     setShowEditModal(true);
   };
 
@@ -118,7 +121,7 @@ export default function VenueAdminPage() {
     try {
       const method = showModal ? "POST" : "PUT";
       const url = showModal
-        ? page.baseUrl+"/api/venue"
+        ? page.baseUrl + "/api/venue"
         : `${page.baseUrl}/api/venue/${venue.id}`;
 
       const formData = new FormData();
@@ -179,11 +182,11 @@ export default function VenueAdminPage() {
             </div>
             <div className="card-body p-4">
               <div>
-                  <p className="text-muted mb-0">
-                    Kelola data koleksi museum. Anda dapat menambah, mengedit,
-                    atau menghapus koleksi.
-                  </p>
-                </div>
+                <p className="text-muted mb-0">
+                  Kelola data koleksi museum. Anda dapat menambah, mengedit,
+                  atau menghapus koleksi.
+                </p>
+              </div>
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div></div>
                 <button
@@ -242,7 +245,9 @@ export default function VenueAdminPage() {
                                   style={{ objectFit: "cover" }}
                                   width={"200"}
                                   height={"100"}
-                                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${
+                                  src={`${
+                                    process.env.NEXT_PUBLIC_API_BASE_URL
+                                  }/uploads/${
                                     item.photo
                                   }?t=${new Date().getTime()}`}
                                   alt={item.name}
@@ -367,10 +372,9 @@ export default function VenueAdminPage() {
                       <Image
                         src={showImage}
                         alt="Preview"
-                        width={50} // pastikan menambahkan width dan height jika pakai next/image
+                        width={50} 
                         height={50}
                         style={{
-                     
                           border: "2px dashed rgba(13, 110, 253, 0.3)",
                           borderRadius: "8px",
                           padding: "4px",
@@ -378,7 +382,6 @@ export default function VenueAdminPage() {
                       />
                     </div>
                   )}
-                
                 </div>
               </div>
               <div
@@ -419,9 +422,7 @@ export default function VenueAdminPage() {
                 className="modal-header"
                 style={{ borderBottomColor: "rgba(13, 110, 253, 0.2)" }}
               >
-                <h5
-                  className="modal-title fw-bold text-white"
-                >
+                <h5 className="modal-title fw-bold text-white">
                   Konfirmasi Hapus
                 </h5>
                 <button
@@ -457,33 +458,73 @@ export default function VenueAdminPage() {
         </div>
       )}
 
-      {/* Notification */}
-      {message && (
+      {/* Enhanced Notification Modal */}
+      {notification && (
         <div
-          className="toast show position-fixed bottom-0 end-0 m-3"
-          role="alert"
-          style={{
-            minWidth: "350px",
-            animation: "slideIn 0.3s ease-out",
-            backgroundColor: "#fff",
-            borderLeft: "4px solid #0d6efd",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          }}
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
-          <div className="toast-body d-flex align-items-center">
-            <FiCheckCircle className="fs-4 me-3" style={{ color: "#0d6efd" }} />
-            <div>
-              <h6 className="mb-1" style={{ color: "#0d6efd" }}>
-                Success!
-              </h6>
-              <p className="mb-0 text-secondary">{message}</p>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content overflow-hidden">
+              <div
+                className={`modal-header ${
+                  notification.type === "success"
+                    ? "bg-gradient-success"
+                    : "bg-gradient-danger"
+                } text-white border-0`}
+              >
+                <h5 className="modal-title d-flex align-items-center gap-2">
+                  {notification.type === "success" ? (
+                    <>
+                      <FiCheckCircle size={20} />
+                      <span className="text-white">Berhasil!</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiAlertTriangle size={20} />
+                      <span>Terjadi Kesalahan</span>
+                    </>
+                  )}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setNotification(null)}
+                />
+              </div>
+              <div className="modal-body text-center p-4">
+                <div
+                  className={`${
+                    notification.type === "success"
+                      ? "bg-success bg-opacity-10"
+                      : "bg-danger bg-opacity-10"
+                  } rounded-circle d-inline-flex p-4 mb-3`}
+                >
+                  {notification.type === "success" ? (
+                    <FiCheckCircle size={40} className="text-success" />
+                  ) : (
+                    <FiAlertTriangle size={40} className="text-danger" />
+                  )}
+                </div>
+                <h4 className="h5 fw-bold mb-3">
+                  {notification.type === "success"
+                    ? "Operasi Berhasil"
+                    : "Perhatian!"}
+                </h4>
+                <p className="mb-4 fs-5">{notification.message}</p>
+                <button
+                  type="button"
+                  className={`btn ${
+                    notification.type === "success"
+                      ? "btn-success px-4 py-2"
+                      : "btn-danger px-4 py-2"
+                  } rounded-pill fw-medium`}
+                  onClick={() => setNotification(null)}
+                >
+                  Mengerti
+                </button>
+              </div>
             </div>
-            <button
-              type="button"
-              className="btn-close ms-auto"
-              onClick={() => setMessage("")}
-              aria-label="Close"
-            ></button>
           </div>
         </div>
       )}
@@ -515,7 +556,6 @@ export default function VenueAdminPage() {
         .animate-progress {
           animation: progress 10s linear forwards;
         }
-        
       `}</style>
     </>
   );

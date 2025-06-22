@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 import Template from "@/components/admin/Template";
 import { getCookie } from "cookies-next";
 import page from "@/config/page";
+import {
+  FiCheckCircle,
+  FiAlertTriangle,
+  FiAlertCircle,
+  FiTrash2,
+} from "react-icons/fi";
 
 export default function TicketAdminPage() {
   const [data, setData] = useState([]);
@@ -21,7 +27,6 @@ export default function TicketAdminPage() {
 
   const token = getCookie("token");
 
-  // Auto-dismiss notification after 10 seconds
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -32,34 +37,35 @@ export default function TicketAdminPage() {
   }, [notification]);
 
   useEffect(() => {
-    if (!token) return;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(page.baseUrl+"/api/ticket", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const result = await res.json();
-        setData(result);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        showNotification("Gagal mengambil data tiket", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    if (token) {
+      fetchData();
+    }
   }, [token]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${page.baseUrl}/api/ticket`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const result = await res.json();
+      setData(result);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+      showNotification("Gagal mengambil data tiket", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const showNotification = (message, type) => {
     setNotification({ message, type, id: Date.now() });
@@ -93,7 +99,7 @@ export default function TicketAdminPage() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      setData(data.filter((i) => i.id !== ticket.id));
+      await fetchData();
       showNotification("Tiket berhasil dihapus", "success");
     } catch (error) {
       console.error("Error deleting ticket:", error);
@@ -108,16 +114,18 @@ export default function TicketAdminPage() {
     setTicket((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const payload = {
         ...ticket,
         price: Number(ticket.price),
+        terms: ticket.terms.split("\n").join("; "),
       };
 
       const method = showModal ? "POST" : "PUT";
       const url = showModal
-        ? page.baseUrl+"/api/ticket"
+        ? page.baseUrl + "/api/ticket"
         : `${page.baseUrl}/api/ticket/${ticket.id}`;
 
       const res = await fetch(url, {
@@ -133,15 +141,11 @@ export default function TicketAdminPage() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const result = await res.json();
-
-      if (showModal) {
-        setData([...data, result]);
-        showNotification("Tiket berhasil ditambahkan", "success");
-      } else {
-        setData(data.map((i) => (i.id === ticket.id ? result : i)));
-        showNotification("Tiket berhasil diperbarui", "success");
-      }
+      await fetchData();
+      showNotification(
+        showModal ? "Tiket berhasil ditambahkan" : "Tiket berhasil diperbarui",
+        "success"
+      );
 
       setShowModal(false);
       setShowEditModal(false);
@@ -159,18 +163,27 @@ export default function TicketAdminPage() {
     }).format(price);
   };
 
+  const renderTerms = (terms) => {
+    if (!terms) return <span className="text-muted">Tidak ada syarat</span>;
+
+    return terms.split(";").map(
+      (term, index) =>
+        term.trim() && (
+          <div key={`term-${index}`} className="mb-1">
+            <i className="bi bi-check-circle-fill text-success me-2"></i>
+            {term.trim()}
+          </div>
+        )
+    );
+  };
 
   return (
     <>
       <Template />
 
-    
-
       <div className="d-flex justify-content-center align-items-start min-vh-100 bg-light">
         <div className="container py-5">
           <div className="card shadow-sm border-0 mt-5">
-            {" "}
-            {/* <-- Tambah jarak di sini */}
             <div className="card-header bg-primary text-white">
               <h2 className="card-title fw-semibold mb-0 text-white">
                 Data Tiket Museum Lampung
@@ -223,21 +236,17 @@ export default function TicketAdminPage() {
                     </thead>
                     <tbody>
                       {data.map((item, idx) => (
-                        <tr key={item.id}>
+                        <tr key={`ticket-${item.id}`}>
                           <td>{idx + 1}</td>
                           <td>
-                            <span className="badge bg-primary bg-opacity-10 text-white w-50">
+                            <span className="badge bg-primary bg-opacity-10 text-primary w-50">
                               {item.code}
                             </span>
                           </td>
                           <td>{item.type}</td>
                           <td>{formatPrice(item.price)}</td>
-                          <td
-                            className="text-truncate"
-                            style={{ maxWidth: "300px" }}
-                            title={item.terms}
-                          >
-                            {item.terms}
+                          <td style={{ maxWidth: "300px" }}>
+                            {renderTerms(item.terms)}
                           </td>
                           <td>
                             <div className="d-flex gap-2">
@@ -270,14 +279,14 @@ export default function TicketAdminPage() {
       {showModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.42)" }}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title text-white">
-                  <i className="bi bi-ticket-perforated me-2 "></i>
+                  <i className="bi bi-ticket-perforated me-2"></i>
                   Tambah Tiket Baru
                 </h5>
                 <button
@@ -288,12 +297,7 @@ export default function TicketAdminPage() {
                 ></button>
               </div>
               <div className="modal-body">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
+                <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <label className="form-label">
                       Kode Tiket <span className="text-danger">*</span>
@@ -351,17 +355,17 @@ export default function TicketAdminPage() {
                       rows="5"
                       value={ticket.terms}
                       onChange={handleChange}
-                      placeholder="Masukkan syarat dan ketentuan tiket"
+                      placeholder="Masukkan syarat dan ketentuan, pisahkan dengan titik koma (;) atau baris baru"
                       required
-                    ></textarea>
+                    />
                     <div className="form-text">
-                      Gunakan titik koma (;) untuk memisahkan poin-poin
+                      Pisahkan setiap poin dengan titik koma (;) atau baris baru
                     </div>
                   </div>
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-danger"
+                      className="btn btn-secondary"
                       onClick={() => setShowModal(false)}
                     >
                       Batal
@@ -381,7 +385,7 @@ export default function TicketAdminPage() {
       {showEditModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "#0000006b" }}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">
@@ -399,12 +403,7 @@ export default function TicketAdminPage() {
                 ></button>
               </div>
               <div className="modal-body">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmit();
-                  }}
-                >
+                <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <label className="form-label">
                       Kode Tiket <span className="text-danger">*</span>
@@ -460,15 +459,15 @@ export default function TicketAdminPage() {
                       value={ticket.terms}
                       onChange={handleChange}
                       required
-                    ></textarea>
+                    />
                     <div className="form-text">
-                      Gunakan titik koma (;) untuk memisahkan poin-poin
+                      Pisahkan setiap poin dengan titik koma (;) atau baris baru
                     </div>
                   </div>
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-danger"
+                      className="btn btn-secondary"
                       onClick={() => setShowEditModal(false)}
                     >
                       Batal
@@ -488,52 +487,101 @@ export default function TicketAdminPage() {
       {showConfirmModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "#0000006b" }}
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(3px)",
+          }}
           tabIndex="-1"
         >
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title text-white">
-                  <i className="bi bi-exclamation-triangle me-2"></i>
-                  Konfirmasi Hapus
+            <div className="modal-content border-0 overflow-hidden">
+              <div className="modal-header bg-gradient-danger text-white py-3">
+                <h5 className="modal-title text-white d-flex align-items-center">
+                  <FiAlertCircle className="me-2" size={24} />
+                  <span>Konfirmasi Penghapusan</span>
                 </h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
                   onClick={() => setShowConfirmModal(false)}
                   aria-label="Close"
-                ></button>
+                />
               </div>
-              <div className="modal-body">
-                <p>Apakah Anda yakin ingin menghapus tiket berikut?</p>
-                <div className="alert alert-warning p-2">
-                  <p className="mb-1">
-                    <strong>Kode:</strong> {ticket.code}
-                  </p>
-                  <p className="mb-1">
-                    <strong>Jenis:</strong> {ticket.type}
-                  </p>
-                  <p className="mb-0">
-                    <strong>Harga:</strong> {formatPrice(ticket.price)}
-                  </p>
+              <div className="modal-body p-4">
+                <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 mb-4">
+                  <div className="d-flex">
+                    <FiAlertTriangle
+                      className="me-2 mt-1 flex-shrink-0"
+                      size={20}
+                    />
+                    <div>
+                      <h6 className="alert-heading fw-bold mb-2">Perhatian!</h6>
+                      <p className="mb-0">
+                        Anda akan menghapus tiket berikut secara permanen:
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-black">Aksi ini tidak dapat dibatalkan!</p>
+
+                <div className="bg-light p-3 rounded mb-4">
+                  <div className="d-flex mb-2">
+                    <span
+                      className="text-muted flex-shrink-0"
+                      style={{ width: "80px" }}
+                    >
+                      Kode:
+                    </span>
+                    <span className="fw-semibold">{ticket.code}</span>
+                  </div>
+                  <div className="d-flex mb-2">
+                    <span
+                      className="text-muted flex-shrink-0"
+                      style={{ width: "80px" }}
+                    >
+                      Jenis:
+                    </span>
+                    <span className="fw-semibold">{ticket.type}</span>
+                  </div>
+                  <div className="d-flex">
+                    <span
+                      className="text-muted flex-shrink-0"
+                      style={{ width: "80px" }}
+                    >
+                      Harga:
+                    </span>
+                    <span className="fw-semibold">
+                      {formatPrice(ticket.price)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25">
+                  <div className="d-flex">
+                    <FiAlertCircle
+                      className="me-2 mt-1 flex-shrink-0"
+                      size={20}
+                    />
+                    <span className="fw-semibold">
+                      Aksi ini tidak dapat dibatalkan!
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="modal-footer">
+              <div className="modal-footer border-0 pt-0">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="btn btn-outline-secondary px-4 py-2 rounded-pill"
                   onClick={() => setShowConfirmModal(false)}
                 >
-                  Batal
+                  Batalkan
                 </button>
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="btn btn-danger px-4 py-2 rounded-pill d-flex align-items-center"
                   onClick={handleConfirmDelete}
                 >
-                  <i className="bi bi-trash me-1"></i> Hapus
+                  <FiTrash2 className="me-2" size={18} />
+                  <span>Hapus Permanen</span>
                 </button>
               </div>
             </div>
@@ -541,38 +589,113 @@ export default function TicketAdminPage() {
         </div>
       )}
 
-      {/* Add CSS animations */}
+      {/* Notification Modal */}
+      {notification && (
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content overflow-hidden">
+              <div
+                className={`modal-header ${
+                  notification.type === "success"
+                    ? "bg-gradient-success"
+                    : "bg-gradient-danger"
+                } text-white border-0`}
+              >
+                <h5 className="modal-title d-flex align-items-center gap-2">
+                  {notification.type === "success" ? (
+                    <>
+                      <FiCheckCircle size={20} />
+                      <span className="text-white">Berhasil!</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiAlertTriangle size={20} />
+                      <span>Terjadi Kesalahan</span>
+                    </>
+                  )}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setNotification(null)}
+                />
+              </div>
+              <div className="modal-body text-center p-4">
+                <div
+                  className={`${
+                    notification.type === "success"
+                      ? "bg-success bg-opacity-10"
+                      : "bg-danger bg-opacity-10"
+                  } rounded-circle d-inline-flex p-4 mb-3`}
+                >
+                  {notification.type === "success" ? (
+                    <FiCheckCircle size={40} className="text-success" />
+                  ) : (
+                    <FiAlertTriangle size={40} className="text-danger" />
+                  )}
+                </div>
+                <h4 className="h5 fw-bold mb-3">
+                  {notification.type === "success"
+                    ? "Operasi Berhasil"
+                    : "Perhatian!"}
+                </h4>
+                <p className="mb-4 fs-5">{notification.message}</p>
+                <button
+                  type="button"
+                  className={`btn ${
+                    notification.type === "success"
+                      ? "btn-success px-4 py-2"
+                      : "btn-danger px-4 py-2"
+                  } rounded-pill fw-medium`}
+                  onClick={() => setNotification(null)}
+                >
+                  Mengerti
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .modal-backdrop {
+          opacity: 0.5 !important;
         }
-
-        @keyframes progress {
-          from {
-            width: 100%;
-          }
-          to {
-            width: 0%;
-          }
+        .badge.bg-primary-opacity-10 {
+          background-color: rgba(13, 110, 253, 0.1) !important;
         }
-
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out forwards;
+        .modal {
+          backdrop-filter: blur(2px);
         }
-
-        .animate-progress {
-          animation: progress 10s linear forwards;
+        .bg-gradient-danger {
+          background: linear-gradient(135deg, #ff4d4d, #d93636);
         }
-        .modal-header {
-          background-color: #d32f2f !important;
-          color: white;
+        .bg-gradient-success {
+          background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        .modal-content {
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
+        }
+        .rounded-pill {
+          border-radius: 50px !important;
+        }
+        .btn-danger {
+          background-color: #ff4d4d;
+          border-color: #ff4d4d;
+          transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+          background-color: #d93636;
+          border-color: #d93636;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(217, 54, 54, 0.3);
+        }
+        .btn-outline-secondary:hover {
+          background-color: #f8f9fa;
         }
       `}</style>
     </>

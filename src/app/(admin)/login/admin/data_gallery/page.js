@@ -13,6 +13,7 @@ import {
   FiEdit,
   FiPlus,
   FiImage,
+  FiAlertTriangle
 } from "react-icons/fi";
 import Image from "next/image";
 
@@ -615,10 +616,76 @@ export default function GalleryAdminPage() {
         </div>
       )}
 
-      <NotificationToast
-        notification={notification}
-        setNotification={setNotification}
-      />
+      {/* Enhanced Notification Modal */}
+           {notification && (
+             <div
+               className="modal show d-block"
+               style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+             >
+               <div className="modal-dialog modal-dialog-centered">
+                 <div className="modal-content overflow-hidden">
+                   <div
+                     className={`modal-header ${
+                       notification.type === "success"
+                         ? "bg-gradient-success"
+                         : "bg-gradient-danger"
+                     } text-white border-0`}
+                   >
+                     <h5 className="modal-title d-flex align-items-center gap-2">
+                       {notification.type === "success" ? (
+                         <>
+                           <FiCheckCircle size={20} />
+                           <span className="text-white">Berhasil!</span>
+                         </>
+                       ) : (
+                         <>
+                           <FiAlertTriangle size={20} />
+                           <span>Terjadi Kesalahan</span>
+                         </>
+                       )}
+                     </h5>
+                     <button
+                       type="button"
+                       className="btn-close btn-close-white"
+                       onClick={() => setNotification(null)}
+                     />
+                   </div>
+                   <div className="modal-body text-center p-4">
+                     <div
+                       className={`${
+                         notification.type === "success"
+                           ? "bg-success bg-opacity-10"
+                           : "bg-danger bg-opacity-10"
+                       } rounded-circle d-inline-flex p-4 mb-3`}
+                     >
+                       {notification.type === "success" ? (
+                         <FiCheckCircle size={40} className="text-success" />
+                       ) : (
+                         <FiAlertTriangle size={40} className="text-danger" />
+                       )}
+                     </div>
+                     <h4 className="h5 fw-bold mb-3">
+                       {notification.type === "success"
+                         ? "Operasi Berhasil"
+                         : "Perhatian!"}
+                     </h4>
+                     <p className="mb-4 fs-5">{notification.message}</p>
+                     <button
+                       type="button"
+                       className={`btn ${
+                         notification.type === "success"
+                           ? "btn-success px-4 py-2"
+                           : "btn-danger px-4 py-2"
+                       } rounded-pill fw-medium`}
+                       onClick={() => setNotification(null)}
+                     >
+                       Mengerti
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
     </>
   );
 }
