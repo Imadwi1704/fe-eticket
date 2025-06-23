@@ -206,9 +206,7 @@ export default function GalleryAdminPage() {
     formData.append("description", gallery.description);
     formData.append("category", gallery.category);
 
-    // if (gallery.image) {
-    //   formData.append("image", gallery.image);
-    // }
+   
     formData.append("image", gallery.image);
 
     try {
@@ -311,16 +309,19 @@ export default function GalleryAdminPage() {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
                   <p className="text-muted mb-0">
-                    Kelola data gallery museum. Anda dapat menambah, mengedit,
+                    Kelola data gallery untuk menambah, mengedit,
                     atau menghapus koleksi.
                   </p>
                 </div>
+              </div>
+               <div className="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
                 <button
-                  className="btn text-white d-flex align-items-center"
+                  className="btn btn-primary d-flex align-items-center"
                   onClick={handleAddGallery}
-                  style={{ backgroundColor: "#0d6efd" }}
                 >
-                  <FiPlus className="me-2" /> Tambah
+                  <i className="bi bi-plus-circle me-2"></i>
+                  Tambah Tiket
                 </button>
               </div>
 
@@ -337,12 +338,12 @@ export default function GalleryAdminPage() {
                       style={{ backgroundColor: "rgba(13, 110, 253, 0.1)" }}
                     >
                       <tr>
-                        <th style={{ color: "#0d6efd" }}>No</th>
-                        <th style={{ color: "#0d6efd" }}>Judul</th>
-                        <th style={{ color: "#0d6efd" }}>Deskripsi</th>
-                        <th style={{ color: "#0d6efd" }}>Kategori</th>
-                        <th style={{ color: "#0d6efd" }}>Gambar</th>
-                        <th style={{ color: "#0d6efd" }}>Aksi</th>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Deskripsi</th>
+                        <th>Kategori</th>
+                        <th>Gambar</th>
+                        <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>

@@ -126,7 +126,7 @@ export default function VenuesPage() {
         id="aboutnext"
         style={{
           height: "50vh",
-          backgroundImage: "url('/assets/images/histori.jpg')",
+          backgroundImage: "url('/assets/images/koleksi.jpg')",
           backgroundSize: "cover",
           backgroundAttachment: "fixed",
           backgroundPosition: "center",

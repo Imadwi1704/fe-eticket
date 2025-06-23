@@ -33,6 +33,18 @@ export default function VenueAdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const token = getCookie("token");
+  const categories = [
+    { value: "GEOLOGIKA", label: "Geologika" },
+    { value: "HISTORIKA", label: "Historika" },
+    { value: "KERAMOLOGIKA", label: "Keramologika" },
+    { value: "NUMISMATIKA", label: "Numismatika" },
+    { value: "ETNOGRAFIKA", label: "Etnografika" },
+    { value: "BIOLOGIKA", label: "Biologika" },
+    { value: "TEKNOLOGIKA", label: "Teknologika" },
+    { value: "FIOLOGIKA", label: "Filologika" },
+    { value: "ARKEOLOGIKA", label: "Arkeologika" },
+    { value: "SENI_RUPA", label: "Seni Rupa" },
+  ];
 
   useEffect(() => {
     if (!token) {
@@ -49,11 +61,11 @@ export default function VenueAdminPage() {
           },
           cache: "no-store",
         });
-        
+
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        
+
         const result = await res.json();
         setData(result);
       } catch (error) {
@@ -81,7 +93,7 @@ export default function VenueAdminPage() {
   const handleEditVenue = (item) => {
     setVenue(item);
     setShowImage(
-      item.photo 
+      item.photo
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.photo}`
         : null
     );
@@ -133,7 +145,8 @@ export default function VenueAdminPage() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+    if (file.size > 2 * 1024 * 1024) {
+      // 2MB limit
       showNotification("Image size should be less than 2MB", "error");
       return;
     }
@@ -145,7 +158,32 @@ export default function VenueAdminPage() {
     };
     reader.readAsDataURL(file);
   };
-
+  const mapCategory = (category) => {
+    switch (category) {
+      case "GEOLOGIKA":
+        "Geologika";
+      case "HISTORIKA":
+        return "Historika";
+      case "KERAMOLOGIKA":
+        return "Keramologika";
+      case "NUMISMATIKA":
+        return "Numismatika";
+      case "ETNOGRAFIKA":
+        return "Etnografika";
+      case "BIOLOGIKA":
+        return "Biologika";
+      case "TEKNOLOGIKA":
+        return "Teknologika";
+      case "FIOLOGIKA":
+        return "Filologika";
+      case "ARKEOLOGIKA":
+        return "Arkeologika";
+      case "SENI_RUPA":
+        return "Seni Rupa";
+      default:
+        return "Tidak Diketahui";
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!venue.name || !venue.year) {
@@ -199,7 +237,10 @@ export default function VenueAdminPage() {
       setShowImage(null);
     } catch (error) {
       console.error("Error while saving venue:", error);
-      showNotification(error.message || "Error occurred while saving data", "error");
+      showNotification(
+        error.message || "Error occurred while saving data",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -222,22 +263,26 @@ export default function VenueAdminPage() {
             <div className="card-header bg-primary text-white">
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="card-title fw-semibold text-white mb-0">
-                  Venue Management
+                  Data Koleksi
                 </h2>
-                <button
-                  className="btn btn-light btn-sm d-flex align-items-center"
-                  onClick={handleAddVenue}
-                >
-                  <FiPlus size={16} className="me-1" />
-                  Add Venue
-                </button>
               </div>
             </div>
             <div className="card-body p-4">
               <div className="mb-4">
                 <p className="text-muted mb-0">
-                  Manage venue data. You can add, edit, or delete venues.
+                  Kelola data koleksi museum. Anda dapat menambah, mengedit,
+                  atau menghapus koleksi.
                 </p>
+              </div>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div></div>
+                <button
+                  className="btn btn-primary d-flex align-items-center"
+                  onClick={handleAddVenue}
+                >
+                  <i className="bi bi-plus-circle me-2"></i>
+                  Tambah Koleksi
+                </button>
               </div>
 
               {loading ? (
@@ -247,16 +292,16 @@ export default function VenueAdminPage() {
               ) : data.length === 0 ? (
                 <div className="text-center py-5">
                   <FiImage size={48} className="text-muted mb-3" />
-                  <h4>No Venues Found</h4>
+                  <h4>Tidak ada koleksi</h4>
                   <p className="text-muted">
-                    There are no venues available. Add a new venue to get started.
+                    Tidak ada koleksi, silahkan tambahkan data koleksi baru.
                   </p>
                   <button
                     className="btn btn-primary mt-3"
                     onClick={handleAddVenue}
                   >
                     <FiPlus size={16} className="me-1" />
-                    Add Venue
+                    Tambah Koleksi
                   </button>
                 </div>
               ) : (
@@ -265,9 +310,10 @@ export default function VenueAdminPage() {
                     <thead className="table-light">
                       <tr>
                         <th>No</th>
-                        <th>Name</th>
-                        <th>Year</th>
-                        <th>Description</th>
+                        <th>Nama</th>
+                        <th>Tahun</th>
+                        <th>Deskripsi</th>
+                        <th>Kategori</th>
                         <th>Photo</th>
                         <th>Actions</th>
                       </tr>
@@ -278,26 +324,34 @@ export default function VenueAdminPage() {
                           <td>{idx + 1}</td>
                           <td>{item.name}</td>
                           <td>{item.year}</td>
-                          <td className="text-truncate" style={{ maxWidth: "200px" }}>
+                          <td
+                            className="text-truncate"
+                            style={{ maxWidth: "200px" }}
+                          >
                             {item.description || "-"}
                           </td>
+                          <td>{mapCategory(item.category)}</td>
                           <td>
-                            <div className="h-10 w-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden border">
+                            <div className="h-30 w-30 flex items-center justify-center overflow-hidden border">
                               {item.photo ? (
                                 <Image
                                   width={100}
                                   height={100}
-                                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.photo}?t=${new Date().getTime()}`}
+                                  src={`${
+                                    process.env.NEXT_PUBLIC_API_BASE_URL
+                                  }/uploads/${
+                                    item.photo
+                                  }?t=${new Date().getTime()}`}
                                   alt={item.name}
-                                  className="img-thumbnail"
-                                  style={{ 
+                                  style={{
                                     objectFit: "cover",
-                                    width: "50px",
-                                    height: "50px"
+                                    width: "100px",
+                                    height: "100px",
                                   }}
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
+                                    e.target.src =
+                                      "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiYjMzszMztjdXJyZW50Q29sb3ImIzMzOzMiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNNCAxNmw0LjU4Ni00LjU4NmEyIDIgMCAwMTIuODI4IDBMMTYgMTZtLTItMmwxLjU4Ni0xLjU4NmEyIDIgMCAwMTIuODI4IDBMMjAgMTRtLTYtNmguMDFNNiAyMGgxMmEyIDIgMCAwMDItMlY2YTIgMiAwIDAwLTItMkg2YTIgMiAwIDAwLTIgMnYxMmEyIDIgMCAwMDIgMnoiPjwvcGF0aD48L3N2Zz4=";
                                   }}
                                 />
                               ) : (
@@ -334,12 +388,15 @@ export default function VenueAdminPage() {
 
       {/* Add/Edit Modal */}
       {(showModal || showEditModal) && (
-        <div className="modal show d-block fade" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block fade"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title">
-                  {showModal ? "Add New Venue" : "Edit Venue"}
+                  {showModal ? "Tambah Data Venue" : "Edit Data Venue"}
                 </h5>
                 <button
                   type="button"
@@ -353,7 +410,7 @@ export default function VenueAdminPage() {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label required">Name</label>
+                        <label className="form-label required">Nama</label>
                         <input
                           type="text"
                           name="name"
@@ -366,7 +423,7 @@ export default function VenueAdminPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label required">Year</label>
+                        <label className="form-label required">Tahun</label>
                         <input
                           type="text"
                           name="year"
@@ -379,7 +436,7 @@ export default function VenueAdminPage() {
                     </div>
                     <div className="col-12">
                       <div className="mb-3">
-                        <label className="form-label">Description</label>
+                        <label className="form-label">Deskripsi</label>
                         <textarea
                           name="description"
                           className="form-control"
@@ -388,6 +445,23 @@ export default function VenueAdminPage() {
                           onChange={handleChange}
                         ></textarea>
                       </div>
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Kategori</label>
+                      <select
+                        name="category"
+                        className="form-control"
+                        value={venue.category}
+                        onChange={handleChange}
+                        style={{ borderColor: "rgba(13, 110, 253, 0.3)" }}
+                      >
+                        <option value="">Pilih Kategori</option>
+                        {categories.map((cat) => (
+                          <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-12">
                       <div className="mb-3">
@@ -411,7 +485,7 @@ export default function VenueAdminPage() {
                               className="img-thumbnail"
                               style={{
                                 maxHeight: "200px",
-                                objectFit: "contain"
+                                objectFit: "contain",
                               }}
                             />
                           </div>
@@ -423,11 +497,11 @@ export default function VenueAdminPage() {
                 <div className="modal-footer">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-danger"
                     onClick={closeModal}
                     disabled={isSubmitting}
                   >
-                    Cancel
+                    Batal
                   </button>
                   <button
                     type="submit"
@@ -436,11 +510,17 @@ export default function VenueAdminPage() {
                   >
                     {isSubmitting ? (
                       <>
-                        <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                        {showModal ? "Adding..." : "Updating..."}
+                        <span
+                          className="spinner-border spinner-border-sm me-1"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        {showModal ? "Menambahkan..." : "Updating..."}
                       </>
+                    ) : showModal ? (
+                      "Tambah Data Koleksi"
                     ) : (
-                      showModal ? "Add Venue" : "Update Venue"
+                      "Update Data Koleksi"
                     )}
                   </button>
                 </div>
@@ -452,11 +532,14 @@ export default function VenueAdminPage() {
 
       {/* Delete Confirmation Modal */}
       {showConfirmModal && (
-        <div className="modal show d-block fade" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block fade"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">Confirm Deletion</h5>
+              <div className="modal-header-delete bg-danger text-white">
+                <h5 className="modal-title text-white">Konfirmasi Hapus</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
@@ -467,9 +550,11 @@ export default function VenueAdminPage() {
               <div className="modal-body">
                 <div className="text-center mb-4">
                   <FiAlertTriangle size={48} className="text-danger mb-3" />
-                  <h5>Are you sure you want to delete this venue?</h5>
+                  <h5>Apakah Kamu Yakin Menghapus ?</h5>
                   <p className="fw-bold">{venue.name}</p>
-                  <p className="text-muted">This action cannot be undone.</p>
+                  <p className="text-muted">
+                    Aksi ini tidak bisa dikembalikan.
+                  </p>
                 </div>
               </div>
               <div className="modal-footer">
@@ -489,11 +574,15 @@ export default function VenueAdminPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                      <span
+                        className="spinner-border spinner-border-sm me-1"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Deleting...
                     </>
                   ) : (
-                    "Delete"
+                    "Hapus"
                   )}
                 </button>
               </div>
@@ -502,43 +591,72 @@ export default function VenueAdminPage() {
         </div>
       )}
 
-      {/* Notification */}
+      {/* Notification Modal */}
       {notification && (
-        <div className="position-fixed bottom-0 end-0 p-3" style={{ zIndex: 11 }}>
-          <div 
-            className={`toast show ${notification.type === "success" ? "bg-success" : "bg-danger"} text-white`}
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
-          >
-            <div className="toast-header">
-              <strong className="me-auto">
-                {notification.type === "success" ? "Success" : "Error"}
-              </strong>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                onClick={() => setNotification(null)}
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="toast-body d-flex align-items-center">
-              {notification.type === "success" ? (
-                <FiCheckCircle className="me-2" size={20} />
-              ) : (
-                <FiAlertTriangle className="me-2" size={20} />
-              )}
-              {notification.message}
-            </div>
-            <div 
-              className="progress" 
-              style={{ height: "3px" }}
-            >
-              <div 
-                className={`progress-bar ${notification.type === "success" ? "bg-white" : "bg-warning"}`}
-                style={{ width: "100%" }}
-                onAnimationEnd={() => setNotification(null)}
-              ></div>
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content overflow-hidden">
+              <div
+                className={`modal-header ${
+                  notification.type === "success"
+                    ? "bg-gradient-success"
+                    : "bg-gradient-danger"
+                } text-white border-0`}
+              >
+                <h5 className="modal-title d-flex align-items-center gap-2">
+                  {notification.type === "success" ? (
+                    <>
+                      <FiCheckCircle size={20} className="text-white" />
+                      <span className="text-white">Berhasil!</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiAlertTriangle size={20} className="text-white" />
+                      <span>Terjadi Kesalahan</span>
+                    </>
+                  )}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setNotification(null)}
+                />
+              </div>
+              <div className="modal-body text-center p-4">
+                <div
+                  className={`${
+                    notification.type === "success"
+                      ? "bg-success bg-opacity-10"
+                      : "bg-danger bg-opacity-10"
+                  } rounded-circle d-inline-flex p-4 mb-3`}
+                >
+                  {notification.type === "success" ? (
+                    <FiCheckCircle size={40} className="text-success" />
+                  ) : (
+                    <FiAlertTriangle size={40} className="text-danger" />
+                  )}
+                </div>
+                <h4 className="h5 fw-bold mb-3">
+                  {notification.type === "success"
+                    ? "Operasi Berhasil"
+                    : "Perhatian!"}
+                </h4>
+                <p className="mb-4 fs-5">{notification.message}</p>
+                <button
+                  type="button"
+                  className={`btn ${
+                    notification.type === "success"
+                      ? "btn-success px-4 py-2"
+                      : "btn-danger px-4 py-2"
+                  } rounded-pill fw-medium`}
+                  onClick={() => setNotification(null)}
+                >
+                  Mengerti
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -553,6 +671,10 @@ export default function VenueAdminPage() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        .modal-header-delete {
+          backgroundcolor: #dc3545;
+          width: 
         }
 
         @keyframes progress {

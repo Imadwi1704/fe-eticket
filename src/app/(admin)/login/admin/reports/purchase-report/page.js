@@ -177,7 +177,7 @@ export default function AdminPage() {
         }
       );
 
-      const result = await res.json(); // ⬅️ pindah ke sini dulu supaya bisa lihat isinya
+      const result = await res.json(); 
 
       if (!res.ok) {
         console.error("Server responded with:", result);
@@ -308,14 +308,14 @@ export default function AdminPage() {
                                 </div>
                               </td>
                               <td>
-                                {item.orderItems?.map((oi, i) => (
+                                {item.payment?.ticketDetails?.map((oi, i) => (
                                   <div key={i}>
                                     {oi.ticket?.type} ({oi.quantity})
                                   </div>
                                 ))}
                               </td>
                               <td className="text-center">
-                                {item.orderItems?.reduce(
+                                {item.payment?.ticketDetails?.reduce(
                                   (sum, oi) => sum + oi.quantity,
                                   0
                                 )}

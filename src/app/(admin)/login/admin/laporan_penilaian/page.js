@@ -181,13 +181,11 @@ export default function AdminPage() {
 
   const handleDownloadPDF = async () => {
     try {
-      const token = getCookie("token"); // Ambil token dari cookies
-
+      const token = getCookie("token"); 
       const response = await fetch(
-        `${page.baseUrl}/api/reviews/ReviewPDF?token=${token}`, // Token di query parameter
+        `${page.baseUrl}/api/reviews/ReviewPDF?token=${token}`, 
         {
           method: "GET",
-          // Tidak perlu header Authorization
         }
       );
 

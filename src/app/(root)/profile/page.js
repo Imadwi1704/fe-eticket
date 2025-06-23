@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "cookies-next";
 import Footer from "@/components/Footer";
+import Link from "next/link";
+import Image from "next/image";
 import {
   FiUser,
   FiMail,
@@ -12,11 +14,12 @@ import {
   FiEye,
   FiEyeOff,
   FiCheckCircle,
+  FiArrowRight,
 } from "react-icons/fi";
 import { AsYouType } from "libphonenumber-js";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import page from '@/config/page';
+import page from "@/config/page";
 
 export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -54,7 +57,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(page.baseUrl+"/api/users/profile", {
+        const res = await fetch(page.baseUrl + "/api/users/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -110,7 +113,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch(page.baseUrl+"/api/users/profile", {
+      const res = await fetch(page.baseUrl + "/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -169,44 +172,46 @@ export default function ProfilePage() {
 
   return (
     <div
-      className="profile-page"
+      className="overflow-hidden"
       style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
-      <section className="flex-grow-1 py-5">
+      <section
+        className="text-white py-3"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/assets/images/profile.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="container py-5">
+          <div className="row align-items-center">
+            <div className="col-lg-8 text-lg-start text-center">
+              <h2 className=" fw-bold mb-2 text-white">
+                Selamat Datang <br />
+                <span className="text-warning">
+                  {userData?.fullName || "Pengguna"}
+                </span>
+              </h2>
+              <p className="lead mb-3 text-white">
+                Kelola informasi akun Anda dengan mudah dan aman. Perbarui
+                profil dan ganti password kapan saja.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Profile Information Section */}
+      <section className="py-5 bg-white">
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-lg-8 col-12">
-              <div className="text-center mb-5" data-aos="fade-up">
-                <h2
-                  className="text-dark fw-bold position-relative pb-3"
-                  style={{ display: "inline-block" }}
-                >
-                  <span style={{ position: "relative", zIndex: 1 }}>
-                    Profil Pengguna
-                  </span>
-                  <span
-                    className="position-absolute bottom-0 left-0 w-100"
-                    style={{
-                      height: "4px",
-                      background:
-                        "linear-gradient(90deg, #6c63ff 0%, #0d6edf 100%)",
-                      borderRadius: "2px",
-                      transform: "scaleX(0.8) translateX(12.5%)",
-                    }}
-                  ></span>
-                </h2>
-                <p className="text-muted mt-3">
-                  Kelola informasi profil Anda dengan aman
-                </p>
-              </div>
-
+            <div className="col-lg-10">
               <div
-                className="card border-0 rounded-4 overflow-hidden shadow-lg mb-5"
-                data-aos="zoom-in"
+                className="card border-2 rounded-4 overflow-hidden mb-5"
                 style={{
                   backgroundColor: "#ffffff",
-                  borderLeft: "5px solid #6c63ff",
-                  boxShadow: "0 10px 30px rgba(108, 99, 255, 0.15)",
+                  borderLeft: "5px solid #0d6efd",
                 }}
               >
                 <div className="card-body p-4 p-md-5">
@@ -215,9 +220,11 @@ export default function ProfilePage() {
                     style={{ borderColor: "rgba(108, 99, 255, 0.1)" }}
                   >
                     <div>
-                      <h3 className="mb-0 fw-bold text-dark">Informasi Akun</h3>
+                      <h3 className="mb-0 fw-bold text-dark">
+                        Detail Informasi Akun
+                      </h3>
                       <p className="text-muted mb-0 small">
-                        Detail profil Anda
+                        Kelola informasi profil Anda dengan aman
                       </p>
                     </div>
                     <button
@@ -367,277 +374,241 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Success Notification */}
-        {isSuccess && (
+      {/* Success Notification */}
+      {isSuccess && (
+        <div
+          className="position-fixed bottom-0 end-0 m-4"
+          style={{
+            zIndex: 1100,
+            animation: "fadeInUp 0.5s ease-out",
+          }}
+        >
           <div
-            className="position-fixed bottom-0 end-0 m-4"
+            className="d-flex align-items-center p-3 rounded-3 shadow"
             style={{
-              zIndex: 1100,
-              animation: "fadeInUp 0.5s ease-out",
+              background: "linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%)",
+              borderLeft: "4px solid #198754",
+              minWidth: "300px",
             }}
           >
+            <FiCheckCircle className="fs-4 me-2" style={{ color: "#198754" }} />
+            <div>
+              <h6 className="mb-0 fw-bold" style={{ color: "#0f5132" }}>
+                Berhasil!
+              </h6>
+              <small style={{ color: "#0f5132" }}>
+                Profil berhasil diperbarui
+              </small>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showModal && (
+        <div
+          className="modal-backdrop fade show d-flex align-items-center justify-content-center"
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1050,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            style={{ maxWidth: "600px", width: "100%" }}
+          >
             <div
-              className="d-flex align-items-center p-3 rounded-3 shadow"
+              className="modal-content border-0 rounded-4 overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, #d1e7dd 0%, #a3cfbb 100%)",
-                borderLeft: "4px solid #198754",
-                minWidth: "300px",
+                borderTop: "4px solid #6c63ff",
+                backgroundColor: "#ffffff",
               }}
             >
-              <FiCheckCircle
-                className="fs-4 me-2"
-                style={{ color: "#198754" }}
-              />
-              <div>
-                <h6 className="mb-0 fw-bold" style={{ color: "#0f5132" }}>
-                  Berhasil!
-                </h6>
-                <small style={{ color: "#0f5132" }}>
-                  Profil berhasil diperbarui
-                </small>
+              <div className="modal-header border-0 pb-0 pt-4 px-4">
+                <h4 className="modal-title fw-bold text-dark">Edit Profil</h4>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                  style={{ fontSize: "0.8rem" }}
+                ></button>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* Modal Edit Profil */}
-        {showModal && (
-          <div
-            className="modal-backdrop fade show d-flex align-items-center justify-content-center"
-            style={{
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1050,
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          >
-            <div
-              className="modal-dialog modal-dialog-centered"
-              data-aos="zoom-in"
-            >
-              <div
-                className="modal-content border-0 rounded-4 overflow-hidden"
-                style={{
-                  borderTop: "4px solid #6c63ff",
-                  boxShadow: "0 10px 30px rgba(108, 99, 255, 0.3)",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <div className="modal-header border-0 pb-0 pt-4 px-4">
-                  <h4 className="modal-title fw-bold text-dark">Edit Profil</h4>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setShowModal(false)}
-                    style={{ fontSize: "0.8rem" }}
-                  ></button>
+              <form onSubmit={handleUpdateProfile}>
+                <div className="modal-body pt-0 px-4 pb-3">
+                  <div className="row g-3">
+                    {/* Nama Lengkap */}
+                    <div className="col-12">
+                      <label className="form-label text-dark mb-2">
+                        Nama Lengkap
+                      </label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={editData.fullName}
+                        onChange={handleEditChange}
+                        className="form-control py-2 px-3"
+                        style={{
+                          border: "1px solid rgba(108, 99, 255, 0.3)",
+                          borderRadius: "8px",
+                        }}
+                        required
+                      />
+                    </div>
+
+                    {/* Nomor Telepon */}
+                    <div className="col-12">
+                      <label className="form-label text-dark mb-2">
+                        Nomor Telepon
+                      </label>
+                      <div className="input-group">
+                        <span
+                          className="input-group-text"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderRight: "none",
+                            borderRadius: "8px 0 0 8px",
+                            background: "#f8fafc",
+                            color: "#6c63ff",
+                            fontWeight: "600",
+                          }}
+                        >
+                          +62
+                        </span>
+                        <input
+                          type="tel"
+                          name="phoneNumber"
+                          value={editData.phoneNumber}
+                          onChange={handleEditChange}
+                          className="form-control py-2 px-3"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderLeft: "none",
+                            borderRadius: "0 8px 8px 0",
+                          }}
+                          pattern="^[0-9]{10,15}$"
+                          maxLength={15}
+                          placeholder="81234567890"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password Baru */}
+                    <div className="col-md-6">
+                      <label className="form-label text-dark mb-2">
+                        Password Baru
+                      </label>
+                      <div className="input-group">
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          name="password"
+                          value={editData.password}
+                          onChange={handleEditChange}
+                          className="form-control py-1 px-3"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderRadius: "8px 0 0 8px",
+                          }}
+                          placeholder="••••••"
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary py-3 px-3"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderRadius: "0 8px 8px 0",
+                            backgroundColor: "#ffffff",
+                          }}
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                        >
+                          {showNewPassword ? <FiEyeOff /> : <FiEye />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Konfirmasi Password */}
+                    <div className="col-md-6">
+                      <label className="form-label text-dark mb-2">
+                        Konfirmasi Password
+                      </label>
+                      <div className="input-group">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          name="confirmPassword"
+                          value={editData.confirmPassword}
+                          onChange={handleEditChange}
+                          className="form-control py-1 px-3"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderRadius: "8px 0 0 8px",
+                          }}
+                          placeholder="••••••"
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary py-3 px-3"
+                          style={{
+                            border: "1px solid rgba(108, 99, 255, 0.3)",
+                            borderRadius: "0 8px 8px 0",
+                            backgroundColor: "#ffffff",
+                          }}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                        >
+                          {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <form onSubmit={handleUpdateProfile}>
-                  <div className="modal-body pt-0 px-4 pb-3">
-                    <div className="row g-3">
-                      <div className="col-12" data-aos="fade-up">
-                        <div className="form-group">
-                          <label className="form-label text-dark mb-2">
-                            Nama Lengkap
-                          </label>
-                          <input
-                            type="text"
-                            name="fullName"
-                            value={editData.fullName}
-                            onChange={handleEditChange}
-                            className="form-control py-3 px-3"
-                            style={{
-                              border: "1px solid rgba(108, 99, 255, 0.3)",
-                              borderRadius: "8px",
-                              backgroundColor: "#ffffff",
-                            }}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="col-12" data-aos="fade-up">
-                        <div className="form-group">
-                          <label className="form-label text-dark mb-2">
-                            Nomor Telepon
-                          </label>
-                          <div className="input-group">
-                            <span
-                              className="input-group-text py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderRight: "none",
-                                borderRadius: "8px 0 0 8px",
-                                background: "#f8fafc",
-                                color: "#6c63ff",
-                                fontWeight: "600",
-                              }}
-                            >
-                              +62
-                            </span>
-                            <input
-                              type="tel"
-                              name="phoneNumber"
-                              value={editData.phoneNumber}
-                              onChange={handleEditChange}
-                              className="form-control py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderLeft: "none",
-                                borderRadius: "0 8px 8px 0",
-                                backgroundColor: "#ffffff",
-                              }}
-                              pattern="^[0-9]{10,15}$"
-                              maxLength={15}
-                              placeholder="Contoh: 81234567890"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-6" data-aos="fade-up">
-                        <div className="form-group">
-                          <label className="form-label text-dark mb-2">
-                            Password Baru
-                          </label>
-                          <div className="input-group">
-                            <input
-                              type={showNewPassword ? "text" : "password"}
-                              name="password"
-                              value={editData.password}
-                              onChange={handleEditChange}
-                              className="form-control py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderRadius: "8px 0 0 8px",
-                                backgroundColor: "#ffffff",
-                              }}
-                              placeholder="••••••"
-                              minLength={6}
-                            />
-                            <button
-                              type="button"
-                              className="btn btn-outline-secondary py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderRadius: "0 8px 8px 0",
-                                color: "#6c757d",
-                                backgroundColor: "#ffffff",
-                              }}
-                              onClick={() =>
-                                setShowNewPassword(!showNewPassword)
-                              }
-                            >
-                              {showNewPassword ? <FiEyeOff /> : <FiEye />}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="col-md-6" data-aos="fade-up">
-                        <div className="form-group">
-                          <label className="form-label text-dark mb-2">
-                            Konfirmasi Password
-                          </label>
-                          <div className="input-group">
-                            <input
-                              type={showConfirmPassword ? "text" : "password"}
-                              name="confirmPassword"
-                              value={editData.confirmPassword}
-                              onChange={handleEditChange}
-                              className="form-control py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderRadius: "8px 0 0 8px",
-                                backgroundColor: "#ffffff",
-                              }}
-                              placeholder="••••••"
-                              minLength={6}
-                            />
-                            <button
-                              type="button"
-                              className="btn btn-outline-secondary py-3 px-3"
-                              style={{
-                                border: "1px solid rgba(108, 99, 255, 0.3)",
-                                borderRadius: "0 8px 8px 0",
-                                color: "#6c757d",
-                                backgroundColor: "#ffffff",
-                              }}
-                              onClick={() =>
-                                setShowConfirmPassword(!showConfirmPassword)
-                              }
-                            >
-                              {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                {/* Footer */}
+                <div className="modal-footer border-0 pt-0 px-4 pb-4">
+                  <div className="d-flex gap-3 w-100">
+                    <button
+                      type="button"
+                      className="btn rounded-pill flex-grow-1 py-2 px-3"
+                      style={{
+                        background: "white",
+                        color: "#dc3545",
+                        border: "1px solid #dc3545",
+                        fontWeight: "500",
+                      }}
+                      onClick={() => setShowModal(false)}
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn rounded-pill flex-grow-1 py-2 px-3"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #6c63ff 0%, #0d6edf 100%)",
+                        color: "white",
+                        border: "none",
+                        fontWeight: "500",
+                        boxShadow: "0 4px 15px rgba(108, 99, 255, 0.3)",
+                      }}
+                    >
+                      Simpan Perubahan
+                    </button>
                   </div>
-
-                  <div className="modal-footer border-0 pt-0 px-4 pb-4">
-                    <div className="d-flex gap-3 w-100">
-                      <button
-                        type="button"
-                        className="btn rounded-pill flex-grow-1 py-2 px-3"
-                        style={{
-                          background: "white",
-                          color: "#dc3545",
-                          border: "1px solid #dc3545",
-                          transition: "all 0.3s ease",
-                          fontWeight: "500",
-                        }}
-                        onMouseOver={(e) => {
-                          e.target.style.backgroundColor = "#f8d7da";
-                          e.target.style.transform = "translateY(-2px)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.target.style.backgroundColor = "white";
-                          e.target.style.transform = "translateY(0)";
-                        }}
-                        onClick={() => setShowModal(false)}
-                      >
-                        Batal
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn rounded-pill flex-grow-1 py-2 px-3"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #6c63ff 0%, #0d6edf 100%)",
-                          color: "white",
-                          border: "none",
-                          transition: "all 0.3s ease",
-                          fontWeight: "500",
-                          boxShadow: "0 4px 15px rgba(108, 99, 255, 0.3)",
-                        }}
-                        onMouseOver={(e) => {
-                          e.target.style.transform = "translateY(-2px)";
-                          e.target.style.boxShadow =
-                            "0 6px 20px rgba(108, 99, 255, 0.4)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.target.style.transform = "translateY(0)";
-                          e.target.style.boxShadow =
-                            "0 4px 15px rgba(108, 99, 255, 0.3)";
-                        }}
-                      >
-                        Simpan Perubahan
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+                </div>
+              </form>
             </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
       <Footer />
 
@@ -651,6 +622,13 @@ export default function ProfilePage() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        .overlay {
+          background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+          z-index: 1;
+        }
+        .text-white {
+          color: #fff !important;
         }
 
         .form-control:focus {

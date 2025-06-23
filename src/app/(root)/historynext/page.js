@@ -45,7 +45,7 @@ export default function Historynext() {
   }, []);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white overflow-hidden">
       {/* Hero Section */}
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden"

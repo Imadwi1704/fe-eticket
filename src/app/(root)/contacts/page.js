@@ -23,7 +23,7 @@ export default function Review() {
   const [reviewsData, setReviewsData] = useState({
     reviews: [],
     averageRating: 0,
-    totalReviews: 0
+    totalReviews: 0,
   });
   const [message, setMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -69,12 +69,12 @@ export default function Review() {
       }
 
       const result = await res.json();
-      
+
       if (result.success && result.data) {
         setReviewsData({
           reviews: result.data.reviews || [],
           averageRating: result.data.averageRating || 0,
-          totalReviews: result.data.totalReviews || 0
+          totalReviews: result.data.totalReviews || 0,
         });
       } else {
         throw new Error(result.message || "Invalid data format received");
@@ -85,7 +85,7 @@ export default function Review() {
       setReviewsData({
         reviews: [],
         averageRating: 0,
-        totalReviews: 0
+        totalReviews: 0,
       });
     } finally {
       setLoading(false);
@@ -100,7 +100,7 @@ export default function Review() {
   // Submit review to server
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!token) {
       alert("Anda harus login terlebih dahulu.");
       return;
@@ -193,8 +193,12 @@ export default function Review() {
         <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
         <div className="container position-relative text-center text-white px-4">
           <h1 className="display-4 fw-bold mb-3">Kontak & Ulasan Museum</h1>
-          <p className="lead mb-0 mx-auto text-white" style={{ maxWidth: "600px" }}>
-            Berikan ulasan Anda dan temukan informasi kontak Museum Negeri Ruwa Jurai
+          <p
+            className="lead mb-0 mx-auto text-white"
+            style={{ maxWidth: "600px" }}
+          >
+            Berikan ulasan Anda dan temukan informasi kontak Museum Negeri Ruwa
+            Jurai
           </p>
         </div>
       </section>
@@ -207,10 +211,15 @@ export default function Review() {
             <div className="col-lg-5">
               <div className=" h-100">
                 <div className="card-body p-4">
-                  <h5 className="text-primary mb-4 fw-bold">Informasi Museum</h5>
+                  <h5 className="text-primary mb-4 fw-bold">
+                    Informasi Museum
+                  </h5>
                   <div className="list-group list-group">
                     {museumInfo.map((item, i) => (
-                      <div key={i} className="list-group-item border-0 px-0 py-3">
+                      <div
+                        key={i}
+                        className="list-group-item border-0 px-0 py-3"
+                      >
                         <div className="d-flex">
                           <div className="me-3">{item.icon}</div>
                           <div>
@@ -226,9 +235,12 @@ export default function Review() {
             </div>
 
             {/* Review Form */}
-            <div className="col-lg-7 ">
-              <div className="card border-0 shadow-sm h-100 ">
-                <div className="card-body p-4 p-md-5">
+            <div className="col-lg-7">
+              <div className="card  h-100 ">
+                <div
+                  className="card-body p-4 p-md-5"
+                  style={{ backgroundColor: "#0D6EFD1A" }}
+                >
                   <div className="text-center mb-4">
                     <div className="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
                       <FiStar size={28} className="text-primary" />
@@ -239,7 +251,11 @@ export default function Review() {
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: "600px" }}>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="mx-auto"
+                    style={{ maxWidth: "600px" }}
+                  >
                     <div className="mb-4">
                       <label className="form-label fw-medium">Rating</label>
                       <div className="d-flex align-items-center gap-3">
@@ -249,25 +265,39 @@ export default function Review() {
                               key={star}
                               type="button"
                               className="btn p-0 me-1"
-                              onClick={() => setReview({ ...review, score: star.toString() })}
+                              onClick={() =>
+                                setReview({ ...review, score: star.toString() })
+                              }
                               aria-label={`Rate ${star} star`}
                             >
                               <FiStar
                                 size={28}
-                                className={star <= (review.score || 0) ? "text-warning" : "text-secondary"}
-                                fill={star <= (review.score || 0) ? "#ffc107" : "transparent"}
+                                className={
+                                  star <= (review.score || 0)
+                                    ? "text-warning"
+                                    : "text-secondary"
+                                }
+                                fill={
+                                  star <= (review.score || 0)
+                                    ? "#ffc107"
+                                    : "transparent"
+                                }
                               />
                             </button>
                           ))}
                         </div>
                         <span className="text-primary fw-medium">
-                          {review.score ? `${review.score} bintang` : "Pilih rating"}
+                          {review.score
+                            ? `${review.score} bintang`
+                            : "Pilih rating"}
                         </span>
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <label className="form-label fw-medium">Ulasan Anda</label>
+                      <label className="form-label fw-medium">
+                        Ulasan Anda
+                      </label>
                       <textarea
                         name="comment"
                         value={review.comment}
@@ -288,7 +318,11 @@ export default function Review() {
                       >
                         {loading ? (
                           <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span
+                              className="spinner-border spinner-border-sm me-2"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
                             Mengirim...
                           </>
                         ) : (
@@ -318,7 +352,8 @@ export default function Review() {
                   <div className="d-flex align-items-center">
                     {renderStars(reviewsData.averageRating)}
                     <span className="ms-2 fw-medium">
-                      {reviewsData.averageRating.toFixed(1)} ({reviewsData.totalReviews} ulasan)
+                      {reviewsData.averageRating.toFixed(1)} (
+                      {reviewsData.totalReviews} ulasan)
                     </span>
                   </div>
                 </div>
@@ -327,7 +362,10 @@ export default function Review() {
               {error && (
                 <div className="alert alert-danger text-center">
                   {error}
-                  <button className="btn btn-sm btn-outline-danger ms-3" onClick={fetchReviews}>
+                  <button
+                    className="btn btn-sm btn-outline-danger ms-3"
+                    onClick={fetchReviews}
+                  >
                     Coba Lagi
                   </button>
                 </div>
@@ -360,7 +398,12 @@ export default function Review() {
                             </small>
                           </div>
                           <div className="mb-3">{renderStars(item.score)}</div>
-                          <p className="mb-0" style={{ whiteSpace: "pre-line" }}>{item.comment}</p>
+                          <p
+                            className="mb-0"
+                            style={{ whiteSpace: "pre-line" }}
+                          >
+                            {item.comment}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -448,10 +491,17 @@ export default function Review() {
           position: relative;
           overflow: hidden;
         }
+        .form-control:focus {
+          box-shadow: none;
+          border-color: #0d6efd !important;
+          color: #000000 !important;
+          background-color: #ffffff !important;
+        }
         .card {
           transition: all 0.3s ease;
           border-radius: 0.5rem;
         }
+
         .card:hover {
           transform: translateY(-5px);
           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;

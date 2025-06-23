@@ -125,7 +125,7 @@ export default function CollectionDetail() {
       {/* Hero Section */}
       <div
         className="position-relative w-100 overflow-hidden"
-        style={{ height: "200px" }}
+        style={{ height: "300px" }}
       >
         <Image
           src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${venue.photo}`}
@@ -143,7 +143,7 @@ export default function CollectionDetail() {
           className="position-absolute top-50 start-50 translate-middle text-center text-white"
           style={{ zIndex: 2, whiteSpace: "nowrap" }}
         >
-          <h1 className="display-5 fw-bold m-0">Detail Koleksi {venue.name}</h1>
+          <h2 className=" text-white fw-bold m-0">Detail Koleksi {venue.name}</h2>
         </div>
       </div>
 

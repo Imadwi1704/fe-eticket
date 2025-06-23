@@ -68,18 +68,16 @@ export default function Dashboard() {
       minimumFractionDigits: 0,
     }).format(amount);
   };
-
-  // Fetch dashboard data
+ useEffect(() => {
   const fetchDashboardData = async () => {
     if (!token) {
       console.error("Token tidak tersedia.");
       return;
     }
+    console.log(`Fetching dashboard data dengan token: ${token}`);
 
     try {
       setLoading(true);
-      
-      // Fetch all data in parallel
       const [statsRes, ordersRes, visitorsRes, revenueRes] = await Promise.all([
         fetch(`${page.baseUrl}/api/admin/dashboard/stats`, {
           headers: {
@@ -103,7 +101,6 @@ export default function Dashboard() {
         }),
       ]);
 
-      // Process responses
       if (!statsRes.ok || !ordersRes.ok || !visitorsRes.ok || !revenueRes.ok) {
         throw new Error("Gagal mengambil data dashboard");
       }
@@ -123,6 +120,8 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
+  fetchDashboardData();
+  }, [token, startDate, endDate, selectedYear]);
 
   // Apply date filter
   const applyFilter = () => {
@@ -135,6 +134,7 @@ export default function Dashboard() {
   };
 
  
+  
 
   // Chart data generators
   const generateMonthlySalesChart = () => {
@@ -244,18 +244,7 @@ export default function Dashboard() {
                 <h2 className="fw-bold mb-0 text-primary">Dashboard Admin ERUWAIJURAI</h2>
                 <p className="text-muted mb-0">Analisis dan manajemen data museum</p>
               </div>
-              <button
-                className="btn btn-outline-primary d-flex align-items-center"
-                onClick={fetchDashboardData}
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="spinner-border spinner-border-sm me-1" role="status"></span>
-                ) : (
-                  <FiRefreshCw className="me-1" />
-                )}
-                Refresh
-              </button>
+            
             </div>
           </div>
         </div>

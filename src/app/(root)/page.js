@@ -603,7 +603,7 @@ export default function RootLayout() {
                       position: "absolute",
                       bottom: "-40px",
                       left: "15px",
-                      zIndex: 10,
+                      zIndex: 2,
                     }}
                   >
                     <button
@@ -612,6 +612,7 @@ export default function RootLayout() {
                         width: "40px",
                         height: "40px",
                         transition: "all 0.3s ease",
+                
                       }}
                       onClick={scrollLeft}
                       onMouseEnter={(e) =>

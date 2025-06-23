@@ -18,6 +18,10 @@ export default function TicketAdminPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [fullName, setFullName] = useState("");
   const [ticket, setTicket] = useState({
     code: "",
     type: "",
@@ -26,6 +30,7 @@ export default function TicketAdminPage() {
   });
 
   const token = getCookie("token");
+ 
 
   useEffect(() => {
     if (notification) {
@@ -37,39 +42,39 @@ export default function TicketAdminPage() {
   }, [notification]);
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${page.baseUrl}/api/ticket`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        });
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${page.baseUrl}/api/ticket`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      });
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        const result = await res.json();
+        setData(result);
+      } catch (error) {
+        console.error("Gagal untuk Fetch Data:", error);
+        showNotification("Gagal mengambil data tiket", "error");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const result = await res.json();
-      setData(result);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-      showNotification("Gagal mengambil data tiket", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchData();
+  }, [token]);
 
   const showNotification = (message, type) => {
     setNotification({ message, type, id: Date.now() });
   };
+
+ 
 
   const handleAddTicket = () => {
     setTicket({ code: "", type: "", price: "", terms: "" });
@@ -239,7 +244,7 @@ export default function TicketAdminPage() {
                         <tr key={`ticket-${item.id}`}>
                           <td>{idx + 1}</td>
                           <td>
-                            <span className="badge bg-primary bg-opacity-10 text-primary w-50">
+                            <span className="text-dark">
                               {item.code}
                             </span>
                           </td>
@@ -362,6 +367,7 @@ export default function TicketAdminPage() {
                       Pisahkan setiap poin dengan titik koma (;) atau baris baru
                     </div>
                   </div>
+               
                   <div className="modal-footer">
                     <button
                       type="button"
@@ -495,10 +501,10 @@ export default function TicketAdminPage() {
         >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 overflow-hidden">
-              <div className="modal-header bg-gradient-danger text-white py-3">
+              <div className="modal-header bg-danger text-white py-3">
                 <h5 className="modal-title text-white d-flex align-items-center">
                   <FiAlertCircle className="me-2" size={24} />
-                  <span>Konfirmasi Penghapusan</span>
+                  <span className="tex-white">Konfirmasi Penghapusan</span>
                 </h5>
                 <button
                   type="button"
@@ -668,7 +674,7 @@ export default function TicketAdminPage() {
           background-color: rgba(13, 110, 253, 0.1) !important;
         }
         .modal {
-          backdrop-filter: blur(2px);
+          backdrop-filter: #000;
         }
         .bg-gradient-danger {
           background: linear-gradient(135deg, #ff4d4d, #d93636);

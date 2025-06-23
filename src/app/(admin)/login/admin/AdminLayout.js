@@ -6,38 +6,19 @@ import { getCookie } from "cookies-next";
 import Image from "next/image";
 import page from "@/config/page";
 
-
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
   const token = getCookie("token");
-  const [tickets, setTickets] = useState([]);
   const [activeDropdown, setActiveDropdown] = useState(null);
-
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const res = await fetch(page.baseUrl+"/api/ticket");
-        const data = await res.json();
-        if (res.ok) {
-          setTickets(data);
-        } else {
-          console.error("Gagal ambil tiket:", data.message);
-        }
-      } catch (err) {
-        console.error("Error fetch tiket:", err);
-      }
-    };
-
-    fetchTickets();
-  }, []);
+  const [readReviews, setReadReviews] = useState([]);
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const reviewRes = await fetch(page.baseUrl+"/api/reviews", {
+        const reviewRes = await fetch(page.baseUrl + "/api/reviews", {
           headers: {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
@@ -240,7 +221,6 @@ export default function AdminLayout({ children }) {
                   "bi bi-people-fill me-2",
                   "Data Kunjungan"
                 )}
-               
 
                 {renderSidebarItem(
                   "/login/admin/data_pembayaran",
@@ -304,11 +284,27 @@ export default function AdminLayout({ children }) {
                       style={{ color: "var(--primary-color)" }}
                     >
                       <i className="ti ti-bell-ringing fs-5" />
-                      {reviews.length > 0 && (
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                          {reviews.length}
-                        </span>
-                      )}
+                      <div className="d-flex align-items-center">
+                        <button
+                          className="btn position-relative"
+                          type="button"
+                          onClick={() => setShowModal(true)}
+                          style={{ color: "var(--primary-color)" }}
+                        >
+
+                          {reviews.length > 0 &&
+                            reviews.filter((r) => !readReviews.includes(r.id))
+                              .length > 0 && (
+                              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {
+                                  reviews.filter(
+                                    (r) => !readReviews.includes(r.id)
+                                  ).length
+                                }
+                              </span>
+                            )}
+                        </button>
+                      </div>
                     </button>
                   </div>
 
@@ -360,23 +356,27 @@ export default function AdminLayout({ children }) {
             </nav>
           </header>
 
-          <div
-            className="container-fluid p-0"
-          >
-            {children}
-          </div>
+          <div className="container-fluid p-0">{children}</div>
         </div>
       </div>
 
       {showModal && (
         <div
           className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          style={{
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1050,
+          }}
         >
           <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content border-0 shadow-lg">
-              <div className="modal-header">
-                <h5 className="modal-title text-white">
+            <div
+              className="modal-content border-0 rounded-4 overflow-hidden shadow"
+              style={{
+                background: "linear-gradient(to bottom, #ffffff, #f8f9fa)",
+              }}
+            >
+              <div className="modal-header bg-primary text-white py-3 px-4">
+                <h5 className="modal-title fw-bold text-white">
                   {selectedReview
                     ? "Detail Review"
                     : "Daftar Review Pengunjung"}
@@ -391,28 +391,39 @@ export default function AdminLayout({ children }) {
                 />
               </div>
 
-              <div className="modal-body p-4">
+              <div className="modal-body p-4 bg-white">
                 {selectedReview ? (
-                  <div className="row g-3">
+                  <div className="row g-4">
                     <div className="col-md-6">
-                      <label className="fw-bold text-primary">Nama:</label>
-                      <p>{selectedReview.user?.fullName}</p>
+                      <label className="fw-semibold text-secondary">
+                        Nama:
+                      </label>
+                      <p className="mb-0 ">{selectedReview.user?.fullName}</p>
                     </div>
                     <div className="col-md-6">
-                      <label className="fw-bold text-primary">Rating:</label>
-                      <div className="text-warning">
+                      <label className="fw-semibold text-secondary">
+                        Rating:
+                      </label>
+                      <div className="text-warning fs-5">
                         {"★".repeat(selectedReview.score)}
+                        {"☆".repeat(5 - selectedReview.score)}
                       </div>
                     </div>
                     <div className="col-md-6">
-                      <label className="fw-bold text-primary">Tanggal:</label>
-                      <p>{selectedReview.date}</p>
+                      <label className="fw-semibold text-secondary">
+                        Tanggal:
+                      </label>
+                      <p className="mb-0">{selectedReview.date}</p>
                     </div>
                     <div className="col-12">
-                      <label className="fw-bold text-primary">Komentar:</label>
-                      <p className="border p-3 rounded bg-light">
-                        {selectedReview.comment}
-                      </p>
+                      <label className="fw-semibold text-secondary">
+                        Komentar:
+                      </label>
+                      <div className="border rounded p-3 bg-light">
+                        <p className="mb-0 text-dark">
+                          {selectedReview.comment}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -421,19 +432,52 @@ export default function AdminLayout({ children }) {
                       reviews.map((review) => (
                         <button
                           key={review.id}
-                          className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                          onClick={() => setSelectedReview(review)}
+                          className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm ${
+                            readReviews.includes(review.id) ? "text-muted" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedReview(review);
+                            setReadReviews((prev) => [
+                              ...new Set([...prev, review.id]),
+                            ]);
+                          }}
+                          style={{
+                            backgroundColor: readReviews.includes(review.id)
+                              ? "#ffffff"
+                              : "#3d8bfd",
+                            cursor: "pointer",
+                          }}
                         >
                           <div>
-                            <span className="fw-bold text-primary">
+                            <span
+                              className={`fw-bold ${
+                                readReviews.includes(review.id)
+                                  ? "text-dark"
+                                  : "text-white"
+                              }`}
+                            >
                               {review.user?.fullName}
                             </span>
                             <br />
-                            <small className="text-muted">{review.date}</small>
+                            <small
+                              className={`fw-bold ${
+                                readReviews.includes(review.id)
+                                  ? "text-dark"
+                                  : "text-white"
+                              }`}
+                            >
+                              {review.date}
+                            </small>
                           </div>
-                          <span className="badge bg-primary rounded-pill">
+                          <h3
+                            className={`badge rounded-pill ${
+                              readReviews.includes(review.id)
+                                ? "bg-secondary"
+                                : "bg-primary"
+                            }`}
+                          >
                             {review.score}/5
-                          </span>
+                          </h3>
                         </button>
                       ))
                     ) : (
@@ -446,13 +490,13 @@ export default function AdminLayout({ children }) {
               </div>
 
               {selectedReview && (
-                <div className="modal-footer">
+                <div className="modal-footer bg-light border-0 px-4 py-3">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="btn btn-outline-primary rounded-pill px-4"
                     onClick={() => setSelectedReview(null)}
                   >
-                    Kembali ke Daftar
+                    ← Kembali ke Daftar
                   </button>
                 </div>
               )}

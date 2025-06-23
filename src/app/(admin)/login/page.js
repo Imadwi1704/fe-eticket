@@ -83,6 +83,7 @@ const LoginPage = () => {
 
       if (res.ok && data.status === "success") {
         // Set cookies
+        setCookie("fullName", data.data.user.fullName);
         setCookie("token", data.data.token, {
           maxAge: 60 * 60 * 24,
           path: "/",
@@ -91,7 +92,10 @@ const LoginPage = () => {
           maxAge: 60 * 60 * 24,
           path: "/",
         });
-
+        // setCookie("fullName", "ini full name", {
+        //   maxAge: 60 * 60 * 24,
+        //   path: "/",
+        // });
         // Redirect based on role
         const redirectPath =
           data.data.role === "ADMIN" ? "/login/admin/dashboard" : "/";

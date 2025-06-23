@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
-const Navbar = dynamic(() => import("../../components/Navbar"), { ssr: false });
+const Navbar = dynamic(() => import("../../components/Navbar/Navbar"), { ssr: false });
 const Belitiketbutton = dynamic(() => import("../../components/Belitiketbutton"), { ssr: false });
 
 export default function IndexLayout({ children }) {

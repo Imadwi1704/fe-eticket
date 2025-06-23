@@ -34,7 +34,7 @@ export default function Aboutnext() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to fetch tickets");
+        throw new Error("Gagal untuk mengambil data tiket");
       }
 
       const data = await res.json();
@@ -48,7 +48,7 @@ export default function Aboutnext() {
   };
 
   return (
-    <>
+    <div className="overflow-hidden">
       {/* Hero Section */}
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center overflow-hidden"
@@ -665,9 +665,9 @@ export default function Aboutnext() {
           --dark: #212529;
           --light: #f8f9fa;
         }
-          .text-white {
+        .text-white {
           color: #ffffff !important;
-      }
+        }
 
         body {
           scroll-behavior: smooth;
@@ -719,7 +719,7 @@ export default function Aboutnext() {
           bottom: 0;
           left: 15px;
           width: 2px;
-          background: #0D6EFD;
+          background: #0d6efd;
         }
 
         .timeline-badge {
@@ -729,9 +729,14 @@ export default function Aboutnext() {
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          background: #0D6EFD;
+          background: #0d6efd;
           border: 4px solid var(--dark);
           z-index: 1;
+        }
+        a:focus,
+        button:focus {
+          outline: none !important;
+          outline-offset: 0 !important;
         }
 
         .nav-tabs {
@@ -805,6 +810,6 @@ export default function Aboutnext() {
           }
         }
       `}</style>
-    </>
+    </div>
   );
 }

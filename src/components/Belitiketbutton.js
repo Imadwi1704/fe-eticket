@@ -22,11 +22,11 @@ const BeliTiketButton = () => {
     <motion.button
       className="flex items-center justify-center overflow-hidden relative"
       style={{
-        height: "48px",
+        height: "50px",
         padding: "0 16px",
         backgroundColor: "#0D6EFD",
         borderRadius: "24px",
-        border: "none",
+        border: "2px solid #ffffff",
         cursor: "pointer",
         gap: "8px",
         minWidth: "48px",
@@ -107,7 +107,7 @@ const BeliTiketButton = () => {
           className="absolute inset-0 bg-white opacity-30 rounded-full"
           initial={{ scale: 0, opacity: 0.5 }}
           animate={{ scale: 2, opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.1, ease: "easeInOut" }}
         />
       )}
 

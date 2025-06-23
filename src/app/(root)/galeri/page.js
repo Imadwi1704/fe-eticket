@@ -85,7 +85,7 @@ export default function Gallery() {
   };
 
   return (
-    <div className="bg-light">
+    <div className="bg-white">
       {/* Hero Section */}
       <section
         className="hero-section position-relative d-flex align-items-center justify-content-center"

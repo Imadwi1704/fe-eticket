@@ -9,9 +9,10 @@ import DatePicker from "react-datepicker";
 import { id } from "date-fns/locale";
 import { isMonday, format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
-import page from '@/config/page';
+import page from "@/config/page";
+import Link from "next/link";
+import Image from "next/image";
 
-// Daftar libur nasional 2025 (contoh)
 const nationalHolidays = [
   new Date(2025, 0, 1), // Tahun Baru
   new Date(2025, 0, 6), // Hari Raya Natal
@@ -52,7 +53,7 @@ export default function Ticket() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch(page.baseUrl+"/api/ticket", {
+      const res = await fetch(page.baseUrl + "/api/ticket", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -75,7 +76,7 @@ export default function Ticket() {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch(page.baseUrl+"/api/users/profile", {
+      const res = await fetch(page.baseUrl + "/api/users/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -140,7 +141,7 @@ export default function Ticket() {
 
     try {
       setLoading(true);
-      const res = await fetch(page.baseUrl+"/api/payments", {
+      const res = await fetch(page.baseUrl + "/api/payments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -269,6 +270,12 @@ export default function Ticket() {
           border: 1px solid #ced4da;
           padding: 5px;
         }
+        .form-control:focus {
+          background-color: #fff !important;
+          border-color: #86b7fe !important;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+          color: #000 !important;
+        }
         .total-box {
           background-color: #f8f9fa;
           border-radius: 10px;
@@ -303,7 +310,6 @@ export default function Ticket() {
           height: 3rem;
         }
 
-        /* Perbaikan untuk form-control focus */
         .ticket-page .form-control:focus {
           background-color: #fff !important;
           border-color: #86b7fe !important;
@@ -317,9 +323,12 @@ export default function Ticket() {
           box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
           outline: none;
         }
+        .text-white {
+          color: #ffffff !important;
+        }
       `}</style>
 
-      <main className="py-5 bg-light min-vh-100">
+      <div className="overflow-hidden ticket-page">
         {loading && (
           <div className="loading-overlay">
             <div className="spinner-border text-primary" role="status">
@@ -327,41 +336,78 @@ export default function Ticket() {
             </div>
           </div>
         )}
-
+        {/* Hero Section */}
+        <section className="bg-primary bg-gradient text-white py-5">
+          <div className="container py-4">
+            <div className="row align-items-center">
+              <div className="col-lg-8">
+                <h1 className="display-5 fw-bold mb-3 text-white">
+                  Pemesanan Tiket
+                </h1>
+                <p className="lead mb-4 text-white">
+                  Pesan tiket kunjungan Anda dengan mudah dan cepat. Pilih
+                  tanggal, jenis tiket, dan jumlah yang diinginkan. Pastikan
+                  untuk memilih tanggal yang sesuai dengan jadwal kunjungan
+                  Anda.
+                </p>
+                <div className="d-flex gap-3">
+                  <Link href="/" className="btn btn-light px-2">
+                    <i className="bi bi-arrow-left me-3"></i>
+                    Kembali ke Beranda
+                  </Link>
+                </div>
+              </div>
+              <div className="col-lg-4 d-none d-lg-block">
+                <Image
+                  src="/assets/images/ticket.jpg"
+                  alt="Payment Illustration"
+                  className="img-fluid"
+                  width={600}
+                  height={400}
+                  style={{ maxHeight: "250px", objectFit: "contain" }}
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </section>
         <div className="container my-5">
           <div className="row justify-content-center">
-            <div className="col-lg-8">
-              <div className="text-center mb-5">
-                <p className="lead text-muted">
-                  Pilih tanggal kunjungan dan jumlah tiket yang diinginkan
-                </p>
-              </div>
-
+            <div className="col-lg-10">
               {error ? (
-                <div className="alert alert-danger text-center">
-                  <i className="fas fa-exclamation-circle me-2"></i>
-                  {error}
-                  {!token && (
-                    <div className="mt-2">
-                      <a href="/login" className="btn btn-sm btn-primary">
-                        Login Sekarang
-                      </a>
+                <div className="alert alert-danger text-center rounded-lg shadow-sm">
+                  <div className="d-flex align-items-center justify-content-center">
+                    <i className="fas fa-exclamation-circle me-3 fs-4"></i>
+                    <div>
+                      <h5 className="mb-1">Terjadi Kesalahan</h5>
+                      <p className="mb-0">{error}</p>
+                      {!token && (
+                        <div className="mt-3">
+                          <a href="/login" className="btn btn-primary px-4">
+                            <i className="fas fa-sign-in-alt me-2"></i>
+                            Login Sekarang
+                          </a>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : (
-                <div className="card border-0 shadow-sm">
-                  <div className="card-body p-4">
-                    <div className="row">
-                      <div className="col-md-6 mb-4 mb-md-0">
+                <div className="card border-0 shadow-lg overflow-hidden bg-white">
+                  <div className="card-body p-0">
+                    <div className="row g-0">
+                      <div className="col-md-6 p-4" style={{backgroundColor: "#0D6EFD1A"} }>
                         <div className="date-picker-container mb-4">
-                          <label
-                            htmlFor="tanggal"
-                            className="form-label fw-bold"
-                          >
-                            <i className="fas fa-calendar-alt me-2"></i>
-                            Tanggal Kunjungan
-                          </label>
+                          <div className="d-flex align-items-center mb-3">
+                            <div
+                              className="d-flex align-items-center justify-content-center bg-primary p-3 rounded-circle me-2"
+                              style={{ width: "40px", height: "40px" }}
+                            >
+                              <i className="fas fa-calendar-alt text-white"></i>
+                            </div>
+                            <h4 className="fw-bold mb-0 text-dark">Tanggal Kunjungan</h4>
+                          </div>
+
                           <DatePicker
                             selected={selectedDate}
                             onChange={(date) => setSelectedDate(date)}
@@ -370,36 +416,53 @@ export default function Ticket() {
                             minDate={new Date()}
                             filterDate={(date) => !isDateDisabled(date)}
                             dayClassName={dayClassName}
-                            className="form-control form-control-lg"
+                            className="form-control form-control-lg border-2 py-1"
                             placeholderText="Pilih tanggal"
                             required
                           />
-                          <div className="date-info">
-                            <i className="fas fa-info-circle me-1"></i>
-                            Hari Senin dan hari libur nasional tutup
+
+                          <div className="mt-2 text-muted">
+                            <small>
+                              <i className="fas fa-info-circle me-1 text-primary"></i>
+                              Hari Senin dan hari libur nasional tutup
+                            </small>
                           </div>
                         </div>
 
-                        <div className="alert alert-info">
-                          <h5 className="alert-heading">
-                            <i className="fas fa-lightbulb me-2"></i>
-                            Informasi Penting
-                          </h5>
-                          <ul className="mb-0">
-                            <li>Pembelian tiket minimal 1 hari sebelumnya</li>
-                            <li>Tiket tidak dapat dibatalkan setelah dibeli</li>
-                            <li>Waktu kunjungan: 09:00 - 17:00 WIB</li>
-                          </ul>
+                        <div className="alert alert-primary border-start border-primary border-5 rounded-start-0 bg-white">
+                          <div className="d-flex">
+                            <i className="fas fa-lightbulb text-primary fs-4 me-3"></i>
+                            <div>
+                              <h5 className="alert-heading fw-bold">
+                                Informasi Penting
+                              </h5>
+                              <ul className="mb-0 ps-3 text-dark">
+                                <li className="mb-1 text-dark">
+                                  Pembelian tiket minimal 1 hari sebelumnya
+                                </li>
+                                <li className="mb-1 text-dark">
+                                  Tiket tidak dapat dibatalkan setelah dibeli
+                                </li>
+                                <li className="text-dark">Waktu kunjungan: 08:00 - 14:00 WIB</li>
+                              </ul>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="col-md-6">
-                        <h4 className="fw-bold mb-4">
-                          <i className="fas fa-ticket-alt me-2"></i>
-                          Pilih Tiket
-                        </h4>
+                      <div className="col-md-6 p-4">
+                        <div className="d-flex align-items-center mb-4">
+                          <div
+                            className="d-flex align-items-center justify-content-center bg-primary p-3 rounded-circle me-2"
+                            style={{ width: "40px", height: "40px" }}
+                          >
+                            <i className="fas fa-ticket-alt text-white"></i>
+                          </div>
 
-                        <div className="mb-4">
+                          <h4 className="fw-bold mb-0">Pilih Tiket</h4>
+                        </div>
+
+                        <div className="ticket-list">
                           {tickets.map((ticket) => {
                             const selected = selectedTicket.find(
                               (item) => item.id === ticket.id
@@ -409,28 +472,44 @@ export default function Ticket() {
                             return (
                               <div
                                 key={ticket.id}
-                                className={`ticket-card card mb-3 ${
-                                  quantity > 0 ? "selected" : ""
+                                className={`ticket-card card mb-3 overflow-hidden transition-all ${
+                                  quantity > 0
+                                    ? "border-primary border-2 shadow-lg transform scale-[1.02]"
+                                    : "border-light"
                                 }`}
+                                style={{
+                                  transition: "all 0.3s ease",
+                                  borderRadius: "12px",
+                                  borderLeft:
+                                    quantity > 0
+                                      ? "4px solid #0d6efd"
+                                      : "4px solid #f8f9fa",
+                                }}
                               >
-                                <div className="card-body">
-                                  <div className="d-flex justify-content-between align-items-center">
+                                <div className="card-body p-4">
+                                  <div className="d-flex justify-content-between align-items-start mb-3">
                                     <div>
-                                      <h5 className="fw-bold mb-1">
+                                      <h5 className="fw-bold mb-1 text-gradient-primary">
                                         {ticket.type}
                                       </h5>
-                                      <p className="text-muted small mb-2">
+                                      <p className="text-muted small mb-0">
+                                        <i className="fas fa-info-circle me-1 text-primary"></i>
                                         {ticket.terms}
                                       </p>
-                                      <p className="text-success mb-0">
+                                    </div>
+                                    <div className="bg-primary bg-opacity-10 px-3 py-2 rounded-pill">
+                                      <h4 className="text-primary mb-0 fw-bold">
                                         Rp{" "}
                                         {ticket.price.toLocaleString("id-ID")}
-                                      </p>
+                                      </h4>
                                     </div>
-                                    <div className="d-flex align-items-center gap-2">
+                                  </div>
+
+                                  <div className="d-flex align-items-center justify-content-between mt-4">
+                                    <div className="quantity-selector d-flex align-items-center">
                                       <button
                                         type="button"
-                                        className="btn btn-outline-danger btn-sm"
+                                        className="btn btn-outline-danger btn-icon rounded-circle"
                                         onClick={() =>
                                           handleQuantityChange(
                                             ticket,
@@ -441,22 +520,14 @@ export default function Ticket() {
                                       >
                                         <i className="fas fa-minus"></i>
                                       </button>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max="10"
-                                        value={quantity}
-                                        onChange={(e) =>
-                                          handleQuantityChange(
-                                            ticket,
-                                            e.target.value
-                                          )
-                                        }
-                                        className="quantity-input"
-                                      />
+                                      <div className="quantity-display mx-3 px-3 py-1 bg-light rounded">
+                                        <span className="fw-bold fs-5">
+                                          {quantity}
+                                        </span>
+                                      </div>
                                       <button
                                         type="button"
-                                        className="btn btn-outline-success btn-sm"
+                                        className="btn btn-outline-success btn-icon rounded-circle"
                                         onClick={() =>
                                           handleQuantityChange(
                                             ticket,
@@ -468,22 +539,43 @@ export default function Ticket() {
                                         <i className="fas fa-plus"></i>
                                       </button>
                                     </div>
+
+                                    {quantity > 0 && (
+                                      <div className="text-end">
+                                        <span className="text-muted small d-block">
+                                          Subtotal
+                                        </span>
+                                        <h5 className="text-success mb-0 fw-bold">
+                                          Rp{" "}
+                                          {(
+                                            ticket.price * quantity
+                                          ).toLocaleString("id-ID")}
+                                        </h5>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
+
+                                {quantity > 0 && (
+                                  <div className="selected-indicator bg-primary text-white text-center py-1 small">
+                                    <i className="fas fa-check-circle me-2"></i>
+                                    Ditambahkan ke keranjang
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
                         </div>
 
-                        <div className="total-box mt-4">
+                        <div className="total-box bg-light p-4 rounded mt-4">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <h5 className="fw-bold mb-0">Total Pembayaran:</h5>
-                            <h3 className="fw-bold text-primary mb-0">
+                            <h3 className="fw-bold text-dark mb-0">
                               Rp {totalPrice.toLocaleString("id-ID")}
                             </h3>
                           </div>
                           <button
-                            className="btn btn-primary btn-lg w-100 py-3"
+                            className="btn btn-primary btn-lg w-80 py-2 rounded-2"
                             type="button"
                             data-bs-toggle="modal"
                             data-bs-target="#confirmationModal"
@@ -527,13 +619,15 @@ export default function Ticket() {
           tabIndex={-1}
           aria-hidden="true"
         >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 shadow">
               <div className="modal-header bg-primary text-white">
-                <h5 className="modal-title text-white">
-                  <i className="fas fa-check-circle me-2 text-white"></i>
-                  Konfirmasi Pemesanan
-                </h5>
+                <div className="d-flex align-items-center">
+                  <i className="fas fa-check-circle me-2 fs-4"></i>
+                  <h5 className="modal-title mb-2 text-white">
+                    Konfirmasi Pemesanan
+                  </h5>
+                </div>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
@@ -541,51 +635,73 @@ export default function Ticket() {
                   aria-label="Close"
                 ></button>
               </div>
-              <div className="modal-body">
-                <div className="mb-4">
-                  <p className="text-dark">Detail Pesanan</p>
-                  <div className="d-flex justify-content-between mb-2">
-                    <span>Tanggal Kunjungan:</span>
-                    <strong>
-                      {selectedDate && format(selectedDate, "dd MMMM yyyy")}
-                    </strong>
+              <div className="modal-body p-4">
+                <div className="row">
+                  <div className="col-md-6 mb-4 mb-md-0">
+                    <h6 className="fw-bold text-primary mb-3">
+                      <i className="fas fa-calendar-day me-2"></i>
+                      Detail Kunjungan
+                    </h6>
+                    <div className="bg-light p-3 rounded">
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Tanggal:</span>
+                        <span>
+                          {selectedDate && format(selectedDate, "dd MMMM yyyy")}
+                        </span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Jam:</span>
+                        <span>08:00 - 14:00 WIB</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <h6 className="fw-bold text-primary mb-3">
+                      <i className="fas fa-ticket-alt me-2"></i>
+                      Tiket Anda
+                    </h6>
+                    <div className="bg-light p-3 rounded">
+                      {selectedTicket.map((item) => (
+                        <div
+                          key={item.id}
+                          className="d-flex justify-content-between align-items-center mb-2"
+                        >
+                          <div>
+                            <strong>{item.type}</strong>
+                            <div className="text-muted small">
+                              {item.qty} x Rp{" "}
+                              {item.price.toLocaleString("id-ID")}
+                            </div>
+                          </div>
+                          <span className="badge bg-primary rounded-pill px-3 py-2">
+                            Rp {(item.price * item.qty).toLocaleString("id-ID")}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <p className="text-dark">Tiket yang dibeli:</p>
-                <ul className="list-group mb-4">
-                  {selectedTicket.map((item) => (
-                    <li
-                      key={item.id}
-                      className="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      <div>
-                        <strong>{item.type}</strong>
-                        <div className="text-muted small">
-                          Rp {item.price.toLocaleString("id-ID")} x {item.qty}
-                        </div>
-                      </div>
-                      <span className="badge bg-primary rounded-pill">
-                        Rp {(item.price * item.qty).toLocaleString("id-ID")}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="d-flex justify-content-between align-items-center border-top pt-3">
-                  <h5 className="fw-bold mb-0">Total:</h5>
-                  <h4 className="fw-bold text-primary mb-0">
-                    Rp {totalPrice.toLocaleString("id-ID")}
-                  </h4>
+                <div className="bg-primary bg-opacity-10 p-3 rounded mt-4">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h3 className=" mb-0">Total Pembayaran:</h3>
+                    <h4 className="fw-bold text-primary mb-0">
+                      Rp {totalPrice.toLocaleString("id-ID")}
+                    </h4>
+                  </div>
                 </div>
               </div>
-              <div className="modal-footer">
-                <button className="btn btn-danger" data-bs-dismiss="modal">
+              <div className="modal-footer border-0">
+                <button
+                  className="btn btn-outline-danger px-4"
+                  data-bs-dismiss="modal"
+                >
                   <i className="fas fa-times me-2"></i>
                   Batal
                 </button>
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary px-4 fw-bold"
                   onClick={handleConfirmOrder}
                   disabled={loading}
                 >
@@ -600,7 +716,7 @@ export default function Ticket() {
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-credit-card me-2 text-white"></i>
+                      <i className="fas fa-credit-card me-2"></i>
                       Konfirmasi Pembayaran
                     </>
                   )}
@@ -609,7 +725,55 @@ export default function Ticket() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
+      <style jsx>{`
+      /* Add these styles to your CSS file */
+.ticket-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.text-gradient-primary {
+  background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+}
+
+.quantity-display {
+  min-width: 50px;
+  text-align: center;
+}
+
+.selected-indicator {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+      }`}</style>
 
       <Footer />
       <Script src="/assets/js/jquery.min.js" strategy="lazyOnload" />
