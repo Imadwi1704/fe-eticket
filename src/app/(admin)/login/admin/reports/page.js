@@ -79,7 +79,7 @@ const FilterLaporan = () => {
       <div className="container-fluid py-5" style={{ minHeight: "100vh" }}>
         <div className="row justify-content-center">
           <div className="col-md-8 mt-5">
-            <div className="card shadow-sm  border-0">
+            <div className="card border-1 ">
               <div className="card-header bg-primary text-white">
                 <h2 className="card-title fw-semibold mb-0 text-white">
                   Filter Laporan Pemesanan

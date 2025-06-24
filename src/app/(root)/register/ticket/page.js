@@ -498,10 +498,10 @@ export default function Ticket() {
                                       </p>
                                     </div>
                                     <div className="bg-primary bg-opacity-10 px-3 py-2 rounded-pill">
-                                      <h4 className="text-primary mb-0 fw-bold">
+                                      <h3 className="text-primary mb-0 fw-bold">
                                         Rp{" "}
                                         {ticket.price.toLocaleString("id-ID")}
-                                      </h4>
+                                      </h3>
                                     </div>
                                   </div>
 

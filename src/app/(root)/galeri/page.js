@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import Footer from "@/components/Footer";
-import { FiSearch, FiGrid, FiList } from "react-icons/fi";
+import { FiSearch, FiGrid, FiList, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import page from "@/config/page";
@@ -17,6 +17,8 @@ export default function Gallery() {
   const [viewMode, setViewMode] = useState("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const categories = [
     { id: "all", name: "Semua Kategori" },
@@ -25,16 +27,13 @@ export default function Gallery() {
     { id: "EVENT", name: "Event" },
   ];
 
-  // Handle category change with URL update
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
-    // Update URL without page reload
     router.push(`/galeri/?category=${categoryId}`, undefined, {
       shallow: true,
     });
   };
 
-  // Read URL params on initial load
   useEffect(() => {
     if (typeof window !== "undefined") {
       const queryParams = new URLSearchParams(window.location.search);
@@ -82,6 +81,26 @@ export default function Gallery() {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  const openImageModal = (item, index) => {
+    setSelectedImage(item);
+    setCurrentImageIndex(index);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
+  const navigateImages = (direction) => {
+    let newIndex;
+    if (direction === "prev") {
+      newIndex = currentImageIndex === 0 ? filteredItems.length - 1 : currentImageIndex - 1;
+    } else {
+      newIndex = currentImageIndex === filteredItems.length - 1 ? 0 : currentImageIndex + 1;
+    }
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(filteredItems[newIndex]);
   };
 
   return (
@@ -136,6 +155,15 @@ export default function Gallery() {
                   value={searchTerm}
                   onChange={handleSearch}
                 />
+                {searchTerm && (
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <FiX size={18} />
+                  </button>
+                )}
               </div>
             </div>
             <div className="col-md-4 d-flex justify-content-md-end">
@@ -231,44 +259,40 @@ export default function Gallery() {
           {/* Grid View */}
           {!isLoading && items.length > 0 && viewMode === "grid" && (
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-              {filteredItems.map((item) => (
+              {filteredItems.map((item, index) => (
                 <div className="col" key={item.id}>
-                  <div className="card h-100 border-0 shadow-sm overflow-hidden">
-                    <div
-                      className="card-img-top"
-                      style={{
-                        height: "250px",
-                        width: "100%",
-                        position: "relative",
-                      }}
-                    >
+                  <div 
+                    className="card h-100 border-0 shadow-sm overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                    onClick={() => openImageModal(item, index)}
+                  >
+                    <div className="card-img-top relative h-[250px] w-full">
                       {item.imageUrl ? (
                         <Image
                           src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.imageUrl}`}
                           alt={item.title || "Gambar"}
                           fill
                           style={{ objectFit: "cover" }}
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          sizes="(max-width: 500px) 100vw, (max-width: 500px) 50vw, 33vw"
                           onError={(e) => {
                             e.currentTarget.src =
                               "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
                           }}
                         />
                       ) : (
-                        <div
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            backgroundColor: "#e2e4e4",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#777",
-                          }}
-                        >
+                        <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-600">
                           Gambar tidak tersedia
                         </div>
                       )}
+                      {/* Overlay pada hover */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex items-end p-4">
+                        <div className="text-white opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 w-full">
+                          <h5 className="font-bold text-lg mb-1 truncate">{item.title}</h5>
+                          <p className="text-sm line-clamp-2">{item.description}</p>
+                          <div className="mt-2 text-xs text-gray-300">
+                            {categories.find(c => c.id === item.category)?.name}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -281,64 +305,40 @@ export default function Gallery() {
             <div className="row">
               <div className="col-12">
                 <div className="list-group">
-                  {filteredItems.map((item) => (
-                    <div
-                      className="list-group-item list-group-item-action p-3"
-                      key={item.id}
+                  {filteredItems.map((item, index) => (
+                    <div 
+                      key={item.id} 
+                      className="list-group-item list-group-item-action p-0 mb-3 border-0 shadow-sm rounded overflow-hidden cursor-pointer"
+                      onClick={() => openImageModal(item, index)}
                     >
-                      <div className="row align-items-center">
-                        <div className="col-md-2">
-                          <div
-                            style={{
-                              height: "120px",
-                              width: "100%",
-                              position: "relative",
-                            }}
-                          >
-                            {item.imageUrl ? (
-                              <Image
-                                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.imageUrl}`}
-                                alt={item.title || "Gambar"}
-                                fill
-                                style={{ objectFit: "cover" }}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                onError={(e) => {
-                                  e.currentTarget.src =
-                                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
-                                }}
-                              />
-                            ) : (
-                              <div
-                                style={{
-                                  height: "100%",
-                                  width: "100%",
-                                  backgroundColor: "#e2e4e4",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  color: "#777",
-                                }}
-                              >
-                                Gambar tidak tersedia
-                              </div>
-                            )}
-                          </div>
+                      <div className="d-flex flex-column flex-md-row">
+                        <div className="col-md-3 position-relative" style={{ height: "200px" }}>
+                          {item.imageUrl ? (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${item.imageUrl}`}
+                              alt={item.title || "Gambar"}
+                              fill
+                              style={{ objectFit: "cover" }}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                              onError={(e) => {
+                                e.currentTarget.src =
+                                  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
+                              }}
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-600">
+                              Gambar tidak tersedia
+                            </div>
+                          )}
                         </div>
-                        <div className="col-md-8">
-                          <div className="d-flex flex-column">
-                            <span className="badge bg-primary mb-1 align-self-start">
-                              {categories.find((c) => c.id === item.category)
-                                ?.name || "Tidak Berkategori"}
+                        <div className="col-md-9 p-4">
+                          <div className="d-flex justify-content-between align-items-start">
+                            <h5 className="mb-2 fw-bold">{item.title}</h5>
+                            <span className="badge bg-primary">
+                              {categories.find(c => c.id === item.category)?.name}
                             </span>
                           </div>
-                        </div>
-                        <div className="col-md-2 text-md-end mt-3 mt-md-0">
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => router.push(`/gallery/${item.id}`)}
-                          >
-                            Detail
-                          </button>
+                          <p className="mb-0 text-muted">{item.description}</p>
                         </div>
                       </div>
                     </div>
@@ -374,6 +374,59 @@ export default function Gallery() {
         </div>
       </section>
 
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
+          <div className="modal-dialog modal-dialog-centered modal-xl">
+            <div className="modal-content border-0 bg-transparent">
+              <div className="modal-header border-0">
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={closeImageModal}
+                ></button>
+              </div>
+              <div className="modal-body text-center">
+                <div className="position-relative" style={{ minHeight: '60vh' }}>
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${selectedImage.imageUrl}`}
+                    alt={selectedImage.title || "Gambar"}
+                    fill
+                    style={{ objectFit: 'contain' }}
+                    sizes="100vw"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNlMmU0ZTQiLz48dGV4dCB4PSIyMCIgeT0iNTUiIGZvbnQtc2l6ZT0iMTBweCIgZmlsbD0iIzc3NyI+SW1hZ2Ugbm90IGZvdW5kPC90ZXh0Pjwvc3ZnPg==";
+                    }}
+                  />
+                </div>
+                <div className="mt-4 text-white">
+                  <h4 className="fw-bold">{selectedImage.title}</h4>
+                  <p>{selectedImage.description}</p>
+                  <div className="badge bg-primary mb-3">
+                    {categories.find(c => c.id === selectedImage.category)?.name}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer border-0 justify-content-between">
+                <button 
+                  className="btn btn-outline-light"
+                  onClick={() => navigateImages("prev")}
+                >
+                  <FiChevronLeft size={24} /> Sebelumnya
+                </button>
+                <button 
+                  className="btn btn-outline-light"
+                  onClick={() => navigateImages("next")}
+                >
+                  Selanjutnya <FiChevronRight size={24} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
 
       {/* Script Tambahan */}
@@ -401,6 +454,14 @@ export default function Gallery() {
 
         .list-group-item {
           transition: background-color 0.2s ease;
+        }
+
+        .list-group-item:hover {
+          background-color: #f8f9fa;
+        }
+
+        .modal {
+          backdrop-filter: blur(5px);
         }
 
         @media (max-width: 768px) {
