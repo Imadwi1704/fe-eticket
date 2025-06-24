@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { getCookie } from "cookies-next";
+import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { getCookie, deleteCookie } from "cookies-next";
 import Image from "next/image";
 import page from "@/config/page";
 
 export default function AdminLayout({ children }) {
+  const router = useRouter();
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -14,7 +15,38 @@ export default function AdminLayout({ children }) {
   const token = getCookie("token");
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [readReviews, setReadReviews] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sidebarRef = useRef(null);
+  const modalRef = useRef(null);
 
+  // Handle click outside sidebar to close it on mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        if (window.innerWidth < 992) {
+          setIsSidebarOpen(false);
+        }
+      }
+      if (showModal && modalRef.current && !modalRef.current.contains(event.target)) {
+        setShowModal(false);
+        setSelectedReview(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showModal]);
+
+  // Close sidebar when route changes on mobile
+  useEffect(() => {
+    if (window.innerWidth < 992) {
+      setIsSidebarOpen(false);
+    }
+  }, [pathname]);
+
+  // Fetch reviews data
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -31,7 +63,11 @@ export default function AdminLayout({ children }) {
             reviewData.data?.reviews?.map((review) => ({
               ...review,
               userName: review.user?.fullName || "Anonymous",
-              date: new Date(review.createdAt).toLocaleDateString("id-ID"),
+              date: new Date(review.createdAt).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
             })) || [];
           setReviews(enrichedReviews);
         }
@@ -42,6 +78,11 @@ export default function AdminLayout({ children }) {
 
     if (token) fetchReviews();
   }, [token]);
+
+  const handleLogout = () => {
+    deleteCookie("token");
+    router.push("/login");
+  };
 
   const isActive = (path) =>
     pathname === path ? "sidebar-item active" : "sidebar-item";
@@ -93,13 +134,31 @@ export default function AdminLayout({ children }) {
           --bs-body-font-family: "Poppins", sans-serif;
         }
 
+        body {
+          overflow-x: hidden;
+        }
+
         .left-sidebar {
           background-color: var(--sidebar-bg) !important;
           color: var(--sidebar-text);
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 260px;
+          height: 100vh;
+          z-index: 1000;
+          transform: translateX(-260px);
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .left-sidebar.show-sidebar {
+          transform: translateX(0);
+          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-nav .sidebar-item .sidebar-link {
           color: var(--sidebar-text);
+          transition: background-color 0.2s ease;
         }
 
         .sidebar-nav .sidebar-item:hover {
@@ -113,6 +172,7 @@ export default function AdminLayout({ children }) {
 
         .sidebar-dropdown {
           background-color: rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
         }
 
         .sidebar-subitem .sidebar-link {
@@ -131,6 +191,7 @@ export default function AdminLayout({ children }) {
         .btn-primary {
           background-color: var(--primary-color);
           border-color: var(--primary-color);
+          transition: all 0.2s ease;
         }
 
         .btn-primary:hover {
@@ -158,14 +219,50 @@ export default function AdminLayout({ children }) {
         .navbar {
           background-color: white;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 800;
         }
 
         .dropdown-menu {
           border: 1px solid var(--primary-light);
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
         }
 
         .dropdown-item:hover {
           background-color: var(--primary-light);
+        }
+
+        .list-group-item {
+          transition: all 0.2s ease;
+        }
+
+        .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 1040;
+          opacity: 1;
+        }
+
+        .modal-content {
+          background: white !important;
+          border: none !important;
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        @media (min-width: 992px) {
+          .left-sidebar {
+            transform: translateX(0);
+            position: relative;
+          }
+          
+          .body-wrapper {
+            margin-left: 260px;
+          }
         }
       `}</style>
 
@@ -178,13 +275,19 @@ export default function AdminLayout({ children }) {
         data-sidebar-position="fixed"
         data-header-position="fixed"
       >
-        <aside className="left-sidebar">
+        <aside
+          ref={sidebarRef}
+          className={`left-sidebar ${isSidebarOpen ? "show-sidebar" : ""}`}
+        >
           <div>
             <div className="brand-logo d-flex align-items-center justify-content-between">
               <a href="/login/admin/dashboard" className="text-nowrap logo-img">
                 <h2 className="text-bold text-white">ERUWAIJUARAI</h2>
               </a>
-              <div className="close-btn d-xl-none d-block sidebartoggler cursor-pointer">
+              <div
+                className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"
+                onClick={() => setIsSidebarOpen(false)}
+              >
                 <i className="ti ti-x fs-8"></i>
               </div>
             </div>
@@ -221,7 +324,6 @@ export default function AdminLayout({ children }) {
                   "bi bi-people-fill me-2",
                   "Data Kunjungan"
                 )}
-
                 {renderSidebarItem(
                   "/login/admin/data_pembayaran",
                   "bi bi-receipt",
@@ -271,6 +373,8 @@ export default function AdminLayout({ children }) {
                   className="btn sidebartoggler nav-icon me-3 d-block d-lg-none"
                   id="headerCollapse"
                   type="button"
+                  onClick={() => setIsSidebarOpen((prev) => !prev)}
+                  aria-label="Toggle sidebar"
                 >
                   <i className="ti ti-menu-2" />
                 </button>
@@ -282,29 +386,22 @@ export default function AdminLayout({ children }) {
                       type="button"
                       onClick={() => setShowModal(true)}
                       style={{ color: "var(--primary-color)" }}
+                      aria-label="Show notifications"
                     >
                       <i className="ti ti-bell-ringing fs-5" />
-                      <div className="d-flex align-items-center">
-                        <button
-                          className="btn position-relative"
-                          type="button"
-                          onClick={() => setShowModal(true)}
-                          style={{ color: "var(--primary-color)" }}
-                        >
-
-                          {reviews.length > 0 &&
-                            reviews.filter((r) => !readReviews.includes(r.id))
-                              .length > 0 && (
-                              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {
-                                  reviews.filter(
-                                    (r) => !readReviews.includes(r.id)
-                                  ).length
-                                }
-                              </span>
-                            )}
-                        </button>
-                      </div>
+                      {reviews.length > 0 &&
+                        reviews.filter((r) => !readReviews.includes(r.id))
+                          .length > 0 && (
+                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {
+                              reviews.filter((r) => !readReviews.includes(r.id))
+                                .length
+                            }
+                            <span className="visually-hidden">
+                              unread notifications
+                            </span>
+                          </span>
+                        )}
                     </button>
                   </div>
 
@@ -315,6 +412,7 @@ export default function AdminLayout({ children }) {
                       id="profileDropdown"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
+                      aria-label="User profile"
                     >
                       <Image
                         src="/assets/images/profile/user-1.jpg"
@@ -322,6 +420,7 @@ export default function AdminLayout({ children }) {
                         width={40}
                         height={40}
                         className="rounded-circle border border-2 border-primary"
+                        priority
                       />
                     </button>
                     <ul
@@ -341,13 +440,13 @@ export default function AdminLayout({ children }) {
                         <hr className="dropdown-divider" />
                       </li>
                       <li>
-                        <a
+                        <button
                           className="dropdown-item d-flex align-items-center"
-                          href="/login"
+                          onClick={handleLogout}
                         >
                           <i className="ti ti-logout me-2 text-primary"></i>{" "}
                           Logout
-                        </a>
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -360,149 +459,150 @@ export default function AdminLayout({ children }) {
         </div>
       </div>
 
+      {/* Review Modal */}
       {showModal && (
-        <div
-          className="modal fade show d-block"
-          style={{
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 1050,
-          }}
-        >
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div
-              className="modal-content border-0 rounded-4 overflow-hidden shadow"
-              style={{
-                background: "linear-gradient(to bottom, #ffffff, #f8f9fa)",
-              }}
-            >
-              <div className="modal-header bg-primary text-white py-3 px-4">
-                <h5 className="modal-title fw-bold text-white">
-                  {selectedReview
-                    ? "Detail Review"
-                    : "Daftar Review Pengunjung"}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close btn-close-white"
-                  onClick={() => {
-                    setShowModal(false);
-                    setSelectedReview(null);
-                  }}
-                />
-              </div>
+        <>
+          <div className="modal-backdrop fade show" />
+          <div
+            ref={modalRef}
+            className="modal fade show d-block"
+            tabIndex="-1"
+            role="dialog"
+            aria-modal="true"
+            style={{ zIndex: 1050 }}
+          >
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header bg-primary text-white py-3 px-4">
+                  <h5 className="modal-title fw-bold text-white">
+                    {selectedReview
+                      ? "Detail Review"
+                      : "Daftar Review Pengunjung"}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => {
+                      setShowModal(false);
+                      setSelectedReview(null);
+                    }}
+                    aria-label="Close"
+                  />
+                </div>
 
-              <div className="modal-body p-4 bg-white">
-                {selectedReview ? (
-                  <div className="row g-4">
-                    <div className="col-md-6">
-                      <label className="fw-semibold text-secondary">
-                        Nama:
-                      </label>
-                      <p className="mb-0 ">{selectedReview.user?.fullName}</p>
-                    </div>
-                    <div className="col-md-6">
-                      <label className="fw-semibold text-secondary">
-                        Rating:
-                      </label>
-                      <div className="text-warning fs-5">
-                        {"★".repeat(selectedReview.score)}
-                        {"☆".repeat(5 - selectedReview.score)}
+                <div className="modal-body p-4">
+                  {selectedReview ? (
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="fw-semibold text-secondary">
+                          Nama:
+                        </label>
+                        <p className="mb-0">{selectedReview.userName}</p>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="fw-semibold text-secondary">
+                          Rating:
+                        </label>
+                        <div className="text-warning fs-5">
+                          {"★".repeat(selectedReview.score)}
+                          {"☆".repeat(5 - selectedReview.score)}
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="fw-semibold text-secondary">
+                          Tanggal:
+                        </label>
+                        <p className="mb-0">{selectedReview.date}</p>
+                      </div>
+                      <div className="col-12">
+                        <label className="fw-semibold text-secondary">
+                          Komentar:
+                        </label>
+                        <div className="border rounded p-3 bg-light">
+                          <p className="mb-0 text-dark">
+                            {selectedReview.comment}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="col-md-6">
-                      <label className="fw-semibold text-secondary">
-                        Tanggal:
-                      </label>
-                      <p className="mb-0">{selectedReview.date}</p>
-                    </div>
-                    <div className="col-12">
-                      <label className="fw-semibold text-secondary">
-                        Komentar:
-                      </label>
-                      <div className="border rounded p-3 bg-light">
-                        <p className="mb-0 text-dark">
-                          {selectedReview.comment}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="list-group">
-                    {reviews.length > 0 ? (
-                      reviews.map((review) => (
-                        <button
-                          key={review.id}
-                          className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm ${
-                            readReviews.includes(review.id) ? "text-muted" : ""
-                          }`}
-                          onClick={() => {
-                            setSelectedReview(review);
-                            setReadReviews((prev) => [
-                              ...new Set([...prev, review.id]),
-                            ]);
-                          }}
-                          style={{
-                            backgroundColor: readReviews.includes(review.id)
-                              ? "#ffffff"
-                              : "#3d8bfd",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <div>
-                            <span
-                              className={`fw-bold ${
-                                readReviews.includes(review.id)
-                                  ? "text-dark"
-                                  : "text-white"
-                              }`}
-                            >
-                              {review.user?.fullName}
-                            </span>
-                            <br />
-                            <small
-                              className={`fw-bold ${
-                                readReviews.includes(review.id)
-                                  ? "text-dark"
-                                  : "text-white"
-                              }`}
-                            >
-                              {review.date}
-                            </small>
-                          </div>
-                          <h3
-                            className={`badge rounded-pill ${
-                              readReviews.includes(review.id)
-                                ? "bg-secondary"
-                                : "bg-primary"
+                  ) : (
+                    <div className="list-group">
+                      {reviews.length > 0 ? (
+                        reviews.map((review) => (
+                          <button
+                            key={review.id}
+                            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm ${
+                              readReviews.includes(review.id) ? "text-muted" : ""
                             }`}
+                            onClick={() => {
+                              setSelectedReview(review);
+                              setReadReviews((prev) => [
+                                ...new Set([...prev, review.id]),
+                              ]);
+                            }}
+                            style={{
+                              backgroundColor: readReviews.includes(review.id)
+                                ? "#f8f9fa"
+                                : "var(--primary-light)",
+                              cursor: "pointer",
+                            }}
                           >
-                            {review.score}/5
-                          </h3>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="text-center py-4 text-muted">
-                        Tidak ada review tersedia
-                      </div>
-                    )}
+                            <div>
+                              <span
+                                className={`fw-bold ${
+                                  readReviews.includes(review.id)
+                                    ? "text-dark"
+                                    : "text-primary"
+                                }`}
+                              >
+                                {review.userName}
+                              </span>
+                              <br />
+                              <small
+                                className={`${
+                                  readReviews.includes(review.id)
+                                    ? "text-dark"
+                                    : "text-secondary"
+                                }`}
+                              >
+                                {review.date}
+                              </small>
+                            </div>
+                            <span
+                              className={`badge rounded-pill ${
+                                readReviews.includes(review.id)
+                                  ? "bg-secondary"
+                                  : "bg-primary"
+                              }`}
+                            >
+                              {review.score}/5
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="text-center py-4 text-muted">
+                          Tidak ada review tersedia
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {selectedReview && (
+                  <div className="modal-footer bg-light border-0 px-4 py-3">
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary rounded-pill px-4"
+                      onClick={() => setSelectedReview(null)}
+                    >
+                      ← Kembali ke Daftar
+                    </button>
                   </div>
                 )}
               </div>
-
-              {selectedReview && (
-                <div className="modal-footer bg-light border-0 px-4 py-3">
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary rounded-pill px-4"
-                    onClick={() => setSelectedReview(null)}
-                  >
-                    ← Kembali ke Daftar
-                  </button>
-                </div>
-              )}
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
