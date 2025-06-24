@@ -7,16 +7,20 @@ import { FiDownload, FiFilter, FiSearch, FiCalendar } from "react-icons/fi";
 import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
 import Image from "next/image";
 import page from "@/config/page";
+import { getCookie, deleteCookie } from "cookies-next";
 
 export default function AdminPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingpdf, setLoadingPDF] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [summary, setSummary] = useState({
     totalByCategory: {},
     totalAll: 0,
   });
+    const token = getCookie("token");
+  
   const searchParams = useSearchParams();
 
   // Get parameters from URL
@@ -30,14 +34,14 @@ export default function AdminPage() {
         if (!startDate || !endDate) return;
         setLoading(true);
 
-        const queryString = new URLSearchParams({
+        const queryParams = new URLSearchParams({
           startDate,
           endDate,
           ...(category && { category }),
-        }).toString();
+        });
 
         const res = await fetch(
-          `${page.baseUrl}/api/admin/reports/purchase-report?${queryString}`,
+          `${page.baseUrl}/api/admin/reports/purchase-report?${queryParams}`,
           {
             method: "GET",
             headers: {
@@ -158,43 +162,61 @@ export default function AdminPage() {
 
   const handleGeneratePDF = async () => {
     try {
-      const requestBody = {
+      setLoadingPDF(true);
+
+      const queryParams = new URLSearchParams({
         startDate,
         endDate,
-        category: category || undefined,
-        generatePdf: true,
-      };
+        ...(category && { category }),
+      });
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/reports`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(requestBody),
-          credentials: "include",
+      // Buat URL untuk endpoint PDF
+      const pdfUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/reports/pdf/download?${queryParams}`;
+
+      // Buat request menggunakan fetch dengan header Authorization
+      const response = await fetch(pdfUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      // Handle response
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token tidak valid/expired
+          deleteCookie("token");
+          router.push("/login");
+          return;
         }
-      );
-
-      const result = await res.json(); 
-
-      if (!res.ok) {
-        console.error("Server responded with:", result);
-        throw new Error(result.message || "Failed to generate PDF");
+        throw new Error(`Gagal mengunduh PDF: ${response.statusText}`);
       }
 
-      if (result.status === "success") {
-        window.open(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}${result.fileUrl}`,
-          "_blank"
-        );
-      } else {
-        throw new Error(result.message || "Failed to generate PDF");
-      }
+      // Dapatkan blob dari response
+      const blob = await response.blob();
+
+      // Buat URL objek dari blob
+      const blobUrl = window.URL.createObjectURL(blob);
+      // setLoadingPDF(false);
+      window.open(blobUrl, "_blank");
+
+      // Buat elemen anchor untuk download
+      // const a = document.createElement("a");
+      // a.href = blobUrl;
+      // a.download = `Laporan_Tiket_${startDate}_${endDate}.pdf`;
+      // document.body.appendChild(a);
+      // a.click();
+
+      // Bersihkan
+      // window.URL.revokeObjectURL(blobUrl);
+      // a.remove();
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert(`Error: ${error.message}`);
+    } finally {
+      setLoadingPDF(false); // Matikan loading state
     }
   };
 
@@ -308,14 +330,14 @@ export default function AdminPage() {
                                 </div>
                               </td>
                               <td>
-                                {item.payment?.ticketDetails?.map((oi, i) => (
+                                {item.orderItems?.map((oi, i) => (
                                   <div key={i}>
                                     {oi.ticket?.type} ({oi.quantity})
                                   </div>
                                 ))}
                               </td>
                               <td className="text-center">
-                                {item.payment?.ticketDetails?.reduce(
+                                {item.orderItems?.reduce(
                                   (sum, oi) => sum + oi.quantity,
                                   0
                                 )}
@@ -331,21 +353,18 @@ export default function AdminPage() {
                                 )}
                               </td>
                               <td className="text-center">
-                                {getStatusBadge(item.payment?.paymentStatus)}
+                                {getStatusBadge(item.paymentStatus)}
                               </td>
                               <td className="text-center">
                                 {getVisitStatus(item.visitDate)}
                               </td>
                               <td>
                                 <span className="badge bg-light text-dark">
-                                  {item.payment?.paymentMethod}
+                                  {item.paymentMethod}
                                 </span>
                               </td>
                               <td className="text-end fw-bold">
-                                Rp{" "}
-                                {item.payment?.totalAmount?.toLocaleString(
-                                  "id-ID"
-                                )}
+                                Rp {item.totalAmount?.toLocaleString("id-ID")}
                               </td>
                             </tr>
                           ))

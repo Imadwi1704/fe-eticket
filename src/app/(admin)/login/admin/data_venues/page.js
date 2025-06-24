@@ -69,8 +69,8 @@ export default function VenueAdminPage() {
         const result = await res.json();
         setData(result);
       } catch (error) {
-        console.error("Failed to fetch data:", error);
-        showNotification("Failed to load venue data", "error");
+        console.error("Gagal mengambil data koleksi:", error);
+        showNotification("Gagal memuat data koleksi", "error");
       } finally {
         setLoading(false);
       }
@@ -85,7 +85,7 @@ export default function VenueAdminPage() {
   };
 
   const handleAddVenue = () => {
-    setVenue({ name: "", year: "", description: "", photo: "" });
+    setVenue({ name: "", year: "", description: "", category: "", photo: "" });
     setShowImage(null);
     setShowModal(true);
   };
@@ -120,10 +120,10 @@ export default function VenueAdminPage() {
       }
 
       setData(data.filter((i) => i.id !== venue.id));
-      showNotification("Venue successfully deleted");
+      showNotification("Koleksi berhasil dihapus");
     } catch (error) {
-      console.error("Error deleting venue:", error);
-      showNotification("Failed to delete venue", "error");
+      console.error("Error menghapus kolekis:", error);
+      showNotification("Gagal menghapus koleksi", "error");
     } finally {
       setIsSubmitting(false);
       setShowConfirmModal(false);
@@ -147,7 +147,7 @@ export default function VenueAdminPage() {
 
     if (file.size > 2 * 1024 * 1024) {
       // 2MB limit
-      showNotification("Image size should be less than 2MB", "error");
+      showNotification("Foto harus maksimal 2 mb", "error");
       return;
     }
 
@@ -187,7 +187,7 @@ export default function VenueAdminPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!venue.name || !venue.year) {
-      showNotification("Name and year are required fields", "error");
+      showNotification("Name dan tahun harus di isi", "error");
       return;
     }
 
@@ -202,6 +202,7 @@ export default function VenueAdminPage() {
       formData.append("name", venue.name);
       formData.append("year", venue.year);
       formData.append("description", venue.description);
+      formData.append("category", venue.category || "Tidak Diketahui");
 
       if (venue.photo instanceof File) {
         formData.append("photo", venue.photo);
@@ -217,7 +218,7 @@ export default function VenueAdminPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.metaData?.message || "Failed to save data");
+        throw new Error(errorData.metaData?.message || "Gagal menyimpan data koleksi");
       }
 
       const result = await res.json();
@@ -225,18 +226,18 @@ export default function VenueAdminPage() {
 
       if (showModal) {
         setData([...data, newVenue]);
-        showNotification("Venue successfully added");
+        showNotification("Koleksi berhasil ditambahkan");
       } else {
         setData(data.map((i) => (i.id === venue.id ? newVenue : i)));
-        showNotification("Venue successfully updated");
+        showNotification("Koleksi berhasil diperbarui");
       }
 
       setShowModal(false);
       setShowEditModal(false);
-      setVenue({ name: "", year: "", description: "", photo: "" });
+      setVenue({ name: "", year: "", description: "", category: "", photo: "" });
       setShowImage(null);
     } catch (error) {
-      console.error("Error while saving venue:", error);
+      console.error("Error menyimpan data koleksi:", error);
       showNotification(
         error.message || "Error occurred while saving data",
         "error"
@@ -250,7 +251,7 @@ export default function VenueAdminPage() {
     setShowModal(false);
     setShowEditModal(false);
     setShowConfirmModal(false);
-    setVenue({ name: "", year: "", description: "", photo: "" });
+    setVenue({ name: "", year: "", description: "", category: "", photo: "" });
     setShowImage(null);
   };
 

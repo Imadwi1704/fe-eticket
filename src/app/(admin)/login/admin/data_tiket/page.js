@@ -9,6 +9,10 @@ import {
   FiAlertTriangle,
   FiAlertCircle,
   FiTrash2,
+  FiEdit2,
+  FiPlus,
+  FiSave,
+  FiX,
 } from "react-icons/fi";
 
 export default function TicketAdminPage() {
@@ -18,11 +22,8 @@ export default function TicketAdminPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [fullName, setFullName] = useState("");
   const [ticket, setTicket] = useState({
+    id: "",
     code: "",
     type: "",
     price: "",
@@ -30,7 +31,37 @@ export default function TicketAdminPage() {
   });
 
   const token = getCookie("token");
- 
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${page.baseUrl}/api/ticket`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const result = await res.json();
+      setData(result);
+    } catch (error) {
+      console.error("Failed to fetch ticket data:", error);
+      showNotification("Gagal mengambil data tiket", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchData();
+    }
+  }, [token]);
 
   useEffect(() => {
     if (notification) {
@@ -41,48 +72,29 @@ export default function TicketAdminPage() {
     }
   }, [notification]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${page.baseUrl}/api/ticket`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          cache: "no-store",
-        });
-
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const result = await res.json();
-        setData(result);
-      } catch (error) {
-        console.error("Gagal untuk Fetch Data:", error);
-        showNotification("Gagal mengambil data tiket", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [token]);
-
   const showNotification = (message, type) => {
     setNotification({ message, type, id: Date.now() });
   };
 
- 
-
   const handleAddTicket = () => {
-    setTicket({ code: "", type: "", price: "", terms: "" });
+    setTicket({
+      id: "",
+      code: "",
+      type: "",
+      price: "",
+      terms: "",
+    });
     setShowModal(true);
   };
 
   const handleEditTicket = (item) => {
-    setTicket(item);
+    setTicket({
+      id: item.id,
+      code: item.code,
+      type: item.type,
+      price: item.price.toString(),
+      terms: item.terms.split(";").join("\n"),
+    });
     setShowEditModal(true);
   };
 
@@ -130,7 +142,7 @@ export default function TicketAdminPage() {
 
       const method = showModal ? "POST" : "PUT";
       const url = showModal
-        ? page.baseUrl + "/api/ticket"
+        ? `${page.baseUrl}/api/ticket`
         : `${page.baseUrl}/api/ticket/${ticket.id}`;
 
       const res = await fetch(url, {
@@ -203,10 +215,10 @@ export default function TicketAdminPage() {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div></div>
                 <button
-                  className="btn btn-primary d-flex align-items-center"
+                  className="btn btn-primary d-flex align-items-center gap-2"
                   onClick={handleAddTicket}
                 >
-                  <i className="bi bi-plus-circle me-2"></i>
+                  <FiPlus size={18} />
                   Tambah Tiket
                 </button>
               </div>
@@ -244,7 +256,7 @@ export default function TicketAdminPage() {
                         <tr key={`ticket-${item.id}`}>
                           <td>{idx + 1}</td>
                           <td>
-                            <span className="text-dark">
+                            <span className="  bg-opacity-10 text-dark">
                               {item.code}
                             </span>
                           </td>
@@ -256,16 +268,18 @@ export default function TicketAdminPage() {
                           <td>
                             <div className="d-flex gap-2">
                               <button
-                                className="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                                 onClick={() => handleEditTicket(item)}
                               >
-                                <i className="bi bi-pencil me-1"></i> Edit
+                                <FiEdit2 size={14} />
+                                Edit
                               </button>
                               <button
-                                className="btn btn-sm btn-outline-danger d-flex align-items-center"
+                                className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
                                 onClick={() => handleDeleteTicket(item)}
                               >
-                                <i className="bi bi-trash me-1"></i> Hapus
+                                <FiTrash2 size={14} />
+                                Hapus
                               </button>
                             </div>
                           </td>
@@ -290,8 +304,8 @@ export default function TicketAdminPage() {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
-                <h5 className="modal-title text-white">
-                  <i className="bi bi-ticket-perforated me-2"></i>
+                <h5 className="modal-title text-white d-flex align-items-center gap-2">
+                  <FiPlus size={20} />
                   Tambah Tiket Baru
                 </h5>
                 <button
@@ -367,17 +381,21 @@ export default function TicketAdminPage() {
                       Pisahkan setiap poin dengan titik koma (;) atau baris baru
                     </div>
                   </div>
-               
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-secondary d-flex align-items-center gap-2"
                       onClick={() => setShowModal(false)}
                     >
+                      <FiX size={18} />
                       Batal
                     </button>
-                    <button type="submit" className="btn btn-primary">
-                      <i className="bi bi-save me-1"></i> Simpan
+                    <button
+                      type="submit"
+                      className="btn btn-primary d-flex align-items-center gap-2"
+                    >
+                      <FiSave size={18} />
+                      Simpan
                     </button>
                   </div>
                 </form>
@@ -397,8 +415,8 @@ export default function TicketAdminPage() {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
-                <h5 className="modal-title text-white">
-                  <i className="bi bi-ticket-perforated me-2"></i>
+                <h5 className="modal-title text-white d-flex align-items-center gap-2">
+                  <FiEdit2 size={20} />
                   Edit Tiket
                 </h5>
                 <button
@@ -473,13 +491,18 @@ export default function TicketAdminPage() {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-secondary"
+                      className="btn btn-secondary d-flex align-items-center gap-2"
                       onClick={() => setShowEditModal(false)}
                     >
+                      <FiX size={18} />
                       Batal
                     </button>
-                    <button type="submit" className="btn btn-primary">
-                      <i className="bi bi-save me-1"></i> Simpan Perubahan
+                    <button
+                      type="submit"
+                      className="btn btn-primary d-flex align-items-center gap-2"
+                    >
+                      <FiSave size={18} />
+                      Simpan Perubahan
                     </button>
                   </div>
                 </form>
@@ -501,10 +524,10 @@ export default function TicketAdminPage() {
         >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 overflow-hidden">
-              <div className="modal-header bg-danger text-white py-3">
-                <h5 className="modal-title text-white d-flex align-items-center">
-                  <FiAlertCircle className="me-2" size={24} />
-                  <span className="tex-white">Konfirmasi Penghapusan</span>
+              <div className="modal-header-delete text-white py-3">
+                <h5 className="modal-title text-white d-flex align-items-center gap-2">
+                  <FiAlertCircle size={24} />
+                  <span>Konfirmasi Penghapusan</span>
                 </h5>
                 <button
                   type="button"
@@ -515,11 +538,8 @@ export default function TicketAdminPage() {
               </div>
               <div className="modal-body p-4">
                 <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25 mb-4">
-                  <div className="d-flex">
-                    <FiAlertTriangle
-                      className="me-2 mt-1 flex-shrink-0"
-                      size={20}
-                    />
+                  <div className="d-flex gap-2">
+                    <FiAlertTriangle className="mt-1 flex-shrink-0" size={20} />
                     <div>
                       <h6 className="alert-heading fw-bold mb-2">Perhatian!</h6>
                       <p className="mb-0">
@@ -562,11 +582,8 @@ export default function TicketAdminPage() {
                 </div>
 
                 <div className="alert alert-danger bg-danger bg-opacity-10 border-danger border-opacity-25">
-                  <div className="d-flex">
-                    <FiAlertCircle
-                      className="me-2 mt-1 flex-shrink-0"
-                      size={20}
-                    />
+                  <div className="d-flex gap-2">
+                    <FiAlertCircle className="mt-1 flex-shrink-0" size={20} />
                     <span className="fw-semibold">
                       Aksi ini tidak dapat dibatalkan!
                     </span>
@@ -576,17 +593,18 @@ export default function TicketAdminPage() {
               <div className="modal-footer border-0 pt-0">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary px-4 py-2 rounded-pill"
+                  className="btn btn-outline-secondary px-4 py-2 rounded-pill d-flex align-items-center gap-2"
                   onClick={() => setShowConfirmModal(false)}
                 >
+                  <FiX size={18} />
                   Batalkan
                 </button>
                 <button
                   type="button"
-                  className="btn btn-danger px-4 py-2 rounded-pill d-flex align-items-center"
+                  className="btn btn-danger px-4 py-2 rounded-pill d-flex align-items-center gap-2"
                   onClick={handleConfirmDelete}
                 >
-                  <FiTrash2 className="me-2" size={18} />
+                  <FiTrash2 size={18} />
                   <span>Hapus Permanen</span>
                 </button>
               </div>
@@ -606,7 +624,7 @@ export default function TicketAdminPage() {
               <div
                 className={`modal-header ${
                   notification.type === "success"
-                    ? "bg-gradient-success"
+                    ? "bg-gradient-primary"
                     : "bg-gradient-danger"
                 } text-white border-0`}
               >
@@ -614,7 +632,7 @@ export default function TicketAdminPage() {
                   {notification.type === "success" ? (
                     <>
                       <FiCheckCircle size={20} />
-                      <span className="text-white">Berhasil!</span>
+                      <span>Berhasil!</span>
                     </>
                   ) : (
                     <>
@@ -655,9 +673,10 @@ export default function TicketAdminPage() {
                     notification.type === "success"
                       ? "btn-success px-4 py-2"
                       : "btn-danger px-4 py-2"
-                  } rounded-pill fw-medium`}
+                  } rounded-pill fw-medium d-flex align-items-center gap-2 mx-auto`}
                   onClick={() => setNotification(null)}
                 >
+                  <FiCheckCircle size={18} />
                   Mengerti
                 </button>
               </div>
@@ -675,6 +694,12 @@ export default function TicketAdminPage() {
         }
         .modal {
           backdrop-filter: #000;
+        }
+          .modal-header-delete {
+          background: linear-gradient(135deg, #ff4d4d, #d93636);
+          color: white;
+          border-bottom: none;
+
         }
         .bg-gradient-danger {
           background: linear-gradient(135deg, #ff4d4d, #d93636);
@@ -702,6 +727,22 @@ export default function TicketAdminPage() {
         }
         .btn-outline-secondary:hover {
           background-color: #f8f9fa;
+        }
+        .table-responsive {
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        .table {
+          margin-bottom: 0;
+        }
+        .table th {
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.8rem;
+          letter-spacing: 0.5px;
+        }
+        .table td {
+          vertical-align: middle;
         }
       `}</style>
     </>

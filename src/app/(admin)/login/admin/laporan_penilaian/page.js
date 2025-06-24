@@ -193,7 +193,6 @@ export default function AdminPage() {
         throw new Error("Gagal mengunduh laporan");
       }
 
-      // Proses download PDF seperti sebelumnya
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
