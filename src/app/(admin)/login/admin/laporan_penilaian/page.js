@@ -18,7 +18,7 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 
-export default function AdminPage() {
+export default function LaporanPenilaian() {
   const [reviews, setReviews] = useState([]);
   const [filteredReviews, setFilteredReviews] = useState([]);
   const [loading, setLoading] = useState(true);

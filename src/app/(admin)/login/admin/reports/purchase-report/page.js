@@ -9,7 +9,7 @@ import Image from "next/image";
 import page from "@/config/page";
 import { getCookie, deleteCookie } from "cookies-next";
 
-export default function AdminPage() {
+export default function PurchaseReport() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingpdf, setLoadingPDF] = useState(true);

@@ -159,7 +159,7 @@ export default function DataKunjungan() {
   return (
     <>
       <Template />
-      <div className="container-fluid py-4">
+      <div className="container-fluid py-4  min-vh-100">
         <div className="card shadow-sm border-0">
           <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h2 className="card-title fw-semibold text-white mb-0">

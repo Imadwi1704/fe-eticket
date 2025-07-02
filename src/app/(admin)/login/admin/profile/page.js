@@ -8,7 +8,7 @@ export default function AdminProfile() {
     nama: "Admin ERUWAIJUARAI",
     email: "admin@museumlampung.id",
     jabatan: "Administrator",
-    foto: "", // bisa base64 atau URL foto
+    foto: "", 
   });
 
   const [editMode, setEditMode] = useState(false);

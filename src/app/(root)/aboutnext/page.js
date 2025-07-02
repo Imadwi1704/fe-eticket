@@ -197,6 +197,158 @@ export default function Aboutnext() {
         </div>
       </section>
 
+       {/* Ticket Cards Section */}
+      <section className="section-padding bg-white">
+        <div className="container">
+          <div className="row mb-3">
+            <div className=" mx-auto">
+              <h2 className="fw-bold">Tiket Museum</h2>
+              <p className="text-dark">
+                Jenis tiket yang tersedia untuk pengunjung, lengkap dengan harga
+                dan syarat ketentuan.
+              </p>
+            </div>
+          </div>
+
+          {/* Loading and error states */}
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-2">Memuat data tiket...</p>
+            </div>
+          ) : error ? (
+            <div className="alert alert-danger text-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+              <button
+                className="btn btn-sm btn-outline-danger ms-3"
+                onClick={fetchTickets}
+              >
+                Coba Lagi
+              </button>
+            </div>
+          ) : (
+            <div className="row g-4 justify-content-center">
+              {tickets.slice(0, 3).map((ticket) => (
+                <div className="col-md-3 col-sm-3 mb-3" key={ticket.id}>
+                  <motion.div
+                    className="card h-100 border-0 position-relative overflow-hidden"
+                    style={{
+                      backgroundColor: "#caf2fa",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    {/* Card Body */}
+                    <div className="card-body py-3 px-4">
+                      {/* Price */}
+                      <div className="mb-3">
+                        <h3
+                          className="fw-bold mb-3 text-dark"
+                          style={{ fontSize: "20px" }}
+                        >
+                          Tiket Masuk {ticket.type}
+                        </h3>
+                        <span
+                          className="text-dark"
+                          style={{ fontSize: "18px", fontWeight: "300" }}
+                        >
+                          Rp{ticket.price.toLocaleString("id-ID")}{" "}
+                          <span className="text-dark">/orang</span>
+                        </span>
+                      </div>
+                      <span className="text-dark fw-bold mb-2 d-block">
+                        Syarat Ketentuan:
+                      </span>
+
+                      {/* Features List */}
+                      <ul
+                        className="list-unstyled mb-3"
+                        style={{ paddingLeft: "0.5rem" }}
+                      >
+                        {ticket.terms.split("\n").map((term, index) => {
+                          const termItems = term
+                            .split(";")
+                            .filter((item) => item.trim() !== "");
+
+                          return (
+                            <Fragment key={index}>
+                              {termItems.map((item, itemIndex) => (
+                                <li
+                                  key={`${index}-${itemIndex}`}
+                                  className="mb-2 d-flex align-items-start"
+                                  style={{ lineHeight: "1.6" }}
+                                >
+                                  <i
+                                    className="bi bi-check-circle-fill text-success me-2 mt-1 flex-shrink-0"
+                                    style={{ fontSize: "1rem" }}
+                                  ></i>
+                                  <span
+                                    className="text-dark"
+                                    style={{
+                                      fontSize: "0.95rem",
+                                    }}
+                                  >
+                                    {item.trim()}
+                                  </span>
+                                </li>
+                              ))}
+                            </Fragment>
+                          );
+                        })}
+                      </ul>
+                    </div>
+
+                    {/* Card Footer */}
+                    <div className="card-footer bg-transparent border-0 pb-4 pt-0 text-center">
+                      <Link
+                        href={`/register/ticket?type=${encodeURIComponent(
+                          ticket.type
+                        )}`}
+                        passHref
+                        legacyBehavior
+                      >
+                        <motion.a
+                          className="btn btn-primary px-1 py-1 rounded-pill "
+                          style={{
+                            minWidth: "180px",
+                            fontSize: "1rem",
+                            zIndex: 1,
+                            overflow: "hidden",
+                          }}
+                          whileHover={{
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                          }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className="position-relative">
+                            Pesan Sekarang
+                          </span>
+                          <motion.span
+                            className="position-absolute top-0 left-0 w-100 h-100 bg-white"
+                            style={{
+                              opacity: 0,
+                              borderRadius: "9999px",
+                              zIndex: -1,
+                            }}
+                            whileHover={{
+                              opacity: 0.1,
+                              scale: 1.2,
+                            }}
+                          ></motion.span>
+                        </motion.a>
+                      </Link>
+                    </div>
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Info Cards */}
       <section
         className="section-padding py-5"
@@ -504,157 +656,7 @@ export default function Aboutnext() {
         </div>
       </section>
 
-      {/* Ticket Cards Section */}
-      <section className="section-padding bg-white">
-        <div className="container">
-          <div className="row mb-3">
-            <div className=" mx-auto">
-              <h2 className="fw-bold">Tiket Museum</h2>
-              <p className="text-dark">
-                Jenis tiket yang tersedia untuk pengunjung, lengkap dengan harga
-                dan syarat ketentuan.
-              </p>
-            </div>
-          </div>
-
-          {/* Loading and error states */}
-          {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p className="mt-2">Memuat data tiket...</p>
-            </div>
-          ) : error ? (
-            <div className="alert alert-danger text-center">
-              <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              {error}
-              <button
-                className="btn btn-sm btn-outline-danger ms-3"
-                onClick={fetchTickets}
-              >
-                Coba Lagi
-              </button>
-            </div>
-          ) : (
-            <div className="row g-4 justify-content-center">
-              {tickets.slice(0, 3).map((ticket) => (
-                <div className="col-md-3 col-sm-3 mb-3" key={ticket.id}>
-                  <motion.div
-                    className="card h-100 border-0 position-relative overflow-hidden"
-                    style={{
-                      backgroundColor: "#caf2fa",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    {/* Card Body */}
-                    <div className="card-body py-3 px-4">
-                      {/* Price */}
-                      <div className="mb-3">
-                        <h3
-                          className="fw-bold mb-3 text-dark"
-                          style={{ fontSize: "20px" }}
-                        >
-                          Tiket Masuk {ticket.type}
-                        </h3>
-                        <span
-                          className="text-dark"
-                          style={{ fontSize: "18px", fontWeight: "300" }}
-                        >
-                          Rp{ticket.price.toLocaleString("id-ID")}{" "}
-                          <span className="text-dark">/orang</span>
-                        </span>
-                      </div>
-                      <span className="text-dark fw-bold mb-2 d-block">
-                        Syarat Ketentuan:
-                      </span>
-
-                      {/* Features List */}
-                      <ul
-                        className="list-unstyled mb-3"
-                        style={{ paddingLeft: "0.5rem" }}
-                      >
-                        {ticket.terms.split("\n").map((term, index) => {
-                          const termItems = term
-                            .split(";")
-                            .filter((item) => item.trim() !== "");
-
-                          return (
-                            <Fragment key={index}>
-                              {termItems.map((item, itemIndex) => (
-                                <li
-                                  key={`${index}-${itemIndex}`}
-                                  className="mb-2 d-flex align-items-start"
-                                  style={{ lineHeight: "1.6" }}
-                                >
-                                  <i
-                                    className="bi bi-check-circle-fill text-success me-2 mt-1 flex-shrink-0"
-                                    style={{ fontSize: "1rem" }}
-                                  ></i>
-                                  <span
-                                    className="text-dark"
-                                    style={{
-                                      fontSize: "0.95rem",
-                                    }}
-                                  >
-                                    {item.trim()}
-                                  </span>
-                                </li>
-                              ))}
-                            </Fragment>
-                          );
-                        })}
-                      </ul>
-                    </div>
-
-                    {/* Card Footer */}
-                    <div className="card-footer bg-transparent border-0 pb-4 pt-0 text-center">
-                      <Link
-                        href={`/register/ticket?type=${encodeURIComponent(
-                          ticket.type
-                        )}`}
-                        passHref
-                        legacyBehavior
-                      >
-                        <motion.a
-                          className="btn btn-primary px-1 py-1 rounded-pill "
-                          style={{
-                            minWidth: "180px",
-                            fontSize: "1rem",
-                            zIndex: 1,
-                            overflow: "hidden",
-                          }}
-                          whileHover={{
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <span className="position-relative">
-                            Pesan Sekarang
-                          </span>
-                          <motion.span
-                            className="position-absolute top-0 left-0 w-100 h-100 bg-white"
-                            style={{
-                              opacity: 0,
-                              borderRadius: "9999px",
-                              zIndex: -1,
-                            }}
-                            whileHover={{
-                              opacity: 0.1,
-                              scale: 1.2,
-                            }}
-                          ></motion.span>
-                        </motion.a>
-                      </Link>
-                    </div>
-                  </motion.div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+     
 
       <Footer />
 
